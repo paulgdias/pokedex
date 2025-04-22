@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+    --color-fire: #f42;
+    --color-grass: #7c5;
+    --color-electric: #fc3;
+    --color-water: #39f;
+    --color-ground: #db5;
+    --color-rock: #ba6;
+    --color-poison: #a59;
+    --color-bug: #ab2;
+    --color-dragon: #76e;
+    --color-psychic: #f59;
+    --color-flying: #89f;
+    --color-fighting: #b54;
+    --color-normal: #aa9;
+    --color-ice: #6cf;
+    --color-ghost: #66b;
+    --color-steel: #aab;
+    --color-dark: #754;
+    --color-fairy: #e9e;
+}
+
+@layer base {
+    a:focus, button:focus, img:focus, input:focus,
+    a:focus-visible, button:focus-visible, img:focus-visible, input:focus-visible,
+    .pokemonCard:focus, .pokemonCard:focus-visible {
+        outline: 2px solid var(--color-sky-500);
+    }
+}
