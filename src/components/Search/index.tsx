@@ -1,53 +1,72 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, Info, X } from "lucide-react";
 
-import { Button, Input, SearchField } from "react-aria-components";
+import {
+	Button,
+	Input,
+	SearchField,
+	Tooltip,
+	TooltipTrigger,
+	Focusable,
+} from "react-aria-components";
 
 import { Pokemon } from "@customTypes/PokemonTypes";
 
+import { advancedSearch, searchRegex } from "@utils/search";
+
+import { twMerge } from "tailwind-merge";
+
 const Search = ({
+	className,
 	data,
+	value,
+	isDisabled,
 	onSubmit,
 }: {
+	className?: string;
 	data: Pokemon[];
-	onSubmit?: (results: Pokemon[]) => void;
+	value?: string;
+	isDisabled?: boolean;
+	onSubmit?: (results: Pokemon[], searches?: RegExpExecArray[]) => void;
 }) => {
 	const [search, setSearch] = useState<string>("");
 
-	const searchCallback = useCallback(
+	const searchFunction = useCallback(
 		(data: Pokemon[], search: string): Pokemon[] => {
-			if (search !== "") {
-				const searchResults = data.filter((item) => {
-					const number = Number(search);
-					if (isNaN(number)) {
-						return item.name.includes(search.toLowerCase());
-					}
-					return item.id === number;
-				});
-				return searchResults;
+			if (search === "") {
+				return data;
 			}
-			return data;
+			return advancedSearch(data, search);
 		},
 		[data, search]
 	);
 
+	useEffect(() => {
+		if (value) {
+			setSearch(value);
+		}
+	}, [value]);
+
 	return (
-		<div className="flex flex-row p-[6px_10px] my-4 mx-2">
-			<SearchIcon color="black" className="mr-2" />
+		<div
+			className={`${twMerge("flex flex-row p-[6px_10px] my-3 mx-2", className)}`}
+		>
+			<SearchIcon className="fill-white stroke-black mr-2" size={26} />
 			<SearchField
 				aria-label="Search Field"
+				className="mr-2 flex flex-row"
 				type="text"
 				onChange={(text) => {
-					setSearch(text)
+					setSearch(text);
 					if (text === "") {
 						if (onSubmit) onSubmit(data);
 					}
 				}}
 				onSubmit={(search) => {
 					if (onSubmit && search !== "") {
-						const results = searchCallback(data, search);
-						onSubmit(results);
+						const results = searchFunction(data, search);
+						onSubmit(results, [...search.matchAll(searchRegex)]);
 					}
 				}}
 				onClear={() => {
@@ -59,17 +78,32 @@ const Search = ({
 					<>
 						<Input
 							title="Search Input"
-							className={"border-1 border-black w-56"}
-							placeholder="Search by Name or Id"
+							className={
+								"bg-white border-1 border-black w-56 disabled:disabled-component"
+							}
+							placeholder="Search"
+							{...(isDisabled ? { disabled: isDisabled } : {})}
 						/>
 						{state.value !== "" && (
-							<Button className="cursor-pointer w-6">
-								<div tabIndex={0}>x</div>
+							<Button className="cursor-pointer ml-1 bg-white border-1 rounded-2xl">
+								<X />
 							</Button>
 						)}
 					</>
 				)}
 			</SearchField>
+
+			<TooltipTrigger delay={100} closeDelay={100}>
+				<Focusable>
+					<Info className="fill-white stroke-sky-700 mt-1" size={18}></Info>
+				</Focusable>
+				<Tooltip
+					placement="top"
+					className="bg-sky-700 text-white text-xs rounded-2xl p-1 ml-2"
+				>
+					Advanced Search: <br /> {`ex. +gen=1 +isLegendary=true +type=flying`}
+				</Tooltip>
+			</TooltipTrigger>
 		</div>
 	);
 };

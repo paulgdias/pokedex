@@ -2,122 +2,39 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
 import { request, gql } from "graphql-request";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 import { Button } from "react-aria-components";
-import {
-	ArrowUpNarrowWide, // asc
-	ArrowDownWideNarrow, // desc
-	ArrowUp,
-} from "lucide-react";
+import { ArrowUp, ChevronsLeft, ChevronsRight, Funnel } from "lucide-react";
 
 import PokemonCard from "@components/PokemonCard";
 import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
+import Search from "@components/Search";
+import SortingArrow from "@components/Buttons/SortingArrow";
 
 import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
+import { Sort, Sorting } from "@customTypes/SortingTypes";
+import { PokedexSetState } from "@customTypes/PokedexTypes";
+
 import {
-	Sort,
-	SortingItem,
-	Sorting,
-	SortFunction,
-} from "@customTypes/SortingTypes";
+	advancedSearch,
+	createURLSearchParams,
+	convertToSearch,
+} from "@utils/search";
+import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
 
 import { buttonClass, gridClass } from "@styles/Pokedex";
-import Search from "@components/Search";
+import { twMerge } from "tailwind-merge";
+const toggleButtonClass = twMerge(buttonClass, "w-12");
 
-const defaultDescSort: SortingItem = {
-	sort: "desc",
-	selected: false,
-};
-const defaultSorting: Sorting = {
-	name: defaultDescSort,
-	id: defaultDescSort,
-	type: defaultDescSort,
-	isLegendary: defaultDescSort,
-	isMythical: defaultDescSort,
-};
-const getSortingKey = (sorting: Sorting) => {
-	return Object.keys(sorting).find((key) => {
-		const typedKey = key as keyof Sorting;
-		return sorting[typedKey].selected === true;
-	});
-};
-
-const basicSortByPokemon = (pokemonData: Pokemon[]): Pokemon[] => {
-	return [...pokemonData].sort((a: Pokemon, b: Pokemon) => a.id - b.id);
-};
-const sortPokemonByType: SortFunction = (pokemonData, sorting, sort) => {
-	if (sort === "id") {
-		return [...pokemonData].sort((a: Pokemon, b: Pokemon) =>
-			sorting[sort].sort === "asc" ? b.id - a.id : a.id - b.id
-		);
-	}
-	if (sort === "type") {
-		return basicSortByPokemon([...pokemonData]).sort(
-			(a: Pokemon, b: Pokemon) =>
-				sorting[sort].sort === "asc"
-					? b.types[0].type.name.localeCompare(a.types[0].type.name)
-					: a.types[0].type.name.localeCompare(b.types[0].type.name)
-		);
-	}
-	if (sort === "isLegendary") {
-		return basicSortByPokemon([...pokemonData]).sort(
-			(a: Pokemon, b: Pokemon) =>
-				sorting[sort].sort === "desc"
-					? b.specs.is_legendary
-						? 1
-						: -1
-					: a.specs.is_legendary
-						? -1
-						: 1
-		);
-	}
-	if (sort === "isMythical") {
-		return basicSortByPokemon([...pokemonData]).sort(
-			(a: Pokemon, b: Pokemon) =>
-				sorting[sort].sort === "desc"
-					? b.specs.is_mythical
-						? 1
-						: -1
-					: a.specs.is_mythical
-						? -1
-						: 1
-		);
-	}
-
-	if (sort === "name") {
-		return basicSortByPokemon([...pokemonData]).sort(
-			(a: Pokemon, b: Pokemon) =>
-				sorting[sort].sort === "desc"
-					? a.name.localeCompare(b.name)
-					: b.name.localeCompare(a.name)
-		);
-	}
-	return basicSortByPokemon(pokemonData);
-};
-
-const SortingArrow = ({ sort }: { sort: Sort }) => {
-	if (sort === "asc") {
-		return <ArrowUpNarrowWide />;
-	}
-
-	return <ArrowDownWideNarrow />;
-};
-
-const setState = ({
+const setState: PokedexSetState = ({
 	pokemonData,
 	sorting,
 	sort,
 	setSorting,
 	setPokemonData,
-	setSearchParams,
-}: {
-	pokemonData: Pokemon[];
-	sorting: Sorting;
-	sort: keyof Sorting;
-	setSorting: Function;
-	setPokemonData: Function;
-	setSearchParams: Function;
+	urlParams,
+	setURLParams,
 }) => {
 	const data = sortPokemonByType(pokemonData, sorting, sort);
 	setSorting({
@@ -129,14 +46,27 @@ const setState = ({
 	});
 	setPokemonData(data);
 
-	const params = new URLSearchParams();
-	params.set(sort, sorting[sort].sort === "asc" ? "desc" : "asc");
-	setSearchParams(params);
+	const params: Record<string, string> = {
+		sort: `${sort}:${sorting[sort].sort === "asc" ? "desc" : "asc"}`,
+	};
+
+	if (urlParams) {
+		for (const [key, value] of urlParams) {
+			if (!params[key]) {
+				params[key] = value;
+			}
+		}
+	}
+
+	setURLParams(params, {
+		preventScrollReset: true,
+	});
 };
 
 const Pokedex: React.FC = () => {
 	const navigate = useNavigate();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [urlParams, setURLParams] = useSearchParams();
+	const [showFilters, setShowFilters] = useState<boolean>(false);
 	const [sorting, setSorting] = useState<Sorting>({
 		...defaultSorting,
 		id: {
@@ -145,7 +75,8 @@ const Pokedex: React.FC = () => {
 		},
 	});
 	const [pokemonData, setPokemonData] = React.useState<Pokemon[]>([]);
-	const { data, isLoading } = useQuery<PokedexResult>({
+
+	const { data, isLoading } = useQuery<PokedexResult, Error>({
 		queryKey: ["pokedex"],
 		queryFn: async (): Promise<PokedexResult> => {
 			const query = gql`
@@ -177,36 +108,54 @@ const Pokedex: React.FC = () => {
 			);
 			return data;
 		},
+		placeholderData: keepPreviousData,
 	});
 
 	useEffect(() => {
-		const params = new URLSearchParams();
-		if (searchParams.size === 0) {
-			params.set("id", sorting.id.sort);
-			setSearchParams(params, {
-				preventScrollReset: true,
-			});
-		} else {
-			const history = Object.entries(Object.fromEntries(searchParams))[0];
-			params.set(history[0], history[1]);
-			setSearchParams(params, {
-				preventScrollReset: true,
-			});
-
-			setSorting({
-				...defaultSorting,
-				[history[0]]: {
-					sort: history[1],
-					selected: true,
+		let params: { sort: string; query?: string } = {
+			sort: "",
+		};
+		if (urlParams.size === 0) {
+			setURLParams(
+				{
+					...params,
+					sort: `id:${sorting.id.sort}`,
 				},
-			});
+				{
+					preventScrollReset: true,
+				}
+			);
+		} else {
+			for (const [key, value] of urlParams) {
+				params = {
+					...params,
+					[key]: value,
+				};
+			}
+			if (params) {
+				setURLParams(params, {
+					preventScrollReset: true,
+				});
+
+				const values = params.sort.split(":");
+				setSorting({
+					...defaultSorting,
+					[values[0]]: {
+						sort: values[1] ?? "asc",
+						selected: true,
+					},
+				});
+			}
 		}
 	}, []);
 
 	useEffect(() => {
 		if (data) {
-			const pokemonData = data.pokemon;
+			const pokemonData = urlParams.has("query")
+				? advancedSearch(data.pokemon, convertToSearch(urlParams))
+				: data.pokemon;
 			const sort = getSortingKey(sorting);
+
 			if (sort) {
 				setPokemonData(
 					sortPokemonByType(
@@ -233,19 +182,72 @@ const Pokedex: React.FC = () => {
 	return (
 		<>
 			<div className="flex flex-col items-center justify-center">
-				<div className="flex flex-row flex-wrap w-full mb-4 md:sticky md:top-0 md:z-1 bg-white rounded-2xl border-2 border-black">
-					<div className="p-[6px_10px] mb-4 mt-4">Sort By:</div>
+				<div
+					className={`flex max-md:flex-col flex-row flex-wrap w-full mb-2 sticky top-0 z-1`}
+				>
+					<div className="flex flex-row">
+						<Funnel className="my-auto mx-1 fill-sky-400" />
+						<Button
+							aria-label={`${showFilters ? "Show Filters" : "Hide Filters"}`}
+							className={`${toggleButtonClass} bg-white`}
+							onPress={() => setShowFilters(!showFilters)}
+						>
+							<div className="flex">
+								{showFilters ? (
+									<ChevronsLeft className="h-6 w-6 text-black" />
+								) : (
+									<ChevronsRight className="h-6 w-6 text-black" />
+								)}
+							</div>
+						</Button>
+					</div>
+					<Search
+						className={`${showFilters ? "" : "hidden invisible"}`}
+						data={data?.pokemon || []}
+						value={convertToSearch(urlParams)}
+						isDisabled={isLoading}
+						onSubmit={(results, searches) => {
+							const sort = getSortingKey(sorting);
+							if (sort) {
+								const sortingConfig = {
+									...defaultSorting,
+									[sort]: {
+										sort: (sorting?.[sort as keyof Sorting].sort === "asc"
+											? "desc"
+											: "asc") as Sort,
+										selected: true,
+									},
+								};
+
+								setState({
+									pokemonData: sortPokemonByType(
+										results,
+										sortingConfig,
+										sort as keyof Sorting
+									),
+									setPokemonData,
+									sorting: sortingConfig,
+									sort: sort as keyof Sorting,
+									setSorting,
+									urlParams: createURLSearchParams(searches),
+									setURLParams,
+								});
+							}
+						}}
+					/>
 					<Button
 						aria-label="Filter by Id"
-						className={buttonClass}
+						className={`${buttonClass} bg-white ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
+						isDisabled={isLoading}
 						onPress={() => {
 							setState({
 								pokemonData,
+								setPokemonData,
 								sorting,
 								sort: "id",
 								setSorting,
-								setPokemonData,
-								setSearchParams,
+								urlParams,
+								setURLParams,
 							});
 						}}
 					>
@@ -258,15 +260,17 @@ const Pokedex: React.FC = () => {
 					</Button>
 					<Button
 						aria-label="Filter by Name"
-						className={buttonClass}
+						className={`${buttonClass} bg-white ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
+						isDisabled={isLoading}
 						onPress={() => {
 							setState({
 								pokemonData,
+								setPokemonData,
 								sorting,
 								sort: "name",
 								setSorting,
-								setPokemonData,
-								setSearchParams,
+								urlParams,
+								setURLParams,
 							});
 						}}
 					>
@@ -279,15 +283,17 @@ const Pokedex: React.FC = () => {
 					</Button>
 					<Button
 						aria-label="Filter by Type"
-						className={buttonClass}
+						className={`${buttonClass} bg-white ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
+						isDisabled={isLoading}
 						onPress={() => {
 							setState({
 								pokemonData,
+								setPokemonData,
 								sorting,
 								sort: "type",
 								setSorting,
-								setPokemonData,
-								setSearchParams,
+								urlParams,
+								setURLParams,
 							});
 						}}
 					>
@@ -300,15 +306,17 @@ const Pokedex: React.FC = () => {
 					</Button>
 					<Button
 						aria-label="Filter by Legendary"
-						className={`${buttonClass} bg-gray-300 hover:bg-gray-200`}
+						className={`${buttonClass} bg-gray-300 hover:bg-gray-200 ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
+						isDisabled={isLoading}
 						onPress={() => {
 							setState({
 								pokemonData,
+								setPokemonData,
 								sorting,
 								sort: "isLegendary",
 								setSorting,
-								setPokemonData,
-								setSearchParams,
+								urlParams,
+								setURLParams,
 							});
 						}}
 					>
@@ -321,15 +329,17 @@ const Pokedex: React.FC = () => {
 					</Button>
 					<Button
 						aria-label="Filter by Mythical"
-						className={`${buttonClass} bg-yellow-400 hover:bg-yellow-300`}
+						className={`${buttonClass} bg-yellow-400 hover:bg-yellow-300 ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
+						isDisabled={isLoading}
 						onPress={() => {
 							setState({
 								pokemonData,
+								setPokemonData,
 								sorting,
 								sort: "isMythical",
 								setSorting,
-								setPokemonData,
-								setSearchParams,
+								urlParams,
+								setURLParams,
 							});
 						}}
 					>
@@ -340,34 +350,10 @@ const Pokedex: React.FC = () => {
 							) : null}
 						</div>
 					</Button>
-					<Search
-						data={data?.pokemon || []}
-						onSubmit={(search) => {
-							const sort = getSortingKey(sorting);
-							if (sort) {
-								setPokemonData(
-									sortPokemonByType(
-										search,
-										{
-											...defaultSorting,
-											[sort]: {
-												sort:
-													sorting?.[sort as keyof Sorting].sort === "asc"
-														? "desc"
-														: "asc",
-												selected: true,
-											},
-										},
-										sort as keyof Sorting
-									)
-								);
-							}
-						}}
-					/>
 				</div>
 				<div className={gridClass}>
 					{isLoading
-						? new Array(18)
+						? new Array(36)
 								.fill(0)
 								.map((_, index) => <PlaceholderCard key={index} />)
 						: pokemonData.map((pokemon: Pokemon, index: number) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { LinkedIn, GitHub, Email } from "../components/icons/Logos";
+import { LinkedIn, GitHub, Email } from "@components/Icons/Logos";
 
 const logo: string = new URL("../images/profile.jpg", import.meta.url).href;
 

@@ -53,7 +53,7 @@ const Nav: React.FC<NavProps> = ({ selected, onSelect }) => {
 			</div>
 
 			{/* Toggle Button */}
-			<nav className={`grid gap-4 bg-gray-700`}>
+			<nav className={`grid gap-4 bg-gray-700 max-sm:hidden max-sm:invisible`}>
 				<Button
 					aria-label={isOpen ? "Collapse Menu" : "Expand Menu"}
 					className="text-white cursor-pointer hover:bg-gray-600"

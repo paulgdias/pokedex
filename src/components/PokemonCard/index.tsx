@@ -1,19 +1,21 @@
-import { Ban, Sparkles} from "lucide-react";
+import { Ban, Sparkles } from "lucide-react";
 
 import { useInView } from "react-intersection-observer";
 
+import { PurePlaceholderCard as PlaceholderCard } from "./PlaceholderCard";
+
 import { typeColors, Pokemon } from "@customTypes/PokemonTypes";
 
-import { twMerge } from 'tailwind-merge';
+import { twMerge } from "tailwind-merge";
 import {
-    cardClass,
-    imgClass,
-    cardStatsClass,
-    pokedexIdClass,
+	cardClass,
+	imgClass,
+	cardStatsClass,
+	pokedexIdClass,
 	placeholderClass,
-    legendaryPokemonClass,
-    mythicalPokemonClass,
-    placeholderImg
+	legendaryPokemonClass,
+	mythicalPokemonClass,
+	placeholderImg,
 } from "@styles/Pokedex";
 
 const PokemonCard = ({
@@ -21,20 +23,20 @@ const PokemonCard = ({
 	pokemon,
 	isLegendary,
 	isMythical,
-	navigateCallback
+	navigateCallback,
 }: {
-	className?: string,
+	className?: string;
 	pokemon: Pokemon;
 	isLegendary: boolean;
 	isMythical: boolean;
-	navigateCallback?: Function 
+	navigateCallback?: Function;
 }) => {
 	const { ref, inView } = useInView({
-		threshold: 0,
+		threshold: 0.25,
 		triggerOnce: true,
 	});
 
-	return (	
+	return (
 		<div ref={ref}>
 			{inView ? (
 				<div
@@ -44,13 +46,13 @@ const PokemonCard = ({
 					className={`pokemonCard ${twMerge(cardClass, className)}`}
 					onClick={() => {
 						if (navigateCallback) {
-							navigateCallback(pokemon)
+							navigateCallback(pokemon);
 						}
 					}}
 					onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
 						if (navigateCallback) {
 							if (event.code === "Enter") {
-								navigateCallback(pokemon)
+								navigateCallback(pokemon);
 							}
 						}
 					}}
@@ -63,10 +65,11 @@ const PokemonCard = ({
 							alt={pokemon.name}
 							className={`${imgClass} bg-gray-500`}
 							src={placeholderImg}
-							onLoad={(e) =>
-								(e.currentTarget.src =
-									pokemon.sprites[0].default || placeholderImg)
-							}
+							onLoad={(e) => {
+								if (e.currentTarget.src === placeholderImg) {
+									e.currentTarget.src = pokemon.sprites[0].default || "";
+								}
+							}}
 						/>
 					) : (
 						<Ban
@@ -77,7 +80,9 @@ const PokemonCard = ({
 					<div className="px-6 py-4">
 						<div className={cardStatsClass}>
 							<div className={pokedexIdClass}>#{pokemon.id}</div>
-							<span title={pokemon.name} className="truncate block">{pokemon.name}</span>
+							<span title={pokemon.name} className="truncate block">
+								{pokemon.name}
+							</span>
 						</div>
 					</div>
 					<div className="px-2 py-2">
@@ -102,7 +107,9 @@ const PokemonCard = ({
 						)}
 					</div>
 				</div>
-			) : null}
+			) : (
+				<PlaceholderCard />
+			)}
 		</div>
 	);
 };
