@@ -28,7 +28,7 @@ const PokemonList = ({
 				{({ height, width }) => {
 					const columnCount = Math.floor(width / 210);
 					const columnWidth = width / columnCount;
-					const rowHeight = columnWidth * 1.75;
+					const rowHeight = columnWidth * 1.65;
 					const itemCount = list.length
 						? list.length
 						: columnCount ** columnCount;
