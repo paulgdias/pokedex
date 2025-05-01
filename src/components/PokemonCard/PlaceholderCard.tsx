@@ -1,4 +1,6 @@
-import { useInView } from "react-intersection-observer";
+import { CSSProperties } from "react";
+
+import { twMerge } from "tailwind-merge";
 
 import {
 	cardClass,
@@ -9,13 +11,20 @@ import {
 	placeholderImg,
 } from "@styles/Pokedex";
 
-const PurePlaceholderCard = ({
-	animated = false
+const PlaceholderCard = ({
+	className,
+	style,
+	animated = false,
 }: {
-	animated?: boolean
+	className?: string;
+	style?: CSSProperties;
+	animated?: boolean;
 }) => {
 	return (
-		<div className={`${cardClass} ${animated && "animate-pulse"}`}>
+		<div
+			className={`${twMerge(cardClass, className)} ${animated && "animate-pulse"}`}
+			style={style}
+		>
 			<img
 				title="Placeholder Card"
 				alt="Placeholder Card"
@@ -37,22 +46,4 @@ const PurePlaceholderCard = ({
 	);
 };
 
-const PlaceholderCardInView = () => {
-	const { ref, inView } = useInView({
-		threshold: 0.25,
-		triggerOnce: true,
-	});
-
-	return (
-		<div ref={ref}>
-			{inView ? (
-				<PurePlaceholderCard animated={false}/>
-			) : null}
-		</div>
-	);
-};
-
-export default PlaceholderCardInView;
-export {
-	PurePlaceholderCard
-};
+export default PlaceholderCard;

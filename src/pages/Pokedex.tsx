@@ -5,7 +5,7 @@ import { request, gql } from "graphql-request";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 import { Button } from "react-aria-components";
-import { ArrowUp, ChevronsLeft, ChevronsRight, Funnel } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, Funnel } from "lucide-react";
 
 import Search from "@components/Search";
 import SortingArrow from "@components/Buttons/SortingArrow";
@@ -177,9 +177,13 @@ const Pokedex: React.FC = () => {
 		}
 	}, [data]);
 
+	const scrollToPosition = () => {};
+
 	return (
 		<>
-			<div className="flex flex-col items-center justify-center">
+			<div className="flex flex-col">
+				{" "}
+				{/* items-center justify-center */}
 				<div
 					className={`flex max-md:flex-col flex-row flex-wrap w-full mb-2 sticky top-0 z-1`}
 				>
@@ -350,15 +354,6 @@ const Pokedex: React.FC = () => {
 					</Button>
 				</div>
 				<PokemonList list={pokemonData} isLoading={isLoading} />
-				<Button
-					aria-label="Go to Top of Page"
-					className="fixed rounded-full bottom-0 right-0 m-4 cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105"
-					onPress={() =>
-						(document.getElementsByClassName("page")[0].scrollTop = 0)
-					}
-				>
-					<ArrowUp color="white" size={42} />
-				</Button>
 			</div>
 		</>
 	);

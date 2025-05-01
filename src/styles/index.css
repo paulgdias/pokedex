@@ -23,9 +23,11 @@
 
 @layer base {
     a:focus, button:focus, img:focus, input:focus, svg:focus,
-    a:focus-visible, button:focus-visible, img:focus-visible, input:focus-visible, svg:focus-visible,
-    .pokemonCard:focus, .pokemonCard:focus-visible {
+    a:focus-visible, button:focus-visible, img:focus-visible, input:focus-visible, svg:focus-visible {
         outline: 2px solid var(--color-sky-500);
+    }
+    .pokemonCard:focus, .pokemonCard:focus-visible {
+      outline: none;
     }
 }
 
