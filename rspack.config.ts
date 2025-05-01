@@ -70,7 +70,7 @@ module.exports = {
     historyApiFallback: true,
     hot: true,
     client: {
-      overlay: true,
+      overlay: false,
     },
     liveReload: true,
     compress: true,

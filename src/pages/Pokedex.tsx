@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 import { request, gql } from "graphql-request";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
@@ -7,10 +7,9 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Button } from "react-aria-components";
 import { ArrowUp, ChevronsLeft, ChevronsRight, Funnel } from "lucide-react";
 
-import PokemonCard from "@components/PokemonCard";
-import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 import Search from "@components/Search";
 import SortingArrow from "@components/Buttons/SortingArrow";
+import PokemonList from "@components/PokemonList";
 
 import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
 import { Sort, Sorting } from "@customTypes/SortingTypes";
@@ -23,7 +22,7 @@ import {
 } from "@utils/search";
 import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
 
-import { buttonClass, gridClass } from "@styles/Pokedex";
+import { buttonClass } from "@styles/Pokedex";
 import { twMerge } from "tailwind-merge";
 const toggleButtonClass = twMerge(buttonClass, "w-12");
 
@@ -64,7 +63,6 @@ const setState: PokedexSetState = ({
 };
 
 const Pokedex: React.FC = () => {
-	const navigate = useNavigate();
 	const [urlParams, setURLParams] = useSearchParams();
 	const [showFilters, setShowFilters] = useState<boolean>(false);
 	const [sorting, setSorting] = useState<Sorting>({
@@ -351,41 +349,16 @@ const Pokedex: React.FC = () => {
 						</div>
 					</Button>
 				</div>
-				<div className={gridClass}>
-					{isLoading
-						? new Array(36)
-								.fill(0)
-								.map((_, index) => <PlaceholderCard key={index} />)
-						: pokemonData.map((pokemon: Pokemon, index: number) => {
-								const { is_legendary: isLegendary, is_mythical: isMythical } =
-									pokemon.specs;
-								return (
-									<PokemonCard
-										key={index}
-										pokemon={pokemon}
-										isLegendary={isLegendary}
-										isMythical={isMythical}
-										navigateCallback={(pokemon: Pokemon) => {
-											navigate(`/pokedex/${pokemon.name}`, {
-												state: {
-													pokemon: pokemon,
-													previous: location.pathname + location.search,
-												},
-											});
-										}}
-									/>
-								);
-							})}
-					<Button
-						aria-label="Go to Top of Page"
-						className="fixed rounded-full bottom-0 right-0 m-4 cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105"
-						onPress={() =>
-							(document.getElementsByClassName("page")[0].scrollTop = 0)
-						}
-					>
-						<ArrowUp color="white" size={42} />
-					</Button>
-				</div>
+				<PokemonList list={pokemonData} isLoading={isLoading} />
+				<Button
+					aria-label="Go to Top of Page"
+					className="fixed rounded-full bottom-0 right-0 m-4 cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105"
+					onPress={() =>
+						(document.getElementsByClassName("page")[0].scrollTop = 0)
+					}
+				>
+					<ArrowUp color="white" size={42} />
+				</Button>
 			</div>
 		</>
 	);

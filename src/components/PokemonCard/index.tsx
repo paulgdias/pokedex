@@ -32,8 +32,8 @@ const PokemonCard = ({
 	navigateCallback?: Function;
 }) => {
 	const { ref, inView } = useInView({
-		threshold: 0.25,
-		triggerOnce: true,
+		threshold: 0.10,
+		// triggerOnce: true,
 	});
 
 	return (

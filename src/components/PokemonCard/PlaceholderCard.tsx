@@ -46,7 +46,7 @@ const PlaceholderCardInView = () => {
 	return (
 		<div ref={ref}>
 			{inView ? (
-				<PurePlaceholderCard animated={true}/>
+				<PurePlaceholderCard animated={false}/>
 			) : null}
 		</div>
 	);

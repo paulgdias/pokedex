@@ -99,7 +99,7 @@ const Search = ({
 				</Focusable>
 				<Tooltip
 					placement="top"
-					className="bg-sky-700 text-white text-xs rounded-2xl p-1 ml-2"
+					className="bg-sky-700 text-white text-xs p-2 ml-2"
 				>
 					Advanced Search: <br /> {`ex. +gen=1 +isLegendary=true +type=flying`}
 				</Tooltip>

@@ -1,6 +1,5 @@
 const buttonClass = `
-    w-[140px]
-    rounded-full align-middle text-center text-base p-[6px_10px] no-underline
+    w-[140px] rounded-full p-[6px_10px]
     border border-black font-semibold text-black cursor-pointer my-3 mx-2
     transition-transform duration-300 ease-out transform hover:scale-105 focus:scale-105
 `;
