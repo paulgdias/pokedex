@@ -29,22 +29,17 @@ const PokemonList = ({
 					const columnCount = Math.floor(width / 210);
 					const columnWidth = width / columnCount;
 					const rowHeight = columnWidth * 1.75;
+					const itemCount = list.length
+						? list.length
+						: columnCount ** columnCount;
+					const rowCount = itemCount / columnCount;
 					const gridGap = 20;
 
 					return (
 						<Grid
 							ref={grid}
-							cellRenderer={({
-								key,
-								columnIndex,
-								rowIndex,
-								style,
-							}) => {
-								const index = columnIndex + rowIndex * 6;
-								const { is_legendary: isLegendary, is_mythical: isMythical } =
-									list[index].specs;
-
-								if (isLoading) {
+							cellRenderer={({ key, columnIndex, rowIndex, style }) => {
+								if (isLoading || list.length === 0) {
 									return (
 										<PlaceholderCard
 											key={key}
@@ -56,6 +51,10 @@ const PokemonList = ({
 										/>
 									);
 								}
+
+								const index = columnIndex + rowIndex * 6;
+								const { is_legendary: isLegendary, is_mythical: isMythical } =
+									list[index].specs;
 
 								return (
 									<PokemonCard
@@ -81,13 +80,13 @@ const PokemonList = ({
 								);
 							}}
 							height={height}
-							rowCount={list.length / columnCount}
-							columnCount={columnCount}
-							columnWidth={columnWidth}
 							rowHeight={rowHeight}
+							rowCount={rowCount}
+							columnCount={columnCount}
 							width={width}
+							columnWidth={columnWidth}
 							tabIndex={-1}
-							overscanRowCount={6}
+							overscanRowCount={columnCount}
 						/>
 					);
 				}}
