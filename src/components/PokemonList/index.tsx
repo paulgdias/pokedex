@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 
 import { Grid, AutoSizer } from "react-virtualized";
@@ -29,6 +29,15 @@ const PokemonList = ({
 }) => {
     const grid = useRef<Grid | null>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (grid.current) {
+            grid.current.scrollToPosition({
+                scrollLeft: 0,
+                scrollTop: 0,
+            });
+        }
+    }, [grid, pokemon]);
 
     if (!isLoading && pokemon.length === 0) {
         return <div className="flex justify-center mt-[50dvh]">No Results</div>;
