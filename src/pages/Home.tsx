@@ -1,9 +1,13 @@
 import React from "react";
+import { preload } from "react-dom";
 import { LinkedIn, GitHub, Email } from "@components/Icons/Logos";
 
 const logo: string = new URL("../images/profile.jpg", import.meta.url).href;
 
 const Home: React.FC = () => {
+    preload(logo, {
+        as: "image",
+    });
     return (
         <>
             <div className="flex flex-col items-center justify-center">

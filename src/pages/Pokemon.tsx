@@ -52,7 +52,7 @@ const Pokemon: React.FC = () => {
             >
                 <ArrowLeft color="white" size={42} />
             </Button>
-            <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-start">
+            <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
                 <PokemonCard
                     ref={pokemonRef}
                     className="max-w-sm hover:shadow-lg cursor-auto m-auto"

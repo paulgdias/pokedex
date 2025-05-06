@@ -89,7 +89,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                         return (
                             <span
                                 key={index}
-                                className={`inline-block ${typeColors[types.type.name]} ${placeholderClass}`}
+                                className={`inline-block ${typeColors[types.type.name]} ${placeholderClass} min-w-12 text-center`}
                             >
                                 {types.type.name}
                             </span>
