@@ -43,8 +43,8 @@ export const sortPokemonByType: SortFunction = (pokemonData, sorting, sort) => {
                         ? 1
                         : -1
                     : a.specs.is_legendary
-                        ? -1
-                        : 1
+                      ? -1
+                      : 1
         );
     }
     if (sort === "isMythical") {
@@ -55,8 +55,8 @@ export const sortPokemonByType: SortFunction = (pokemonData, sorting, sort) => {
                         ? 1
                         : -1
                     : a.specs.is_mythical
-                        ? -1
-                        : 1
+                      ? -1
+                      : 1
         );
     }
 

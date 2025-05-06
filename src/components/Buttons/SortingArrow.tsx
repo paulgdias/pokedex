@@ -1,16 +1,17 @@
+import React from "react";
 import {
-	ArrowUpNarrowWide, // asc
-	ArrowDownWideNarrow, // desc
+    ArrowUpNarrowWide, // asc
+    ArrowDownWideNarrow, // desc
 } from "lucide-react";
 
 import { Sort } from "@customTypes/SortingTypes";
 
 const SortingArrow = ({ sort }: { sort: Sort }) => {
-	if (sort === "asc") {
-		return <ArrowUpNarrowWide />;
-	}
+    if (sort === "asc") {
+        return <ArrowUpNarrowWide />;
+    }
 
-	return <ArrowDownWideNarrow />;
+    return <ArrowDownWideNarrow />;
 };
 
 export default SortingArrow;

@@ -22,48 +22,59 @@
 }
 
 @layer base {
-    a:focus, button:focus, img:focus, input:focus, svg:focus,
-    a:focus-visible, button:focus-visible, img:focus-visible, input:focus-visible, svg:focus-visible {
+    a:focus,
+    button:focus,
+    img:focus,
+    input:focus,
+    svg:focus,
+    a:focus-visible,
+    button:focus-visible,
+    img:focus-visible,
+    input:focus-visible,
+    svg:focus-visible {
         outline: 2px solid var(--color-sky-500);
     }
-    .pokemonCard:focus, .pokemonCard:focus-visible {
-      outline: none;
+    .pokemonCard:focus,
+    .pokemonCard:focus-visible {
+        outline: none;
     }
 }
 
 @utility disabled-component {
-  cursor: not-allowed;
-  background-color: var(--color-gray-100);
-  border-color: var(--color-gray-300);
+    cursor: not-allowed;
+    background-color: var(--color-gray-100);
+    border-color: var(--color-gray-300);
 }
 
 .react-aria-Tooltip {
     transform: translate3d(0, 0, 0);
-    transition: transform 200ms, opacity 200ms;
-  
+    transition:
+        transform 200ms,
+        opacity 200ms;
+
     &[data-entering],
     &[data-exiting] {
-      transform: var(--origin);
-      opacity: 0;
+        transform: var(--origin);
+        opacity: 0;
     }
-  
-    &[data-placement=top] {
-      margin-bottom: 8px;
-      --origin: translateY(4px);
+
+    &[data-placement="top"] {
+        margin-bottom: 8px;
+        --origin: translateY(4px);
     }
-  
-    &[data-placement=bottom] {
-      margin-top: 8px;
-      --origin: translateY(-4px);
+
+    &[data-placement="bottom"] {
+        margin-top: 8px;
+        --origin: translateY(-4px);
     }
-  
-    &[data-placement=right] {
-      margin-left: 8px;
-      --origin: translateX(-4px);
+
+    &[data-placement="right"] {
+        margin-left: 8px;
+        --origin: translateX(-4px);
     }
-  
-    &[data-placement=left] {
-      margin-right: 8px;
-      --origin: translateX(4px);
+
+    &[data-placement="left"] {
+        margin-right: 8px;
+        --origin: translateX(4px);
     }
 }
