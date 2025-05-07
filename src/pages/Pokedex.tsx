@@ -4,9 +4,6 @@ import { preconnect } from "react-dom";
 
 import { useLocalStorage } from "@uidotdev/usehooks";
 
-import { request, gql } from "graphql-request";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-
 import { Button } from "react-aria-components";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 
@@ -19,9 +16,11 @@ import PlaceholderList from "@components/PokemonList/PlaceholderList";
 
 import { ErrorBoundary } from "react-error-boundary";
 
-import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
+import { Pokemon } from "@customTypes/PokemonTypes";
 import { Sort, Sorting } from "@customTypes/SortingTypes";
 import { PokedexSetState } from "@customTypes/PokedexTypes";
+
+import useFetchPokedex from "@api/hooks";
 
 import {
     advancedSearch,
@@ -33,28 +32,6 @@ import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
 import { buttonClass } from "@styles/Pokedex";
 import { twMerge } from "tailwind-merge";
 const toggleButtonClass = twMerge(buttonClass, "w-12");
-
-const getPokemonEvolutions = (data: PokedexResult) => {
-    if (data) {
-        const groupedPokemonData = data.pokemon.reduce(
-            (acc, pokemon) => {
-                const chainId = pokemon.specs.evolution_chain_id;
-                if (!acc[chainId]) {
-                    acc[chainId] = [];
-                }
-                acc[chainId].push(pokemon);
-                return acc;
-            },
-            {} as Record<number, Pokemon[]>
-        );
-        for (const chainId in groupedPokemonData) {
-            groupedPokemonData[chainId].sort((a, b) => a.id - b.id);
-        }
-
-        return groupedPokemonData;
-    }
-    return {};
-};
 
 const setState: PokedexSetState = ({
     pokemonData,
@@ -109,42 +86,8 @@ const Pokedex: React.FC = () => {
         },
     });
     const [pokemonData, setPokemonData] = useState<Pokemon[]>([]);
-    const { data, isLoading } = useQuery<PokedexResult, Error>({
-        queryKey: ["pokedex"],
-        queryFn: async (): Promise<PokedexResult> => {
-            const query = gql`
-                query getPokedex {
-                    pokemon: pokemon_v2_pokemon {
-                        id
-                        name
-                        sprites: pokemon_v2_pokemonsprites {
-                            default: sprites(
-                                path: "other[\\"official-artwork\\"].front_default"
-                            )
-                        }
-                        types: pokemon_v2_pokemontypes {
-                            type: pokemon_v2_type {
-                                name
-                            }
-                        }
-                        specs: pokemon_v2_pokemonspecy {
-                            is_legendary
-                            is_mythical
-                            generation_id
-                            evolution_chain_id
-                            evolves_from_species_id
-                        }
-                    }
-                }
-            `;
-            const data: PokedexResult = await request(
-                "https://beta.pokeapi.co/graphql/v1beta",
-                query
-            );
-            return data;
-        },
-        placeholderData: keepPreviousData,
-    });
+
+    const { data, isLoading } = useFetchPokedex({});
 
     useEffect(() => {
         let params: { sort: string; query?: string } = {
@@ -184,27 +127,11 @@ const Pokedex: React.FC = () => {
         }
     }, []);
 
-    const pokemonWithEvolutions = useMemo(() => {
-        if (data) {
-            const evolutions = getPokemonEvolutions(data);
-            return data.pokemon.map((pokemon) => {
-                return {
-                    ...pokemon,
-                    evolutions: evolutions[pokemon.specs.evolution_chain_id],
-                };
-            });
-        }
-        return [];
-    }, [data]);
-
     useEffect(() => {
         if (data) {
             const pokemonData = urlParams.has("query")
-                ? advancedSearch(
-                      pokemonWithEvolutions,
-                      convertToSearch(urlParams)
-                  )
-                : pokemonWithEvolutions;
+                ? advancedSearch(data.pokemon, convertToSearch(urlParams))
+                : data.pokemon;
             const sort = getSortingKey(sorting);
 
             if (sort) {
@@ -226,7 +153,7 @@ const Pokedex: React.FC = () => {
                     )
                 );
             } else {
-                setPokemonData(pokemonWithEvolutions);
+                setPokemonData(data.pokemon);
             }
         }
     }, [data]);
@@ -260,7 +187,7 @@ const Pokedex: React.FC = () => {
                     </div>
                     <Search
                         className={`${showFilters ? "" : "hidden invisible"}`}
-                        data={pokemonWithEvolutions}
+                        data={data?.pokemon || []}
                         value={convertToSearch(urlParams)}
                         isDisabled={isLoading}
                         onSubmit={(results, searches) => {

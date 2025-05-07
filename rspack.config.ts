@@ -3,76 +3,78 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { TsCheckerRspackPlugin } = require("ts-checker-rspack-plugin");
 
 const plugins = [
-  new HtmlWebpackPlugin({
-    template: "./public/index.html",
-  }),
-  new TsCheckerRspackPlugin(),
+    new HtmlWebpackPlugin({
+        template: "./public/index.html",
+        favicon: "./public/favicon.svg",
+    }),
+    new TsCheckerRspackPlugin(),
 ];
 
 module.exports = {
-  entry: "./src/index.tsx",
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "app.js",
-    publicPath: "/"
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx|ts|tsx)$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "builtin:swc-loader",
-            options: {
-              jsc: {
-                parser: {
-                    syntax: 'typescript',
-                    tsx: true
-                },
-                transform: {
-                    react: {
-                        runtime: 'automatic',
-                        development: false,
-                        refresh: false
-                    }
-                }
-              },
-            }
-          },
-        ]
-      },
-      {
-        test: /\.css$/,
-        use: ["postcss-loader"],
-        type: "css",
-      },
-    ],
-  },
-  plugins,
-  experiments: {
-    css: true,
-  },
-  resolve: {
-    extensions: [".tsx", ".ts", ".jsx", ".js"],
-    alias: {
-      "@components": path.resolve(__dirname, "src/components"),
-      "@styles": path.resolve(__dirname, "src/styles"),
-      "@customTypes": path.resolve(__dirname, "src/types"),
-      "@utils": path.resolve(__dirname, "src/utils"),
+    entry: "./src/index.tsx",
+    output: {
+        path: path.resolve(__dirname, "dist"),
+        filename: "app.js",
+        publicPath: "/",
     },
-  },
-  devServer: {
-    static: {
-      directory: path.join(__dirname, "public"),
+    module: {
+        rules: [
+            {
+                test: /\.(js|jsx|ts|tsx)$/,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: "builtin:swc-loader",
+                        options: {
+                            jsc: {
+                                parser: {
+                                    syntax: "typescript",
+                                    tsx: true,
+                                },
+                                transform: {
+                                    react: {
+                                        runtime: "automatic",
+                                        development: false,
+                                        refresh: false,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                ],
+            },
+            {
+                test: /\.css$/,
+                use: ["postcss-loader"],
+                type: "css",
+            },
+        ],
     },
-    port: 3000,
-    historyApiFallback: true,
-    hot: true,
-    client: {
-      overlay: false,
+    plugins,
+    experiments: {
+        css: true,
     },
-    liveReload: true,
-    compress: true,
-  },
+    resolve: {
+        extensions: [".tsx", ".ts", ".jsx", ".js"],
+        alias: {
+            "@api": path.resolve(__dirname, "src/api"),
+            "@components": path.resolve(__dirname, "src/components"),
+            "@styles": path.resolve(__dirname, "src/styles"),
+            "@customTypes": path.resolve(__dirname, "src/types"),
+            "@utils": path.resolve(__dirname, "src/utils"),
+        },
+    },
+    devServer: {
+        static: {
+            directory: path.join(__dirname, "public"),
+        },
+        port: 3000,
+        historyApiFallback: true,
+        hot: true,
+        client: {
+            overlay: false,
+        },
+        liveReload: true,
+        compress: true,
+    },
 };

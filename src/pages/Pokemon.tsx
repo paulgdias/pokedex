@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, startTransition } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { preconnect } from "react-dom";
 
@@ -9,6 +9,8 @@ import { ArrowLeft, ArrowUp } from "lucide-react";
 import PokemonCard from "@components/PokemonCard";
 
 import { Pokemon as PokemonType } from "@customTypes/PokemonTypes";
+import useFetchPokedex from "@api/hooks";
+import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 
 const Pokemon: React.FC = () => {
     preconnect("https://raw.githubusercontent.com/");
@@ -17,24 +19,47 @@ const Pokemon: React.FC = () => {
     const navigate = useNavigate();
     const {
         state,
+        pathname,
     }: {
         state: {
             pokemon: PokemonType;
             previous: string;
         };
+        pathname: string;
     } = useLocation();
+    const [pokemonItem, setPokemonItem] = useState(state?.pokemon);
+
+    const { data } = useFetchPokedex({
+        enabled: !state ? true : false,
+    });
 
     useEffect(() => {
-        if (!state) {
-            navigate("/pokedex");
+        if (!state && data && pathname) {
+            const pokemonName = pathname.split("/")[2];
+
+            const pokemon = data.pokemon.find((item) => {
+                return item.name === pokemonName;
+            });
+
+            if (pokemon) {
+                startTransition(() => setPokemonItem(pokemon));
+            } else {
+                navigate("/pokedex", { replace: true });
+            }
         }
-    }, [state]);
+    }, [data, state, pathname]);
 
-    if (!state) {
-        return null;
+    const pokemon = state?.pokemon || pokemonItem;
+
+    if (!state && !pokemon) {
+        return (
+            <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
+                <PlaceholderCard className="grow-1" />
+                <div className="h-0 basis-full" />
+                <PlaceholderCard />
+            </div>
+        );
     }
-
-    const { pokemon, previous } = state;
 
     const evolutions = pokemon.evolutions.map((item) => {
         return {
@@ -48,7 +73,7 @@ const Pokemon: React.FC = () => {
             <Button
                 aria-label="Back"
                 className="fixed rounded-full cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105 my-3 mx-2"
-                onPress={() => navigate(previous)}
+                onPress={() => navigate(state?.previous || "/pokedex")}
             >
                 <ArrowLeft color="white" size={42} />
             </Button>
@@ -69,11 +94,14 @@ const Pokemon: React.FC = () => {
                         isLegendary={item.specs.is_legendary}
                         isMythical={item.specs.is_mythical}
                         navigateCallback={(event, pokemon) => {
+                            const previousWithFallback =
+                                state?.previous || "/pokedex";
+
                             navigate(`/pokedex/${pokemon.name}`, {
                                 state: {
                                     pokemon: pokemon,
                                     previous:
-                                        previous ||
+                                        previousWithFallback ||
                                         location.pathname + location.search,
                                 },
                             });
