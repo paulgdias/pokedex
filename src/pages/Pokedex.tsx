@@ -1,6 +1,10 @@
-import React, { memo, Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router";
+import React, { memo, Suspense, useEffect, useState, useMemo } from "react";
+import { useLoaderData, useSearchParams } from "react-router";
 import { preconnect } from "react-dom";
+
+import { request, gql } from "graphql-request";
+import type { QueryClient } from "@tanstack/react-query";
+import { queryOptions, keepPreviousData } from "@tanstack/react-query";
 
 import { useLocalStorage } from "@uidotdev/usehooks";
 
@@ -16,11 +20,9 @@ import PlaceholderList from "@components/PokemonList/PlaceholderList";
 
 import { ErrorBoundary } from "react-error-boundary";
 
-import { Pokemon } from "@customTypes/PokemonTypes";
+import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
 import { Sort, Sorting } from "@customTypes/SortingTypes";
 import { PokedexSetState } from "@customTypes/PokedexTypes";
-
-import useFetchPokedex from "@api/hooks";
 
 import {
     advancedSearch,
@@ -28,10 +30,53 @@ import {
     convertToSearch,
 } from "@utils/search";
 import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
+import { getPokemonEvolutions } from "@utils/pokemon";
 
 import { buttonClass } from "@styles/Pokedex";
 import { twMerge } from "tailwind-merge";
 const toggleButtonClass = twMerge(buttonClass, "w-12");
+
+const pokedexQuery = () =>
+    queryOptions({
+        queryKey: ["pokedex"],
+        queryFn: async (): Promise<PokedexResult> => {
+            const query = gql`
+                query getPokedex {
+                    pokemon: pokemon_v2_pokemon {
+                        id
+                        name
+                        sprites: pokemon_v2_pokemonsprites {
+                            default: sprites(
+                                path: "other[\\"official-artwork\\"].front_default"
+                            )
+                        }
+                        types: pokemon_v2_pokemontypes {
+                            type: pokemon_v2_type {
+                                name
+                            }
+                        }
+                        specs: pokemon_v2_pokemonspecy {
+                            is_legendary
+                            is_mythical
+                            generation_id
+                            evolution_chain_id
+                            evolves_from_species_id
+                        }
+                    }
+                }
+            `;
+            const data: PokedexResult = await request(
+                "https://beta.pokeapi.co/graphql/v1beta",
+                query
+            );
+            return data;
+        },
+        placeholderData: keepPreviousData,
+    });
+
+export const loader = (queryClient: QueryClient) => async () => {
+    return await queryClient.ensureQueryData(pokedexQuery());
+};
 
 const setState: PokedexSetState = ({
     pokemonData,
@@ -45,7 +90,7 @@ const setState: PokedexSetState = ({
     const data = sortPokemonByType(pokemonData, sorting, sort);
     setSorting({
         ...defaultSorting,
-        [sort]: {
+        [sort as keyof Sorting]: {
             sort: sorting[sort].sort === "asc" ? "desc" : "asc",
             selected: true,
         },
@@ -69,6 +114,34 @@ const setState: PokedexSetState = ({
     });
 };
 
+const transformPokemonData = (
+    data: PokedexResult,
+    urlParams: URLSearchParams,
+    sorting: Sorting
+) => {
+    const pokedexList = useMemo(() => getPokemonEvolutions(data), [data]);
+    const filteredPokemonData = useMemo(() => {
+        return urlParams.has("query")
+            ? advancedSearch(pokedexList.pokemon, convertToSearch(urlParams))
+            : pokedexList.pokemon;
+    }, [pokedexList, urlParams]);
+    const sort = useMemo(() => getSortingKey(sorting), [sorting]);
+    return sortPokemonByType(
+        filteredPokemonData,
+        {
+            ...defaultSorting,
+            [sort as keyof Sorting]: {
+                sort:
+                    sorting?.[sort as keyof Sorting].sort === "asc"
+                        ? "desc"
+                        : "asc",
+                selected: true,
+            },
+        },
+        sort as keyof Sorting
+    );
+};
+
 const Pokedex: React.FC = () => {
     preconnect("https://raw.githubusercontent.com/");
 
@@ -77,7 +150,7 @@ const Pokedex: React.FC = () => {
         "showFilters",
         false
     );
-
+    const initialData = useLoaderData();
     const [sorting, setSorting] = useState<Sorting>({
         ...defaultSorting,
         id: {
@@ -85,9 +158,9 @@ const Pokedex: React.FC = () => {
             selected: true,
         },
     });
-    const [pokemonData, setPokemonData] = useState<Pokemon[]>([]);
 
-    const { data, isLoading } = useFetchPokedex({});
+    const pokemonList = transformPokemonData(initialData, urlParams, sorting);
+    const [pokemonData, setPokemonData] = useState<Pokemon[]>(pokemonList);
 
     useEffect(() => {
         let params: { sort: string; query?: string } = {
@@ -127,37 +200,6 @@ const Pokedex: React.FC = () => {
         }
     }, []);
 
-    useEffect(() => {
-        if (data) {
-            const pokemonData = urlParams.has("query")
-                ? advancedSearch(data.pokemon, convertToSearch(urlParams))
-                : data.pokemon;
-            const sort = getSortingKey(sorting);
-
-            if (sort) {
-                setPokemonData(
-                    sortPokemonByType(
-                        pokemonData,
-                        {
-                            ...defaultSorting,
-                            [sort]: {
-                                sort:
-                                    sorting?.[sort as keyof Sorting].sort ===
-                                    "asc"
-                                        ? "desc"
-                                        : "asc",
-                                selected: true,
-                            },
-                        },
-                        sort as keyof Sorting
-                    )
-                );
-            } else {
-                setPokemonData(data.pokemon);
-            }
-        }
-    }, [data]);
-
     return (
         <>
             <div className="flex flex-col">
@@ -187,9 +229,8 @@ const Pokedex: React.FC = () => {
                     </div>
                     <Search
                         className={`${showFilters ? "" : "hidden invisible"}`}
-                        data={data?.pokemon || []}
+                        data={initialData.pokemon}
                         value={convertToSearch(urlParams)}
-                        isDisabled={isLoading}
                         onSubmit={(results, searches) => {
                             const sort = getSortingKey(sorting);
                             if (sort) {
@@ -223,7 +264,6 @@ const Pokedex: React.FC = () => {
                     <Button
                         aria-label="Filter by Id"
                         className={`${buttonClass} bg-white ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
-                        isDisabled={isLoading}
                         onPress={() => {
                             setState({
                                 pokemonData,
@@ -246,7 +286,6 @@ const Pokedex: React.FC = () => {
                     <Button
                         aria-label="Filter by Name"
                         className={`${buttonClass} bg-white ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
-                        isDisabled={isLoading}
                         onPress={() => {
                             setState({
                                 pokemonData,
@@ -269,7 +308,6 @@ const Pokedex: React.FC = () => {
                     <Button
                         aria-label="Filter by Type"
                         className={`${buttonClass} bg-white ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
-                        isDisabled={isLoading}
                         onPress={() => {
                             setState({
                                 pokemonData,
@@ -292,7 +330,6 @@ const Pokedex: React.FC = () => {
                     <Button
                         aria-label="Filter by Legendary"
                         className={`${buttonClass} bg-gray-300 hover:bg-gray-200 ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
-                        isDisabled={isLoading}
                         onPress={() => {
                             setState({
                                 pokemonData,
@@ -317,7 +354,6 @@ const Pokedex: React.FC = () => {
                     <Button
                         aria-label="Filter by Mythical"
                         className={`${buttonClass} bg-yellow-400 hover:bg-yellow-300 ${showFilters ? "" : "hidden invisible"} disabled:disabled-component`}
-                        isDisabled={isLoading}
                         onPress={() => {
                             setState({
                                 pokemonData,
@@ -348,10 +384,7 @@ const Pokedex: React.FC = () => {
                             </div>
                         }
                     >
-                        <PokemonList
-                            pokemon={pokemonData}
-                            isLoading={isLoading}
-                        />
+                        <PokemonList pokemon={pokemonData} />
                     </ErrorBoundary>
                 </Suspense>
             </div>

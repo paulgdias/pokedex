@@ -3,8 +3,6 @@ import { preload } from "react-dom";
 
 import { Ban, Sparkles } from "lucide-react";
 
-import { useCopyToClipboard } from "@uidotdev/usehooks";
-
 import { PokemonCardType } from "@customTypes/PokemonCardTypes";
 import { typeColors } from "@customTypes/PokemonTypes";
 
@@ -29,8 +27,6 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     isMythical,
     navigateCallback,
 }) => {
-    const [copiedText, copyToClipboard] = useCopyToClipboard();
-
     if (pokemon.sprites[0].default) {
         preload(pokemon.sprites[0].default, {
             as: "image",

@@ -1,7 +1,7 @@
 import { request, gql } from "graphql-request";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
-import { PokedexResult } from "@customTypes/PokemonTypes";
+import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
 
 import { getPokemonEvolutions } from "@utils/pokemon";
 
@@ -42,7 +42,8 @@ const useFetchPokedex = ({ enabled }: { enabled?: boolean }) => {
         },
         placeholderData: keepPreviousData,
         select: (data) => {
-            const evolutions = getPokemonEvolutions(data);
+            const evolutions: Record<number, Pokemon[]> =
+                getPokemonEvolutions(data);
             const pokemon = data.pokemon.map((pokemon) => {
                 return {
                     ...pokemon,

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState, startTransition } from "react";
-import { useLocation, useNavigate } from "react-router";
+import React, { useEffect, useRef } from "react";
+import { useLocation, useNavigate, useLoaderData } from "react-router";
 import { preconnect } from "react-dom";
 
 import { Button } from "react-aria-components";
@@ -8,9 +8,9 @@ import { ArrowLeft, ArrowUp } from "lucide-react";
 
 import PokemonCard from "@components/PokemonCard";
 
+import { getPokemonEvolutions } from "@utils/pokemon";
+
 import { Pokemon as PokemonType } from "@customTypes/PokemonTypes";
-import useFetchPokedex from "@api/hooks";
-import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 
 const Pokemon: React.FC = () => {
     preconnect("https://raw.githubusercontent.com/");
@@ -27,46 +27,23 @@ const Pokemon: React.FC = () => {
         };
         pathname: string;
     } = useLocation();
-    const [pokemonItem, setPokemonItem] = useState(state?.pokemon);
 
-    const { data } = useFetchPokedex({
-        enabled: !state ? true : false,
+    const pokemonName = pathname.split("/")[2];
+    const initialData = useLoaderData();
+    const pokedexList = getPokemonEvolutions(initialData);
+    const pokemon = pokedexList.pokemon.find((item: PokemonType) => {
+        return item.name === pokemonName;
     });
 
     useEffect(() => {
-        if (!state && data && pathname) {
-            const pokemonName = pathname.split("/")[2];
-
-            const pokemon = data.pokemon.find((item) => {
-                return item.name === pokemonName;
-            });
-
-            if (pokemon) {
-                startTransition(() => setPokemonItem(pokemon));
-            } else {
-                navigate("/pokedex", { replace: true });
-            }
+        if (!pokemon) {
+            navigate("/pokedex", { replace: true });
         }
-    }, [data, state, pathname]);
+    }, [pokemon]);
 
-    const pokemon = state?.pokemon || pokemonItem;
-
-    if (!state && !pokemon) {
-        return (
-            <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
-                <PlaceholderCard className="grow-1" />
-                <div className="h-0 basis-full" />
-                <PlaceholderCard />
-            </div>
-        );
+    if (!pokemon) {
+        return null;
     }
-
-    const evolutions = pokemon.evolutions.map((item) => {
-        return {
-            ...item,
-            evolutions: pokemon.evolutions,
-        };
-    });
 
     return (
         <>
@@ -86,7 +63,7 @@ const Pokemon: React.FC = () => {
                     isMythical={pokemon.specs.is_mythical}
                 />
                 <div className="h-0 basis-full" />
-                {evolutions.map((item, index) => (
+                {pokemon.evolutions.map((item, index) => (
                     <PokemonCard
                         key={index}
                         className="max-w-[210px] hover:shadow-lg hover:border-sky-500 focus:border-sky-500 m-4"
