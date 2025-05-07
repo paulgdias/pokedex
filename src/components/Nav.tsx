@@ -7,12 +7,7 @@ import { House, LibraryBig, ChevronsLeft, ChevronsRight } from "lucide-react";
 const hoverShadow = "hover:drop-shadow-md hover:drop-shadow-sky-400";
 const iconStyle = "h-6 w-6 text-white";
 
-interface NavProps {
-    selected: string;
-    onSelect: (selection: string) => void;
-}
-
-const Nav: React.FC<NavProps> = ({ selected, onSelect }) => {
+const Nav: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggleWidth = isOpen ? "w-40" : "w-10";
     const toggleDisplay = isOpen ? "block" : "hidden";
@@ -32,7 +27,6 @@ const Nav: React.FC<NavProps> = ({ selected, onSelect }) => {
                         aria-label="Home"
                         onClick={() => {
                             if (isOpen) setIsOpen(false);
-                            onSelect("Home");
                         }}
                     >
                         <House className={`${iconStyle} cursor-pointer`} />
@@ -48,7 +42,6 @@ const Nav: React.FC<NavProps> = ({ selected, onSelect }) => {
                         aria-label="pokedev"
                         onClick={() => {
                             if (isOpen) setIsOpen(false);
-                            onSelect("Pokedex");
                         }}
                     >
                         <LibraryBig className={`${iconStyle} cursor-pointe`} />
