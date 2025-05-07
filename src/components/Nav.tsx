@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Button, Link } from "react-aria-components";
+import { NavLink } from "react-router";
+import { Button } from "react-aria-components";
 
 import { House, LibraryBig, ChevronsLeft, ChevronsRight } from "lucide-react";
 
@@ -23,38 +24,38 @@ const Nav: React.FC<NavProps> = ({ selected, onSelect }) => {
                 <nav
                     className={`grid gap-4 bg-gray-800 p-2 w-full content-start`}
                 >
-                    <Link
-                        href="/"
-                        className={`react-aria-Button flex flex-row items-end ${hoverShadow}`}
+                    <NavLink
+                        to="/"
+                        className={({ isActive }) =>
+                            `react-aria-Button flex flex-row items-end ${hoverShadow} ${isActive ? "active" : ""}`
+                        }
                         aria-label="Home"
-                        onPress={() => {
+                        onClick={() => {
                             if (isOpen) setIsOpen(false);
                             onSelect("Home");
                         }}
                     >
-                        <House
-                            className={`${iconStyle} cursor-pointer ${selected === "Home" ? "border-b-2 border-sky-500" : ""}`}
-                        />
+                        <House className={`${iconStyle} cursor-pointer`} />
                         <span className={`text-white ml-2 ${toggleDisplay}`}>
                             Home
                         </span>
-                    </Link>
-                    <Link
-                        href="/pokedex"
-                        className={`react-aria-Button flex flex-row items-end ${hoverShadow}`}
+                    </NavLink>
+                    <NavLink
+                        to="/pokedex"
+                        className={({ isActive }) =>
+                            `react-aria-Button flex flex-row items-end ${hoverShadow} ${isActive ? "active" : ""}`
+                        }
                         aria-label="pokedev"
-                        onPress={() => {
+                        onClick={() => {
                             if (isOpen) setIsOpen(false);
                             onSelect("Pokedex");
                         }}
                     >
-                        <LibraryBig
-                            className={`${iconStyle} cursor-pointer ${selected === "Pokedex" ? "border-b-2 border-sky-500" : ""}`}
-                        />
+                        <LibraryBig className={`${iconStyle} cursor-pointe`} />
                         <span className={`text-white ml-2 ${toggleDisplay}`}>
                             Pokédex
                         </span>
-                    </Link>
+                    </NavLink>
                 </nav>
             </div>
 

@@ -34,6 +34,12 @@
     svg:focus-visible {
         outline: 2px solid var(--color-sky-500);
     }
+
+    a.active {
+        border-bottom-style: var(--tw-border-style);
+        border-bottom-width: 2px;
+        border-color: var(--color-sky-500);
+    }
     .pokemonCard:focus,
     .pokemonCard:focus-visible {
         outline: none;

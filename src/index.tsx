@@ -1,21 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import {
-    BrowserRouter,
-    type NavigateOptions,
-    useHref,
-    useNavigate,
-    Routes,
-    Route,
-} from "react-router-dom";
 
 import { I18nProvider } from "react-aria";
-import { RouterProvider } from "react-aria-components";
-declare module "react-aria-components" {
-    interface RouterConfig {
-        routerOptions: NavigateOptions;
-    }
-}
 
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
@@ -24,47 +10,29 @@ import { routes } from "./utils/routes";
 
 import "./styles/index.css";
 
-function Navigation() {
-    const navigate = useNavigate();
-
-    return (
-        <RouterProvider navigate={navigate} useHref={useHref}>
-            <Routes>
-                <Route element={<Layout />}>
-                    {[...routes.entries()].map(([key, value], index) => {
-                        if (index === 0) {
-                            return (
-                                <Route
-                                    key={index}
-                                    path={key}
-                                    element={React.createElement(value)}
-                                    index
-                                />
-                            );
-                        }
-                        return (
-                            <Route
-                                key={index}
-                                path={key}
-                                element={React.createElement(value)}
-                            />
-                        );
-                    })}
-                    <Route path="*" element={<Home />} />
-                </Route>
-            </Routes>
-        </RouterProvider>
-    );
-}
+import { createBrowserRouter, RouterProvider } from "react-router";
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root container not found");
 
+const additionalRoutes = [...routes.entries()].map(([key, value]) => {
+    return { path: key, element: React.createElement(value) };
+});
+
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: React.createElement(Layout),
+        children: [
+            { index: true, element: React.createElement(Home) },
+            ...additionalRoutes,
+        ],
+    },
+]);
+
 const root = createRoot(container);
 root.render(
-    <BrowserRouter>
-        <I18nProvider locale="en-US">
-            <Navigation />
-        </I18nProvider>
-    </BrowserRouter>
+    <I18nProvider locale="en-US">
+        <RouterProvider router={router} />
+    </I18nProvider>
 );

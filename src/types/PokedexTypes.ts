@@ -1,4 +1,4 @@
-import type { SetURLSearchParams } from "react-router-dom";
+import type { SetURLSearchParams } from "react-router";
 import { Pokemon } from "./PokemonTypes";
 import { Sorting } from "./SortingTypes";
 
