@@ -1,4 +1,3 @@
-import React from "react";
 import {
     ArrowUpNarrowWide, // asc
     ArrowDownWideNarrow, // desc

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Mail as MailIcon } from "lucide-react";
 
 export interface LogoProps {

@@ -1,4 +1,3 @@
-import React from "react";
 import { preload } from "react-dom";
 
 import { LinkedIn, GitHub, Email } from "@components/Icons/Logos";

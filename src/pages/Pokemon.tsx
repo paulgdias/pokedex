@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation, useNavigate, useLoaderData } from "react-router";
 import { preconnect } from "react-dom";
 
@@ -58,7 +58,7 @@ const Pokemon: React.FC = () => {
             <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
                 <PokemonCard
                     ref={pokemonRef}
-                    className="w-sm hover:shadow-lg cursor-auto m-auto"
+                    className="w-xs sm:w-sm hover:shadow-lg cursor-auto m-auto"
                     pokemon={pokemon}
                     isLegendary={pokemon.specs.is_legendary}
                     isMythical={pokemon.specs.is_mythical}

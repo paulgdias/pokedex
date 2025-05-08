@@ -1,4 +1,4 @@
-import React, { memo, Suspense, useEffect, useState, useMemo } from "react";
+import { memo, useEffect, useState, useMemo } from "react";
 import { useLoaderData, useSearchParams } from "react-router";
 import { preconnect } from "react-dom";
 
@@ -14,9 +14,8 @@ import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import Search from "@components/Search";
 import SortingArrow from "@components/Buttons/SortingArrow";
 
-const PokemonList = React.lazy(() => import("@components/PokemonList"));
+import PokemonList from "@components/PokemonList";
 import Pokeball from "@components/Icons/Pokeball";
-import PlaceholderList from "@components/PokemonList/PlaceholderList";
 
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -32,6 +31,8 @@ import {
 import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
 import { getPokemonEvolutions } from "@utils/pokemon";
 
+import { graphqlQuery } from "@api/hooks";
+
 import { buttonClass } from "@styles/Pokedex";
 import { twMerge } from "tailwind-merge";
 const toggleButtonClass = twMerge(buttonClass, "w-12");
@@ -40,34 +41,9 @@ const pokedexQuery = () =>
     queryOptions({
         queryKey: ["pokedex"],
         queryFn: async (): Promise<PokedexResult> => {
-            const query = gql`
-                query getPokedex {
-                    pokemon: pokemon_v2_pokemon {
-                        id
-                        name
-                        sprites: pokemon_v2_pokemonsprites {
-                            default: sprites(
-                                path: "other[\\"official-artwork\\"].front_default"
-                            )
-                        }
-                        types: pokemon_v2_pokemontypes {
-                            type: pokemon_v2_type {
-                                name
-                            }
-                        }
-                        specs: pokemon_v2_pokemonspecy {
-                            is_legendary
-                            is_mythical
-                            generation_id
-                            evolution_chain_id
-                            evolves_from_species_id
-                        }
-                    }
-                }
-            `;
             const data: PokedexResult = await request(
                 "https://beta.pokeapi.co/graphql/v1beta",
-                query
+                graphqlQuery
             );
             return data;
         },
@@ -75,7 +51,8 @@ const pokedexQuery = () =>
     });
 
 export const loader = (queryClient: QueryClient) => async () => {
-    return await queryClient.ensureQueryData(pokedexQuery());
+    const data = await queryClient.ensureQueryData(pokedexQuery());
+    return getPokemonEvolutions(data);
 };
 
 const setState: PokedexSetState = ({
@@ -119,13 +96,10 @@ const transformPokemonData = (
     urlParams: URLSearchParams,
     sorting: Sorting
 ) => {
-    const pokedexList = useMemo(() => getPokemonEvolutions(data), [data]);
-    const filteredPokemonData = useMemo(() => {
-        return urlParams.has("query")
-            ? advancedSearch(pokedexList.pokemon, convertToSearch(urlParams))
-            : pokedexList.pokemon;
-    }, [pokedexList, urlParams]);
-    const sort = useMemo(() => getSortingKey(sorting), [sorting]);
+    const filteredPokemonData = urlParams.has("query")
+        ? advancedSearch(data.pokemon, convertToSearch(urlParams))
+        : data.pokemon;
+    const sort = getSortingKey(sorting);
     return sortPokemonByType(
         filteredPokemonData,
         {
@@ -160,8 +134,14 @@ const Pokedex: React.FC = () => {
     });
 
     const initialData = useLoaderData();
-    const pokemonList = transformPokemonData(initialData, urlParams, sorting);
-    const [pokemonData, setPokemonData] = useState<Pokemon[]>(pokemonList);
+    const [pokemonData, setPokemonData] = useState<Pokemon[]>(
+        initialData.pokemon
+    );
+    const pokemonList = useMemo(
+        () =>
+            transformPokemonData({ pokemon: pokemonData }, urlParams, sorting),
+        [pokemonData, urlParams, sorting]
+    );
 
     useEffect(() => {
         let params: { sort: string; query?: string } = {
@@ -259,6 +239,11 @@ const Pokedex: React.FC = () => {
                                     urlParams: createURLSearchParams(searches),
                                     setURLParams,
                                 });
+
+                                // hide filters if less than md breakpoint
+                                if (window.innerWidth < 640) {
+                                    setShowFilters(false);
+                                }
                             }
                         }}
                     />
@@ -377,17 +362,15 @@ const Pokedex: React.FC = () => {
                         </div>
                     </Button>
                 </div>
-                <Suspense fallback={<PlaceholderList />}>
-                    <ErrorBoundary
-                        fallback={
-                            <div className="flex justify-center">
-                                Something went wrong!
-                            </div>
-                        }
-                    >
-                        <PokemonList pokemon={pokemonData} />
-                    </ErrorBoundary>
-                </Suspense>
+                <ErrorBoundary
+                    fallback={
+                        <div className="flex justify-center">
+                            Something went wrong!
+                        </div>
+                    }
+                >
+                    <PokemonList pokemon={pokemonList} />
+                </ErrorBoundary>
             </div>
         </>
     );

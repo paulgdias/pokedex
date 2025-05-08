@@ -1,5 +1,3 @@
-import React from "react";
-
 const Pokeball = ({
     width = 32,
     height = 32,

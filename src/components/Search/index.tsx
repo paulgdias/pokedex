@@ -1,4 +1,3 @@
-import React from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import { SearchIcon, Info, X } from "lucide-react";

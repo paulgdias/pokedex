@@ -14,8 +14,9 @@ module.exports = {
     entry: "./src/index.tsx",
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "app.js",
         publicPath: "/",
+        filename: "[name].js",
+        chunkFilename: "[id].[chunkhash].js",
     },
     module: {
         rules: [
@@ -76,5 +77,10 @@ module.exports = {
         },
         liveReload: true,
         compress: true,
+    },
+    optimization: {
+        splitChunks: {
+            chunks: "all",
+        },
     },
 };

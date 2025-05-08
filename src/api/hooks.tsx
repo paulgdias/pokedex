@@ -5,38 +5,39 @@ import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
 
 import { getPokemonEvolutions } from "@utils/pokemon";
 
+export const graphqlQuery = gql`
+    query getPokedex {
+        pokemon: pokemon_v2_pokemon {
+            id
+            name
+            sprites: pokemon_v2_pokemonsprites {
+                default: sprites(
+                    path: "other[\\"official-artwork\\"].front_default"
+                )
+            }
+            types: pokemon_v2_pokemontypes {
+                type: pokemon_v2_type {
+                    name
+                }
+            }
+            specs: pokemon_v2_pokemonspecy {
+                is_legendary
+                is_mythical
+                generation_id
+                evolution_chain_id
+                evolves_from_species_id
+            }
+        }
+    }
+`;
+
 const useFetchPokedex = ({ enabled }: { enabled?: boolean }) => {
     return useQuery<PokedexResult, Error>({
         queryKey: ["pokedex"],
         queryFn: async (): Promise<PokedexResult> => {
-            const query = gql`
-                query getPokedex {
-                    pokemon: pokemon_v2_pokemon {
-                        id
-                        name
-                        sprites: pokemon_v2_pokemonsprites {
-                            default: sprites(
-                                path: "other[\\"official-artwork\\"].front_default"
-                            )
-                        }
-                        types: pokemon_v2_pokemontypes {
-                            type: pokemon_v2_type {
-                                name
-                            }
-                        }
-                        specs: pokemon_v2_pokemonspecy {
-                            is_legendary
-                            is_mythical
-                            generation_id
-                            evolution_chain_id
-                            evolves_from_species_id
-                        }
-                    }
-                }
-            `;
             const data: PokedexResult = await request(
                 "https://beta.pokeapi.co/graphql/v1beta",
-                query
+                graphqlQuery
             );
             return data;
         },

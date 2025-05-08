@@ -1,4 +1,4 @@
-import React, { CSSProperties, useRef } from "react";
+import { CSSProperties, useRef } from "react";
 
 import { Grid, AutoSizer } from "react-virtualized";
 

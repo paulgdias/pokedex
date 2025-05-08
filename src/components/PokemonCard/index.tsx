@@ -1,4 +1,3 @@
-import React from "react";
 import { preload } from "react-dom";
 
 import { Ban, Sparkles } from "lucide-react";
