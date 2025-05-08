@@ -13,6 +13,7 @@ import { getPokemonEvolutions } from "@utils/pokemon";
 import { Pokemon as PokemonType } from "@customTypes/PokemonTypes";
 
 const Pokemon: React.FC = () => {
+    preconnect("https://beta.pokeapi.co");
     preconnect("https://raw.githubusercontent.com/");
 
     const pokemonRef = useRef<HTMLDivElement>(null);
@@ -48,7 +49,7 @@ const Pokemon: React.FC = () => {
     return (
         <>
             <Button
-                aria-label="Back"
+                aria-label="Back to Pokémon"
                 className="fixed rounded-full cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105 my-3 mx-2"
                 onPress={() => navigate(state?.previous || "/pokedex")}
             >
@@ -57,7 +58,7 @@ const Pokemon: React.FC = () => {
             <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
                 <PokemonCard
                     ref={pokemonRef}
-                    className="max-w-sm hover:shadow-lg cursor-auto m-auto"
+                    className="w-sm hover:shadow-lg cursor-auto m-auto"
                     pokemon={pokemon}
                     isLegendary={pokemon.specs.is_legendary}
                     isMythical={pokemon.specs.is_mythical}
@@ -66,7 +67,7 @@ const Pokemon: React.FC = () => {
                 {pokemon.evolutions.map((item, index) => (
                     <PokemonCard
                         key={index}
-                        className="max-w-[210px] hover:shadow-lg hover:border-sky-500 focus:border-sky-500 m-4"
+                        className="w-[210px] hover:shadow-lg hover:border-sky-500 focus:border-sky-500 m-4"
                         pokemon={item}
                         isLegendary={item.specs.is_legendary}
                         isMythical={item.specs.is_mythical}

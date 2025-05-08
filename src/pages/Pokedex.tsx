@@ -143,6 +143,7 @@ const transformPokemonData = (
 };
 
 const Pokedex: React.FC = () => {
+    preconnect("https://beta.pokeapi.co");
     preconnect("https://raw.githubusercontent.com/");
 
     const [urlParams, setURLParams] = useSearchParams();
@@ -150,7 +151,6 @@ const Pokedex: React.FC = () => {
         "showFilters",
         false
     );
-    const initialData = useLoaderData();
     const [sorting, setSorting] = useState<Sorting>({
         ...defaultSorting,
         id: {
@@ -159,6 +159,7 @@ const Pokedex: React.FC = () => {
         },
     });
 
+    const initialData = useLoaderData();
     const pokemonList = transformPokemonData(initialData, urlParams, sorting);
     const [pokemonData, setPokemonData] = useState<Pokemon[]>(pokemonList);
 

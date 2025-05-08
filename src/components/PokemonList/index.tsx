@@ -11,6 +11,8 @@ import { ArrowUp } from "lucide-react";
 
 import { twMerge } from "tailwind-merge";
 
+import { getPokemonGridProps } from "./utils";
+
 import "react-virtualized/styles.css";
 import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 
@@ -47,15 +49,18 @@ const PokemonList = ({
         <div className={twMerge("flex h-[95dvh]", className)}>
             <AutoSizer>
                 {({ height, width }) => {
-                    const cardWidth = 210;
-                    const columnCount = Math.floor(width / cardWidth) || 1;
-                    const columnWidth = width / columnCount;
-                    const rowHeight = columnWidth * 1.6;
-                    const itemCount = pokemon.length
-                        ? pokemon.length
-                        : columnCount ** columnCount;
-                    const rowCount = Math.ceil(itemCount / columnCount);
-                    const gridGap = 10;
+                    const {
+                        columnCount,
+                        columnWidth,
+                        rowHeight,
+                        itemCount,
+                        rowCount,
+                        gridGap,
+                        overscanRowCount,
+                    } = getPokemonGridProps({
+                        pokemon: pokemon,
+                        width: width,
+                    });
 
                     return (
                         <Grid
@@ -133,7 +138,7 @@ const PokemonList = ({
                             width={width}
                             columnWidth={columnWidth}
                             tabIndex={-1}
-                            overscanRowCount={columnCount}
+                            overscanRowCount={overscanRowCount}
                         />
                     );
                 }}

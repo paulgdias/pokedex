@@ -34,13 +34,13 @@ const PokemonCard: React.FC<PokemonCardType> = ({
         });
     }
 
-    return (
+    const Card = (
         <div
             ref={ref}
-            style={style}
             key={pokemon.id}
+            style={style}
             tabIndex={navigateCallback ? 0 : -1}
-            data-pokemon-name={pokemon.name}
+            aria-label={`Pokemon Card for ${pokemon.name}`}
             className={`pokemonCard ${twMerge(cardClass, className)}`}
             onClick={(event) => {
                 if (navigateCallback) {
@@ -67,6 +67,8 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                         if (e.currentTarget.src === placeholderImg) {
                             e.currentTarget.src =
                                 pokemon.sprites[0].default || "";
+                        } else {
+                            e.currentTarget.classList.add("image-loaded");
                         }
                     }}
                 />
@@ -107,6 +109,25 @@ const PokemonCard: React.FC<PokemonCardType> = ({
             </div>
         </div>
     );
+
+    if (navigateCallback) {
+        return (
+            <a
+                title={`Navigate to ${pokemon.name}`}
+                aria-label={`Navigate to ${pokemon.name}`}
+                href={`/pokedex/${pokemon.name}`}
+                tabIndex={-1}
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
+            >
+                {Card}
+            </a>
+        );
+    }
+
+    return Card;
 };
 
 export default PokemonCard;

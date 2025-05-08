@@ -6,6 +6,8 @@ import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 
 import { twMerge } from "tailwind-merge";
 
+import { getPokemonGridProps } from "./utils";
+
 import "react-virtualized/styles.css";
 
 const PlaceholderList = ({
@@ -23,13 +25,18 @@ const PlaceholderList = ({
         <div className={twMerge("flex h-[95dvh]", className)} style={style}>
             <AutoSizer>
                 {({ height, width }) => {
-                    const cardWidth = 210;
-                    const columnCount = Math.floor(width / cardWidth) || 1;
-                    const columnWidth = width / columnCount;
-                    const rowHeight = columnWidth * 1.6;
-                    const itemCount = 36;
-                    const rowCount = Math.ceil(itemCount / columnCount);
-                    const gridGap = 10;
+                    const {
+                        columnCount,
+                        columnWidth,
+                        rowHeight,
+                        itemCount,
+                        rowCount,
+                        gridGap,
+                        overscanRowCount,
+                    } = getPokemonGridProps({
+                        width: width,
+                        isPlacehodler: true,
+                    });
 
                     return (
                         <Grid
@@ -73,7 +80,7 @@ const PlaceholderList = ({
                             width={width}
                             columnWidth={columnWidth}
                             tabIndex={-1}
-                            overscanRowCount={columnCount}
+                            overscanRowCount={overscanRowCount}
                         />
                     );
                 }}
