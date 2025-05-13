@@ -2,7 +2,7 @@ import { memo, useEffect, useState, useMemo } from "react";
 import { useLoaderData, useSearchParams } from "react-router";
 import { preconnect } from "react-dom";
 
-import { request, gql } from "graphql-request";
+import { request } from "graphql-request";
 import type { QueryClient } from "@tanstack/react-query";
 import { queryOptions, keepPreviousData } from "@tanstack/react-query";
 

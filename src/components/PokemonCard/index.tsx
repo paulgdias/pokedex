@@ -25,7 +25,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     isLegendary,
     isMythical,
     navigateCallback,
-}) => {
+}: PokemonCardType) => {
     if (pokemon.sprites[0].default) {
         preload(pokemon.sprites[0].default, {
             as: "image",
