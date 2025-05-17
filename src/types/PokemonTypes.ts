@@ -19,6 +19,10 @@ export const typeColors = {
     ice: "bg-ice",
 };
 
+export type PokedexResult = {
+    pokemon: Pokemon[];
+};
+
 export type Pokemon = {
     id: number;
     name: string;
@@ -34,6 +38,24 @@ export type Pokemon = {
     evolutions: Pokemon[];
 };
 
-export type PokedexResult = {
-    pokemon: Pokemon[];
+export type TeamsResult = Team[];
+
+export type Team = {
+    _id: string;
+    pokemon: PokemonDetails[];
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type PokemonDetails = {
+    id: number;
+    name: string;
+    sprite: string;
+    types: (keyof typeof typeColors)[];
+    isLegendary: boolean;
+    isMythical: boolean;
+    generationId: number;
+    evolutionChainId: number;
+    evolvesFromId: number;
 };

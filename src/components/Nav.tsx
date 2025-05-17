@@ -2,7 +2,13 @@ import { useState } from "react";
 import { NavLink } from "react-router";
 import { Button } from "react-aria-components";
 
-import { House, LibraryBig, ChevronsLeft, ChevronsRight } from "lucide-react";
+import {
+    House,
+    LibraryBig,
+    ChevronsLeft,
+    ChevronsRight,
+    FolderHeart,
+} from "lucide-react";
 
 const hoverShadow = "hover:drop-shadow-md hover:drop-shadow-sky-400";
 const iconStyle = "h-6 w-6 text-white";
@@ -44,9 +50,26 @@ const Nav: React.FC = () => {
                             if (isOpen) setIsOpen(false);
                         }}
                     >
-                        <LibraryBig className={`${iconStyle} cursor-pointe`} />
+                        <LibraryBig className={`${iconStyle} cursor-pointer`} />
                         <span className={`text-white ml-2 ${toggleDisplay}`}>
                             Pokédex
+                        </span>
+                    </NavLink>
+                    <NavLink
+                        to="/teams"
+                        className={({ isActive }) =>
+                            `react-aria-Button flex flex-row items-end ${hoverShadow} ${isActive ? "active" : ""}`
+                        }
+                        aria-label="teams"
+                        onClick={() => {
+                            if (isOpen) setIsOpen(false);
+                        }}
+                    >
+                        <FolderHeart
+                            className={`${iconStyle} cursor-pointer`}
+                        />
+                        <span className={`text-white ml-2 ${toggleDisplay}`}>
+                            Teams
                         </span>
                     </NavLink>
                 </nav>

@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Layout from "./pages/Layout";
 import { loader as pokedexLoader } from "./pages/Pokedex";
+import { loader as teamsLoader } from "./pages/Teams";
 import Home from "./pages/Home";
 
 import { routes } from "./utils/routes";
@@ -31,11 +32,25 @@ const LoadingSpinner = () => {
 };
 
 const additionalRoutes = [...routes.entries()].map(([key, value]) => {
+    if (key.includes("/pokedex")) {
+        return {
+            path: key,
+            element: React.createElement(value),
+            HydrateFallback: LoadingSpinner,
+            loader: pokedexLoader(queryClient),
+        };
+    }
+    if (key.includes("/teams")) {
+        return {
+            path: key,
+            element: React.createElement(value),
+            HydrateFallback: LoadingSpinner,
+            loader: teamsLoader(queryClient),
+        };
+    }
     return {
         path: key,
         element: React.createElement(value),
-        HydrateFallback: LoadingSpinner,
-        loader: pokedexLoader(queryClient),
     };
 });
 

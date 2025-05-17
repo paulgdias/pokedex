@@ -1,0 +1,25 @@
+{
+  "name": "pokeapp-server",
+  "version": "1.0.0",
+  "description": "A Node.js application for storing Pokémon data.",
+  "author": "Paul Dias",
+  "license": "MIT",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "format": "prettier ./src --write"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "mongodb": "^6.16.0",
+    "prettier": "^3.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
