@@ -26,7 +26,6 @@
     "react-dom": "^19.1.0",
     "react-error-boundary": "^6.0.0",
     "react-infinite-scroll-component": "^6.1.0",
-    "react-intersection-observer": "^9.16.0",
     "react-router": "^7.5.3",
     "react-virtualized": "^9.22.6",
     "tailwind-merge": "^3.2.0"
@@ -42,6 +41,7 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/react-lazy-load-image-component": "^1.6.4",
+    "@types/react-slick": "^0.23.13",
     "@types/react-virtualized": "^9.22.2",
     "esbuild": "^0.25.2",
     "eslint": "^9.25.1",

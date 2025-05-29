@@ -36,6 +36,11 @@ const additionalRoutes = [...routes.entries()].map(([key, value]) => {
         return {
             path: key,
             element: React.createElement(value),
+            errorElement: (
+                <div>
+                    There was an error loading the Pokédex. Please try again.
+                </div>
+            ),
             HydrateFallback: LoadingSpinner,
             loader: pokedexLoader(queryClient),
         };
@@ -44,6 +49,9 @@ const additionalRoutes = [...routes.entries()].map(([key, value]) => {
         return {
             path: key,
             element: React.createElement(value),
+            errorElement: (
+                <div>There was an error loading teams. Please try again.</div>
+            ),
             HydrateFallback: LoadingSpinner,
             loader: teamsLoader(queryClient),
         };

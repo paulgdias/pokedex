@@ -74,7 +74,7 @@ const Teams: React.FC = () => {
                                             className="w-[210px] hover:shadow-lg cursor-auto m-auto"
                                             key={index}
                                             pokemon={{
-                                                id: pokemon.id,
+                                                id: pokemon._id,
                                                 name: pokemon.name,
                                                 sprites: [
                                                     { default: pokemon.sprite },

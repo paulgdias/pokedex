@@ -49,7 +49,7 @@ export type Team = {
 };
 
 export type PokemonDetails = {
-    id: number;
+    _id: number;
     name: string;
     sprite: string;
     types: (keyof typeof typeColors)[];
