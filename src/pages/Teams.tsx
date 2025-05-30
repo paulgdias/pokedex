@@ -1,9 +1,15 @@
 import { memo, useRef } from "react";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 import { preconnect } from "react-dom";
 
 import type { QueryClient } from "@tanstack/react-query";
 import { queryOptions, keepPreviousData } from "@tanstack/react-query";
+
+import {
+    carouselClass,
+    carouselSlideClass,
+    carouselWrapperClass,
+} from "@styles/Carousel";
 
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -43,6 +49,8 @@ const Teams: React.FC = () => {
     const pokemonRef = useRef<HTMLDivElement>(null);
     const pokemonData: TeamsResult = useLoaderData();
 
+    const navigate = useNavigate();
+
     return (
         <>
             <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
@@ -64,45 +72,65 @@ const Teams: React.FC = () => {
                             >
                                 {data.name}
                             </h2>
-                            <div className="flex flex-wrap gap-4 w-auto">
-                                {data.pokemon.map(
-                                    (
-                                        pokemon: PokemonDetails,
-                                        index: number
-                                    ) => (
-                                        <PokemonCard
-                                            className="w-[210px] hover:shadow-lg cursor-auto m-auto"
-                                            key={index}
-                                            pokemon={{
-                                                id: pokemon._id,
-                                                name: pokemon.name,
-                                                sprites: [
-                                                    { default: pokemon.sprite },
-                                                ],
-                                                specs: {
-                                                    is_legendary:
-                                                        pokemon.isLegendary,
-                                                    is_mythical:
-                                                        pokemon.isMythical,
-                                                    generation_id:
-                                                        pokemon.generationId,
-                                                    evolution_chain_id:
-                                                        pokemon.evolutionChainId,
-                                                    evolves_from_species_id:
-                                                        pokemon.evolvesFromId,
-                                                },
-                                                types: pokemon.types.map(
-                                                    (type) => ({
-                                                        type: {
-                                                            name: type as keyof typeof typeColors,
+                            <div className={carouselWrapperClass}>
+                                <div className={carouselClass}>
+                                    {data.pokemon.map(
+                                        (
+                                            pokemon: PokemonDetails,
+                                            index: number
+                                        ) => (
+                                            <div
+                                                key={index}
+                                                className={carouselSlideClass}
+                                            >
+                                                <PokemonCard
+                                                    className="w-[210px] hover:border-sky-500 focus:border-sky-500"
+                                                    pokemon={{
+                                                        id: pokemon._id,
+                                                        name: pokemon.name,
+                                                        sprites: [
+                                                            {
+                                                                default:
+                                                                    pokemon.sprite,
+                                                            },
+                                                        ],
+                                                        specs: {
+                                                            is_legendary:
+                                                                pokemon.isLegendary,
+                                                            is_mythical:
+                                                                pokemon.isMythical,
+                                                            generation_id:
+                                                                pokemon.generationId,
+                                                            evolution_chain_id:
+                                                                pokemon.evolutionChainId,
+                                                            evolves_from_species_id:
+                                                                pokemon.evolvesFromId,
                                                         },
-                                                    })
-                                                ),
-                                                evolutions: [],
-                                            }}
-                                        />
-                                    )
-                                )}
+                                                        types: pokemon.types.map(
+                                                            (type) => ({
+                                                                type: {
+                                                                    name: type as keyof typeof typeColors,
+                                                                },
+                                                            })
+                                                        ),
+                                                        evolutions: [],
+                                                    }}
+                                                    navigateCallback={(event, pokemon) => {
+                                                        navigate(
+                                                            `/pokedex/${pokemon.name}`,
+                                                            {
+                                                                state: {
+                                                                    pokemon: pokemon,
+                                                                    previous: location.pathname + location.search,
+                                                                },
+                                                            }
+                                                        );
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}
