@@ -1,8 +1,9 @@
 import { memo, useEffect, useState, useMemo } from "react";
-import { useLoaderData, useSearchParams } from "react-router";
 import { preconnect } from "react-dom";
 
-import { request } from "graphql-request";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData, useSearchParams } from "react-router";
+
 import type { QueryClient } from "@tanstack/react-query";
 import { queryOptions, keepPreviousData } from "@tanstack/react-query";
 
@@ -36,8 +37,8 @@ import { twMerge } from "tailwind-merge";
 
 const toggleButtonClass = twMerge(buttonClass, "w-12");
 
-const pokedexQuery = () =>
-    queryOptions({
+const pokedexQuery = (_args: LoaderFunctionArgs) => {
+    return queryOptions({
         queryKey: ["pokedex"],
         queryFn: async (): Promise<Array<PokemonDetails>> => {
             const response = await fetch(
@@ -48,11 +49,13 @@ const pokedexQuery = () =>
         },
         placeholderData: keepPreviousData,
     });
-
-export const loader = (queryClient: QueryClient) => async () => {
-    const data = await queryClient.ensureQueryData(pokedexQuery());
-    return getPokemonEvolutions(data);
 };
+
+export const loader =
+    (queryClient: QueryClient) => async (_args: LoaderFunctionArgs) => {
+        const data = await queryClient.ensureQueryData(pokedexQuery(_args));
+        return getPokemonEvolutions(data);
+    };
 
 const setState: PokedexSetState = ({
     pokemonData,

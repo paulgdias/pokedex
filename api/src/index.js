@@ -205,7 +205,7 @@ class PokedexServer {
 			}
 		});
 
-		app.get("/api/v1/pokemon/gen/:number", async (req, res) => {
+		app.get("/api/v1/pokemon/gen/:number", async (_req, res) => {
 			try {
 				let collection = await this.connectToDB("pokemon");
 				console.log("Connected to MongoDB", collection.collectionName);
@@ -224,7 +224,7 @@ class PokedexServer {
 			}
 		});
 
-		app.get("/api/v1/pokemon/teams", async (req, res) => {
+		app.get("/api/v1/pokemon/teams", async (_req, res) => {
 			try {
 				let collection = await this.connectToDB("teams");
 				console.log("Connected to MongoDB", collection.collectionName);
@@ -310,7 +310,7 @@ class PokedexServer {
 		});
 
 		// catch-all route
-		app.all("/{*any}", (req, res) =>
+		app.all("/{*any}", (_req, res) =>
 			res.status(404).send("API endpoint not found"),
 		);
 	}
