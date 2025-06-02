@@ -19,7 +19,7 @@ import Pokeball from "@components/Icons/Pokeball";
 
 import { ErrorBoundary } from "react-error-boundary";
 
-import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { Sort, Sorting } from "@customTypes/SortingTypes";
 import { PokedexSetState } from "@customTypes/PokedexTypes";
 
@@ -31,20 +31,19 @@ import {
 import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
 import { getPokemonEvolutions } from "@utils/pokemon";
 
-import { graphqlQuery } from "@api/hooks";
-
 import { buttonClass } from "@styles/Pokedex";
 import { twMerge } from "tailwind-merge";
+
 const toggleButtonClass = twMerge(buttonClass, "w-12");
 
 const pokedexQuery = () =>
     queryOptions({
         queryKey: ["pokedex"],
-        queryFn: async (): Promise<PokedexResult> => {
-            const data: PokedexResult = await request(
-                "https://beta.pokeapi.co/graphql/v1beta",
-                graphqlQuery
+        queryFn: async (): Promise<Array<PokemonDetails>> => {
+            const response = await fetch(
+                "http://localhost:3001/api/v1/pokemon/all"
             );
+            const data: PokemonDetails[] = await response.json();
             return data;
         },
         placeholderData: keepPreviousData,
@@ -92,13 +91,13 @@ const setState: PokedexSetState = ({
 };
 
 const transformPokemonData = (
-    data: PokedexResult,
+    data: PokemonDetails[],
     urlParams: URLSearchParams,
     sorting: Sorting
 ) => {
     const filteredPokemonData = urlParams.has("query")
-        ? advancedSearch(data.pokemon, convertToSearch(urlParams))
-        : data.pokemon;
+        ? advancedSearch(data, convertToSearch(urlParams))
+        : data;
     const sort = getSortingKey(sorting);
     return sortPokemonByType(
         filteredPokemonData,
@@ -133,13 +132,11 @@ const Pokedex: React.FC = () => {
         },
     });
 
-    const initialData = useLoaderData();
-    const [pokemonData, setPokemonData] = useState<Pokemon[]>(
-        initialData.pokemon
-    );
+    const initialData: PokemonDetails[] = useLoaderData();
+    const [pokemonData, setPokemonData] =
+        useState<PokemonDetails[]>(initialData);
     const pokemonList = useMemo(
-        () =>
-            transformPokemonData({ pokemon: pokemonData }, urlParams, sorting),
+        () => transformPokemonData(pokemonData, urlParams, sorting),
         [pokemonData, urlParams, sorting]
     );
 
@@ -210,7 +207,7 @@ const Pokedex: React.FC = () => {
                     </div>
                     <Search
                         className={`${showFilters ? "" : "hidden invisible"}`}
-                        data={initialData.pokemon}
+                        data={initialData}
                         value={convertToSearch(urlParams)}
                         onSubmit={(results, searches) => {
                             const sort = getSortingKey(sorting);

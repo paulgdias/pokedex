@@ -11,7 +11,7 @@ import {
     Focusable,
 } from "react-aria-components";
 
-import { Pokemon } from "@customTypes/PokemonTypes";
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 
 import { advancedSearch, searchRegex } from "@utils/search";
 
@@ -25,15 +25,15 @@ const Search = ({
     onSubmit,
 }: {
     className?: string;
-    data: Pokemon[];
+    data: PokemonDetails[];
     value?: string;
     isDisabled?: boolean;
-    onSubmit?: (results: Pokemon[], searches?: RegExpExecArray[]) => void;
+    onSubmit?: (results: PokemonDetails[], searches?: RegExpExecArray[]) => void;
 }) => {
     const [search, setSearch] = useState<string>("");
 
     const searchFunction = useCallback(
-        (data: Pokemon[], search: string): Pokemon[] => {
+        (data: PokemonDetails[], search: string): PokemonDetails[] => {
             if (search === "") {
                 return data;
             }

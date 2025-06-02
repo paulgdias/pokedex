@@ -26,8 +26,8 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     isMythical,
     navigateCallback,
 }: PokemonCardType) => {
-    if (pokemon.sprites[0].default) {
-        preload(pokemon.sprites[0].default, {
+    if (pokemon.sprite) {
+        preload(pokemon.sprite, {
             as: "image",
             fetchPriority: "high",
         });
@@ -36,7 +36,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     const Card = (
         <div
             ref={ref}
-            key={pokemon.id}
+            key={pokemon._id}
             style={style}
             tabIndex={navigateCallback ? 0 : -1}
             aria-label={`Pokemon Card for ${pokemon.name}`}
@@ -56,7 +56,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
         >
             {isLegendary && <Sparkles className={legendaryPokemonClass} />}
             {isMythical && <Sparkles className={mythicalPokemonClass} />}
-            {pokemon.sprites[0].default ? (
+            {pokemon.sprite ? (
                 <img
                     title={pokemon.name}
                     alt={pokemon.name}
@@ -64,8 +64,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                     src={placeholderImg}
                     onLoad={(e) => {
                         if (e.currentTarget.src === placeholderImg) {
-                            e.currentTarget.src =
-                                pokemon.sprites[0].default || "";
+                            e.currentTarget.src = pokemon.sprite || "";
                         } else {
                             e.currentTarget.classList.add("image-loaded");
                         }
@@ -79,7 +78,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
             )}
             <div className="px-3 py-1">
                 <div className={cardStatsClass}>
-                    <div className={pokedexIdClass}>#{pokemon.id}</div>
+                    <div className={pokedexIdClass}>#{pokemon._id}</div>
                     <span title={pokemon.name} className="truncate block">
                         {pokemon.name}
                     </span>
@@ -88,19 +87,15 @@ const PokemonCard: React.FC<PokemonCardType> = ({
             <div className="px-2 py-2">
                 {pokemon.types.map(
                     (
-                        types: {
-                            type: {
-                                name: keyof typeof typeColors;
-                            };
-                        },
+                        type: keyof typeof typeColors,
                         index: number
                     ) => {
                         return (
                             <span
                                 key={index}
-                                className={`inline-block ${typeColors[types.type.name]} ${placeholderClass} min-w-12 text-center`}
+                                className={`inline-block ${typeColors[type]} ${placeholderClass} min-w-12 text-center`}
                             >
-                                {types.type.name}
+                                {type}
                             </span>
                         );
                     }

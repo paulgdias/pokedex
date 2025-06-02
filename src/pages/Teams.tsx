@@ -86,42 +86,35 @@ const Teams: React.FC = () => {
                                                 <PokemonCard
                                                     className="w-[210px] hover:border-sky-500 focus:border-sky-500"
                                                     pokemon={{
-                                                        id: pokemon._id,
+                                                        _id: pokemon._id,
                                                         name: pokemon.name,
-                                                        sprites: [
-                                                            {
-                                                                default:
-                                                                    pokemon.sprite,
-                                                            },
-                                                        ],
-                                                        specs: {
-                                                            is_legendary:
-                                                                pokemon.isLegendary,
-                                                            is_mythical:
-                                                                pokemon.isMythical,
-                                                            generation_id:
-                                                                pokemon.generationId,
-                                                            evolution_chain_id:
-                                                                pokemon.evolutionChainId,
-                                                            evolves_from_species_id:
-                                                                pokemon.evolvesFromId,
-                                                        },
-                                                        types: pokemon.types.map(
-                                                            (type) => ({
-                                                                type: {
-                                                                    name: type as keyof typeof typeColors,
-                                                                },
-                                                            })
-                                                        ),
+                                                        sprite: pokemon.sprite,
+                                                        isLegendary:
+                                                            pokemon.isLegendary,
+                                                        isMythical:
+                                                            pokemon.isMythical,
+                                                        generationId:
+                                                            pokemon.generationId,
+                                                        evolutionChainId:
+                                                            pokemon.evolutionChainId,
+                                                        evolvesFromId:
+                                                            pokemon.evolvesFromId,
+                                                        types: pokemon.types,
                                                         evolutions: [],
                                                     }}
-                                                    navigateCallback={(event, pokemon) => {
+                                                    navigateCallback={(
+                                                        _event,
+                                                        pokemon
+                                                    ) => {
                                                         navigate(
                                                             `/pokedex/${pokemon.name}`,
                                                             {
                                                                 state: {
-                                                                    pokemon: pokemon,
-                                                                    previous: location.pathname + location.search,
+                                                                    pokemon:
+                                                                        pokemon,
+                                                                    previous:
+                                                                        location.pathname +
+                                                                        location.search,
                                                                 },
                                                             }
                                                         );

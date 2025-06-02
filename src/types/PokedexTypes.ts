@@ -1,10 +1,10 @@
 import type { SetURLSearchParams } from "react-router";
-import { Pokemon } from "./PokemonTypes";
+import { PokemonDetails } from "./PokemonTypes";
 import { Sorting } from "./SortingTypes";
 
 export type PokedexSetState = (args: {
-    pokemonData: Pokemon[];
-    setPokemonData: React.Dispatch<React.SetStateAction<Pokemon[]>>;
+    pokemonData: PokemonDetails[];
+    setPokemonData: React.Dispatch<React.SetStateAction<PokemonDetails[]>>;
     sorting: Sorting;
     sort: keyof Sorting;
     setSorting: React.Dispatch<React.SetStateAction<Sorting>>;

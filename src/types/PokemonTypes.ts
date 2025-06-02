@@ -19,10 +19,10 @@ export const typeColors = {
     ice: "bg-ice",
 };
 
+/* graphql types */
 export type PokedexResult = {
     pokemon: Pokemon[];
 };
-
 export type Pokemon = {
     id: number;
     name: string;
@@ -38,8 +38,8 @@ export type Pokemon = {
     evolutions: Pokemon[];
 };
 
+/* custom types */
 export type TeamsResult = Team[];
-
 export type Team = {
     _id: string;
     pokemon: PokemonDetails[];
@@ -47,7 +47,6 @@ export type Team = {
     createdAt: string;
     updatedAt: string;
 };
-
 export type PokemonDetails = {
     _id: number;
     name: string;
@@ -58,4 +57,5 @@ export type PokemonDetails = {
     generationId: number;
     evolutionChainId: number;
     evolvesFromId: number;
+    evolutions: PokemonDetails[];
 };

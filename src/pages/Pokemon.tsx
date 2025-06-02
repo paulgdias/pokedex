@@ -10,7 +10,7 @@ import PokemonCard from "@components/PokemonCard";
 
 import { getPokemonEvolutions } from "@utils/pokemon";
 
-import { Pokemon as PokemonType } from "@customTypes/PokemonTypes";
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 
 const Pokemon: React.FC = () => {
     preconnect("https://beta.pokeapi.co");
@@ -23,7 +23,7 @@ const Pokemon: React.FC = () => {
         pathname,
     }: {
         state: {
-            pokemon: PokemonType;
+            pokemon: PokemonDetails;
             previous: string;
         };
         pathname: string;
@@ -32,7 +32,7 @@ const Pokemon: React.FC = () => {
     const pokemonName = pathname.split("/")[2];
     const initialData = useLoaderData();
     const pokedexList = getPokemonEvolutions(initialData);
-    const pokemon = pokedexList.pokemon.find((item: PokemonType) => {
+    const pokemon = pokedexList.find((item: PokemonDetails) => {
         return item.name === pokemonName;
     });
 
@@ -60,8 +60,8 @@ const Pokemon: React.FC = () => {
                     ref={pokemonRef}
                     className="w-xs sm:w-sm hover:shadow-lg cursor-auto m-auto"
                     pokemon={pokemon}
-                    isLegendary={pokemon.specs.is_legendary}
-                    isMythical={pokemon.specs.is_mythical}
+                    isLegendary={pokemon.isLegendary}
+                    isMythical={pokemon.isMythical}
                 />
                 <div className="h-0 basis-full" />
                 {pokemon.evolutions.map((item, index) => (
@@ -69,9 +69,9 @@ const Pokemon: React.FC = () => {
                         key={index}
                         className="w-[210px] hover:shadow-lg hover:border-sky-500 focus:border-sky-500 m-4"
                         pokemon={item}
-                        isLegendary={item.specs.is_legendary}
-                        isMythical={item.specs.is_mythical}
-                        navigateCallback={(event, pokemon) => {
+                        isLegendary={item.isLegendary}
+                        isMythical={item.isMythical}
+                        navigateCallback={(_event, pokemon) => {
                             const previousWithFallback =
                                 state?.previous || "/pokedex";
 

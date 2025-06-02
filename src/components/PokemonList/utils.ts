@@ -1,4 +1,4 @@
-import { Pokemon } from "@customTypes/PokemonTypes";
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 
 export const getPokemonGridProps = ({
     width,
@@ -7,7 +7,7 @@ export const getPokemonGridProps = ({
     isPlacehodler = false,
 }: {
     width: number;
-    pokemon?: Pokemon[];
+    pokemon?: PokemonDetails[];
     cardWidth?: number;
     isPlacehodler?: boolean;
 }) => {

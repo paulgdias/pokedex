@@ -1,23 +1,29 @@
-import { Pokemon } from "@customTypes/PokemonTypes";
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { SearchFields } from "@customTypes/SortingTypes";
 
 export const searchRegex = /\+([^=]+)=([^ ]+)/g;
 
-export const basicSearch = (data: Pokemon[], search: string): Pokemon[] => {
+export const basicSearch = (
+    data: PokemonDetails[],
+    search: string
+): PokemonDetails[] => {
     const searchResults = data.filter((item) => {
         const number = Number(search);
         if (isNaN(number)) {
             return item.name.includes(search.toLowerCase());
         }
-        return item.id === number;
+        return item._id === number;
     });
     return searchResults;
 };
 
-export const advancedSearch = (data: Pokemon[], search: string): Pokemon[] => {
+export const advancedSearch = (
+    data: PokemonDetails[],
+    search: string
+): PokemonDetails[] => {
     const match = [...search.matchAll(searchRegex)];
     if (match.length > 0) {
-        let searchResults: Pokemon[] = data;
+        let searchResults: PokemonDetails[] = data;
         match.forEach((match) => {
             const filter = match[1] as keyof SearchFields;
             const value = match[2];
@@ -30,24 +36,22 @@ export const advancedSearch = (data: Pokemon[], search: string): Pokemon[] => {
                         break;
                     case "id":
                     case "number":
-                        exists = item["id"] === Number(value);
+                        exists = item["_id"] === Number(value);
                         break;
                     case "type":
-                        exists = item["types"].some(
-                            (type) => type.type.name === value
-                        );
+                        exists = item["types"].some((type) => type === value);
                         break;
                     case "isLegendary":
                     case "legends":
-                        exists = item["specs"].is_legendary === Boolean(value);
+                        exists = item["isLegendary"] === Boolean(value);
                         break;
                     case "isMythical":
                     case "mythicals":
-                        exists = item["specs"].is_mythical === Boolean(value);
+                        exists = item["isMythical"] === Boolean(value);
                         break;
                     case "gen":
                     case "generation":
-                        exists = item["specs"].generation_id === Number(value);
+                        exists = item["generationId"] === Number(value);
                         break;
                     default:
                         break;

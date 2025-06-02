@@ -1,9 +1,9 @@
+// Hook to fetch and process Pokémon data from the GraphQL API.
+
 import { request, gql } from "graphql-request";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 import { Pokemon, PokedexResult } from "@customTypes/PokemonTypes";
-
-import { getPokemonEvolutions } from "@utils/pokemon";
 
 export const graphqlQuery = gql`
     query getPokedex {
@@ -30,6 +30,41 @@ export const graphqlQuery = gql`
         }
     }
 `;
+
+export const getGroupedEvolutions = (data: PokedexResult) => {
+    if (data) {
+        const groupedPokemonData = data.pokemon.reduce(
+            (acc, pokemon) => {
+                const chainId = pokemon.specs.evolution_chain_id;
+                if (!acc[chainId]) {
+                    acc[chainId] = [];
+                }
+                acc[chainId].push(pokemon);
+                return acc;
+            },
+            {} as Record<number, Pokemon[]>
+        );
+        for (const chainId in groupedPokemonData) {
+            groupedPokemonData[chainId].sort((a, b) => a.id - b.id);
+        }
+
+        return groupedPokemonData;
+    }
+    return {};
+};
+
+export const getPokemonEvolutions = (data: PokedexResult) => {
+    const evolutions = getGroupedEvolutions(data);
+    const pokemon = data.pokemon.map((pokemon) => {
+        return {
+            ...pokemon,
+            evolutions: evolutions[pokemon.specs.evolution_chain_id],
+        };
+    });
+    return {
+        pokemon,
+    };
+};
 
 const useFetchPokedex = ({ enabled }: { enabled?: boolean }) => {
     return useQuery<PokedexResult, Error>({

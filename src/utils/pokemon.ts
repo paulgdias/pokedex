@@ -1,20 +1,20 @@
-import { PokedexResult, Pokemon } from "@customTypes/PokemonTypes";
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 
-export const getGroupedEvolutions = (data: PokedexResult) => {
+export const getGroupedEvolutions = (data: PokemonDetails[]) => {
     if (data) {
-        const groupedPokemonData = data.pokemon.reduce(
+        const groupedPokemonData = data.reduce(
             (acc, pokemon) => {
-                const chainId = pokemon.specs.evolution_chain_id;
+                const chainId = pokemon.evolutionChainId;
                 if (!acc[chainId]) {
                     acc[chainId] = [];
                 }
                 acc[chainId].push(pokemon);
                 return acc;
             },
-            {} as Record<number, Pokemon[]>
+            {} as Record<number, PokemonDetails[]>
         );
         for (const chainId in groupedPokemonData) {
-            groupedPokemonData[chainId].sort((a, b) => a.id - b.id);
+            groupedPokemonData[chainId].sort((a, b) => a._id - b._id);
         }
 
         return groupedPokemonData;
@@ -22,15 +22,12 @@ export const getGroupedEvolutions = (data: PokedexResult) => {
     return {};
 };
 
-export const getPokemonEvolutions = (data: PokedexResult) => {
+export const getPokemonEvolutions = (data: PokemonDetails[]) => {
     const evolutions = getGroupedEvolutions(data);
-    const pokemon = data.pokemon.map((pokemon) => {
+    return data.map((pokemon) => {
         return {
             ...pokemon,
-            evolutions: evolutions[pokemon.specs.evolution_chain_id],
+            evolutions: evolutions[pokemon.evolutionChainId],
         };
     });
-    return {
-        pokemon,
-    };
 };

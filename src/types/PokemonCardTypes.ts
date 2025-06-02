@@ -1,11 +1,11 @@
 import { CSSProperties, Ref } from "react";
-import { Pokemon } from "./PokemonTypes";
+import { PokemonDetails } from "./PokemonTypes";
 
 export interface PokemonCardType {
     ref?: Ref<HTMLDivElement>;
     className?: string;
     style?: CSSProperties;
-    pokemon: Pokemon;
+    pokemon: PokemonDetails;
     isLegendary?: boolean;
     isMythical?: boolean;
     navigateCallback?: (
@@ -13,6 +13,6 @@ export interface PokemonCardType {
             | React.MouseEvent<HTMLDivElement>
             | React.KeyboardEvent<HTMLInputElement>,
         pokemon: PokemonCardType["pokemon"],
-        evolutions?: Record<number, Pokemon[]>
+        evolutions?: Record<number, PokemonDetails[]>
     ) => void;
 }

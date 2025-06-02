@@ -1,4 +1,4 @@
-import { Pokemon } from "./PokemonTypes";
+import { PokemonDetails } from "./PokemonTypes";
 
 export type Sort = "asc" | "desc";
 export type SortingItem = {
@@ -23,5 +23,9 @@ export interface SearchFields extends Sorting {
 }
 
 export interface SortFunction {
-    (pokemonData: Pokemon[], sorting: Sorting, sort: keyof Sorting): Pokemon[];
+    (
+        pokemonData: PokemonDetails[],
+        sorting: Sorting,
+        sort: keyof Sorting
+    ): PokemonDetails[];
 }

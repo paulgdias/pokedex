@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 
 import { Grid, AutoSizer } from "react-virtualized";
 
-import { Pokemon } from "@customTypes/PokemonTypes";
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 import PokemonCard from "@components/PokemonCard";
 
 import { Button } from "react-aria-components";
@@ -25,7 +25,7 @@ const PokemonList = ({
 }: {
     className?: string;
     scrollToPosition?: boolean;
-    pokemon: Pokemon[];
+    pokemon: PokemonDetails[];
     isLoading?: boolean;
     previous?: string;
 }) => {
@@ -94,9 +94,9 @@ const PokemonList = ({
                                 }
 
                                 const {
-                                    is_legendary: isLegendary,
-                                    is_mythical: isMythical,
-                                } = pokemon[index].specs;
+                                    isLegendary,
+                                    isMythical,
+                                } = pokemon[index];
 
                                 return (
                                     <PokemonCard
@@ -110,7 +110,7 @@ const PokemonList = ({
                                         pokemon={pokemon[index]}
                                         isLegendary={isLegendary}
                                         isMythical={isMythical}
-                                        navigateCallback={(event, pokemon) => {
+                                        navigateCallback={(_event, pokemon) => {
                                             navigate(
                                                 `/pokedex/${pokemon.name}`,
                                                 {
