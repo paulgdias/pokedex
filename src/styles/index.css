@@ -35,7 +35,7 @@
         outline: 2px solid var(--color-sky-500);
     }
 
-    a.active {
+    a.active svg {
         border-bottom-style: var(--tw-border-style);
         border-bottom-width: 2px;
         border-color: var(--color-sky-500);
