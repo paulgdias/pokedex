@@ -19,12 +19,7 @@ import { Button } from "react-aria-components";
 
 import { ArrowUp } from "lucide-react";
 
-import {
-    PokemonDetails,
-    TeamsResult,
-    Team,
-    typeColors,
-} from "@customTypes/PokemonTypes";
+import { PokemonDetails, TeamsResult, Team } from "@customTypes/PokemonTypes";
 
 const teamsQuery = () =>
     queryOptions({
@@ -86,20 +81,7 @@ const Teams: React.FC = () => {
                                                 <PokemonCard
                                                     className="w-[210px] hover:border-sky-500 focus:border-sky-500"
                                                     pokemon={{
-                                                        _id: pokemon._id,
-                                                        name: pokemon.name,
-                                                        sprite: pokemon.sprite,
-                                                        isLegendary:
-                                                            pokemon.isLegendary,
-                                                        isMythical:
-                                                            pokemon.isMythical,
-                                                        generationId:
-                                                            pokemon.generationId,
-                                                        evolutionChainId:
-                                                            pokemon.evolutionChainId,
-                                                        evolvesFromId:
-                                                            pokemon.evolvesFromId,
-                                                        types: pokemon.types,
+                                                        ...pokemon,
                                                         evolutions: [],
                                                     }}
                                                     navigateCallback={(

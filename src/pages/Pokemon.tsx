@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
-import { useLocation, useNavigate, useLoaderData } from "react-router";
+import {
+    useLocation,
+    useNavigate,
+    useLoaderData,
+    useParams,
+} from "react-router";
 import { preconnect } from "react-dom";
 
 import { Button } from "react-aria-components";
@@ -18,9 +23,9 @@ const Pokemon: React.FC = () => {
 
     const pokemonRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const params = useParams();
     const {
         state,
-        pathname,
     }: {
         state: {
             pokemon: PokemonDetails;
@@ -29,22 +34,28 @@ const Pokemon: React.FC = () => {
         pathname: string;
     } = useLocation();
 
-    const pokemonName = pathname.split("/")[2];
+    const pokemonName = params?.pokemon;
     const initialData = useLoaderData();
-    const pokedexList = getPokemonEvolutions(initialData);
-    const pokemon = pokedexList.find((item: PokemonDetails) => {
-        return item.name === pokemonName;
-    });
+
+    let pokedexList = [];
+    let pokemon: PokemonDetails = {} as PokemonDetails;
+
+    if (initialData.length === 1) {
+        pokedexList = initialData;
+        pokemon = initialData[0];
+    } else {
+        pokedexList = getPokemonEvolutions(initialData);
+        const foundPokemon = pokedexList.find((item: PokemonDetails) => {
+            return item.name === pokemonName;
+        });
+        pokemon = foundPokemon as PokemonDetails;
+    }
 
     useEffect(() => {
         if (!pokemon) {
             navigate("/pokedex", { replace: true });
         }
     }, [pokemon]);
-
-    if (!pokemon) {
-        return null;
-    }
 
     return (
         <>

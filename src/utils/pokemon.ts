@@ -1,3 +1,5 @@
+import Dexie, { type EntityTable } from "dexie";
+
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
 export const getGroupedEvolutions = (data: PokemonDetails[]) => {
@@ -30,4 +32,16 @@ export const getPokemonEvolutions = (data: PokemonDetails[]) => {
             evolutions: evolutions[pokemon.evolutionChainId],
         };
     });
+};
+
+export const getPokemonDB = () => {
+    const db = new Dexie("pokemonDB") as Dexie & {
+        pokemon: EntityTable<PokemonDetails>;
+    };
+    db.version(1).stores({
+        pokemon:
+            "_id,name,sprite,isLegendary,isMythical,generationId,evolutionChainId,evolvesFromId,types,evolutions",
+    });
+    db.open();
+    return db;
 };

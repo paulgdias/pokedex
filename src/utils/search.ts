@@ -12,7 +12,7 @@ export const basicSearch = (
         if (isNaN(number)) {
             return item.name.includes(search.toLowerCase());
         }
-        return item._id === number;
+        return item._id.toString().startsWith(search);
     });
     return searchResults;
 };

@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-import { SearchIcon, Info, X } from "lucide-react";
+import { SearchIcon, Info } from "lucide-react";
 
 import {
-    Button,
     Input,
     SearchField,
     Tooltip,
@@ -17,36 +16,29 @@ import { advancedSearch, searchRegex } from "@utils/search";
 
 import { twMerge } from "tailwind-merge";
 
+const searchFunction = (data: PokemonDetails[], search: string): PokemonDetails[] => {
+    if (search === "") {
+        return data;
+    }
+    return advancedSearch(data, search);
+};
+
 const Search = ({
     className,
     data,
     value,
     isDisabled,
     onSubmit,
+    onChange,
 }: {
     className?: string;
     data: PokemonDetails[];
     value?: string;
     isDisabled?: boolean;
     onSubmit?: (results: PokemonDetails[], searches?: RegExpExecArray[]) => void;
+    onChange?: (text: string) => void;
 }) => {
-    const [search, setSearch] = useState<string>("");
-
-    const searchFunction = useCallback(
-        (data: PokemonDetails[], search: string): PokemonDetails[] => {
-            if (search === "") {
-                return data;
-            }
-            return advancedSearch(data, search);
-        },
-        [data, search]
-    );
-
-    useEffect(() => {
-        if (value) {
-            setSearch(value);
-        }
-    }, [value]);
+    const [search, setSearch] = useState<string>(value ?? "");
 
     return (
         <div
@@ -56,11 +48,12 @@ const Search = ({
             <SearchField
                 aria-label="Search Field"
                 className="mr-2 flex flex-row"
-                type="text"
                 onChange={(text) => {
                     setSearch(text);
                     if (text === "") {
                         if (onSubmit) onSubmit(data);
+                    } else {
+                        if (onChange) onChange(text);
                     }
                 }}
                 onSubmit={(search) => {
@@ -83,23 +76,14 @@ const Search = ({
                 }}
                 value={search}
             >
-                {({ state }) => (
-                    <>
-                        <Input
-                            title="Search Input"
-                            className={
-                                "bg-white border-1 border-black w-56 disabled:disabled-component"
-                            }
-                            placeholder="Search"
-                            {...(isDisabled ? { disabled: isDisabled } : {})}
-                        />
-                        {state.value !== "" && (
-                            <Button className="cursor-pointer ml-1 bg-white border-1 rounded-2xl">
-                                <X />
-                            </Button>
-                        )}
-                    </>
-                )}
+                <Input
+                    title="Search Input"
+                    className={
+                        "bg-white border-1 border-black w-56 disabled:disabled-component"
+                    }
+                    placeholder="Search"
+                    {...(isDisabled ? { disabled: isDisabled } : {})}
+                />
             </SearchField>
 
             <TooltipTrigger delay={100} closeDelay={100}>

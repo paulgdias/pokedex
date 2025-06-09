@@ -2,12 +2,14 @@ import { memo, useEffect, useState, useMemo } from "react";
 import { preconnect } from "react-dom";
 
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData, useSearchParams } from "react-router";
+import { useLoaderData, useSearchParams, redirect } from "react-router";
 
 import type { QueryClient } from "@tanstack/react-query";
 import { queryOptions, keepPreviousData } from "@tanstack/react-query";
 
 import { useLocalStorage } from "@uidotdev/usehooks";
+
+import { toast } from "sonner";
 
 import { Button } from "react-aria-components";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
@@ -28,9 +30,10 @@ import {
     advancedSearch,
     createURLSearchParams,
     convertToSearch,
+    basicSearch,
 } from "@utils/search";
 import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
-import { getPokemonEvolutions } from "@utils/pokemon";
+import { getPokemonDB, getPokemonEvolutions } from "@utils/pokemon";
 
 import { buttonClass } from "@styles/Pokedex";
 import { twMerge } from "tailwind-merge";
@@ -53,9 +56,64 @@ const pokedexQuery = (_args: LoaderFunctionArgs) => {
 
 export const loader =
     (queryClient: QueryClient) => async (_args: LoaderFunctionArgs) => {
+        const pokedexDBTimestamp = localStorage.getItem("pokedexDBTimestamp");
+        const isPokedexOutdated = pokedexDBTimestamp
+            ? Date.now() - Number(pokedexDBTimestamp) > 1000 * 60 * 60 * 24 // 24 hours
+            : true;
+
+        if (isPokedexOutdated) {
+            localStorage.setItem("pokedexDBTimestamp", Date.now().toString());
+        } else {
+            // use Dexie to load Pokemon from IndexedDB instead of React Query cache
+            const pokemonDb = await getPokemonDB()?.pokemon;
+            if (pokemonDb) {
+                const pokemonName = _args.params.pokemon;
+                if (pokemonName) {
+                    try {
+                        return await pokemonDb
+                            .get({ name: pokemonName })
+                            .then((pokemon) => {
+                                if (!pokemon) {
+                                    throw new Error("Pokemon not found");
+                                }
+                                return [pokemon];
+                            });
+                    } catch (error) {
+                        console.error(error);
+                        toast.error(String(error));
+                        return redirect("/pokedex");
+                    }
+                }
+                try {
+                    const pokemonArray = await pokemonDb.toArray();
+                    if (pokemonArray.length > 0) return pokemonArray;
+                } catch (error) {
+                    console.error(error);
+                    toast.error(String(error));
+                    return redirect("/pokedex");
+                }
+            }
+        }
+
         const data = await queryClient.ensureQueryData(pokedexQuery(_args));
         return getPokemonEvolutions(data);
     };
+
+async function addPokemonToIndexedDB(pokemonDetails: PokemonDetails[]) {
+    try {
+        await getPokemonDB()
+            .pokemon.count()
+            .then(async (count) => {
+                if (count > 0) return;
+                else {
+                    await getPokemonDB().pokemon.clear();
+                    await getPokemonDB().pokemon.bulkAdd(pokemonDetails);
+                }
+            });
+    } catch (error) {
+        console.error("Error adding Pokemon to IndexedDB:", error);
+    }
+}
 
 const setState: PokedexSetState = ({
     pokemonData,
@@ -181,6 +239,10 @@ const Pokedex: React.FC = () => {
         }
     }, []);
 
+    useEffect(() => {
+        addPokemonToIndexedDB(initialData);
+    }, [initialData.length]);
+
     return (
         <>
             <div className="flex flex-col">
@@ -212,6 +274,12 @@ const Pokedex: React.FC = () => {
                         className={`${showFilters ? "" : "hidden invisible"}`}
                         data={initialData}
                         value={convertToSearch(urlParams)}
+                        onChange={(text) => {
+                            if (!text.includes("+")) {
+                                const pokemon = basicSearch(initialData, text);
+                                setPokemonData(pokemon);
+                            }
+                        }}
                         onSubmit={(results, searches) => {
                             const sort = getSortingKey(sorting);
                             if (sort) {
