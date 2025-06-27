@@ -5,7 +5,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useSearchParams, redirect } from "react-router";
 
 import type { QueryClient } from "@tanstack/react-query";
-import { queryOptions, keepPreviousData } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 
 import { useLocalStorage } from "@uidotdev/usehooks";
 
@@ -33,7 +33,13 @@ import {
     basicSearch,
 } from "@utils/search";
 import { defaultSorting, getSortingKey, sortPokemonByType } from "@utils/sort";
-import { getPokemonDB, getPokemonEvolutions } from "@utils/pokemon";
+import {
+    getPokemonDB,
+    getPokemonEvolutions,
+    convertToPokemonDetailsArray,
+} from "@utils/pokemon";
+
+import { getPokeAPIConfig } from "@api/hooks";
 
 import { buttonClass } from "@styles/Pokedex";
 import { twMerge } from "tailwind-merge";
@@ -41,17 +47,7 @@ import { twMerge } from "tailwind-merge";
 const toggleButtonClass = twMerge(buttonClass, "w-12");
 
 const pokedexQuery = (_args: LoaderFunctionArgs) => {
-    return queryOptions({
-        queryKey: ["pokedex"],
-        queryFn: async (): Promise<Array<PokemonDetails>> => {
-            const response = await fetch(
-                "http://localhost:3001/api/v1/pokemon/all"
-            );
-            const data: PokemonDetails[] = await response.json();
-            return data;
-        },
-        placeholderData: keepPreviousData,
-    });
+    return queryOptions(getPokeAPIConfig());
 };
 
 export const loader =
@@ -96,7 +92,10 @@ export const loader =
         }
 
         const data = await queryClient.ensureQueryData(pokedexQuery(_args));
-        return getPokemonEvolutions(data);
+        const pokemon = convertToPokemonDetailsArray(data.pokemon);
+        const pokemonWithEvolutions = getPokemonEvolutions(pokemon);
+
+        return pokemonWithEvolutions;
     };
 
 async function addPokemonToIndexedDB(pokemonDetails: PokemonDetails[]) {

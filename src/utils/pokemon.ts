@@ -1,6 +1,25 @@
 import Dexie, { type EntityTable } from "dexie";
 
-import { PokemonDetails } from "@customTypes/PokemonTypes";
+import { Pokemon, PokemonDetails } from "@customTypes/PokemonTypes";
+
+export function convertToPokemonDetailsArray(
+    pokemonArr: Pokemon[]
+): PokemonDetails[] {
+    return pokemonArr.map((pokemon) => ({
+        _id: pokemon.id ?? 0,
+        name: pokemon.name ?? "",
+        sprite: pokemon.sprites?.[0]?.default ?? "",
+        isLegendary: pokemon.specs?.is_legendary ?? false,
+        isMythical: pokemon.specs?.is_mythical ?? false,
+        generationId: pokemon.specs?.generation_id ?? 0,
+        evolutionChainId: pokemon.specs?.evolution_chain_id ?? 0,
+        evolvesFromId: pokemon.specs?.evolves_from_species_id ?? 0,
+        types: pokemon.types ? pokemon.types.map((t) => t.type.name) : [],
+        evolutions: pokemon.evolutions
+            ? convertToPokemonDetailsArray(pokemon.evolutions)
+            : [],
+    }));
+}
 
 export const getGroupedEvolutions = (data: PokemonDetails[]) => {
     if (data) {

@@ -57,8 +57,10 @@ const Nav: React.FC = () => {
                     </NavLink>
                     <NavLink
                         to="/teams"
-                        className={({ isActive }) =>
-                            `react-aria-Button flex flex-row items-end ${hoverShadow} ${isActive ? "active" : ""}`
+                        className={(
+                            { isActive } // hide since it requires the mongodb API
+                        ) =>
+                            `react-aria-Button hidden flex-row items-end ${hoverShadow} ${isActive ? "active" : ""}`
                         }
                         aria-label="teams"
                         onClick={() => {

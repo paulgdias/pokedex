@@ -66,8 +66,8 @@ export const getPokemonEvolutions = (data: PokedexResult) => {
     };
 };
 
-const useFetchPokedex = ({ enabled }: { enabled?: boolean }) => {
-    return useQuery<PokedexResult, Error>({
+export const getPokeAPIConfig = () => {
+    return {
         queryKey: ["pokedex"],
         queryFn: async (): Promise<PokedexResult> => {
             const data: PokedexResult = await request(
@@ -77,6 +77,12 @@ const useFetchPokedex = ({ enabled }: { enabled?: boolean }) => {
             return data;
         },
         placeholderData: keepPreviousData,
+    };
+};
+
+const useFetchPokedex = ({ enabled }: { enabled?: boolean }) => {
+    return useQuery<PokedexResult, Error>({
+        ...getPokeAPIConfig(),
         select: (data) => {
             const evolutions: Record<number, Pokemon[]> =
                 getPokemonEvolutions(data);

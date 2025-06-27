@@ -1,6 +1,14 @@
 import type { SetURLSearchParams } from "react-router";
-import { PokemonDetails } from "./PokemonTypes";
+import { keepPreviousData } from "@tanstack/react-query";
+import { PokemonDetails, PokedexResult, Pokemon } from "./PokemonTypes";
 import { Sorting } from "./SortingTypes";
+
+export interface PokeAPIConfigResult {
+    queryKey: [string];
+    queryFn: () => Promise<PokedexResult>;
+    placeholderData: typeof keepPreviousData;
+    select: (data: PokedexResult) => { pokemon: Pokemon[] };
+}
 
 export type PokedexSetState = (args: {
     pokemonData: PokemonDetails[];

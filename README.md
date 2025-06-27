@@ -1,5 +1,9 @@
 # Pokedex
 
+A React Typescript application I started as a way to bond with my 9 year old niece.
+
+It also serves as a testbed to try out new libraries, design patterns, UX etc.
+
 ## Prerequisites
 
 - Node.js (v14 or higher)
