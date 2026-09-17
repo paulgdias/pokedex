@@ -5,7 +5,9 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 
 import { I18nProvider } from "react-aria";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 
 import Layout from "./pages/Layout";
 import { loader as pokedexLoader } from "./pages/Pokedex";
@@ -21,7 +23,20 @@ import "./styles/index.css";
 const container = document.getElementById("root");
 if (!container) throw new Error("Root container not found");
 
-const queryClient = new QueryClient();
+const ONE_DAY = 1000 * 60 * 60 * 24;
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: ONE_DAY,
+            gcTime: ONE_DAY,
+        },
+    },
+});
+
+const persister = createAsyncStoragePersister({
+    storage: window.localStorage,
+});
 
 const LoadingSpinner = () => {
     return (
@@ -81,8 +96,11 @@ const router = createBrowserRouter([
 const root = createRoot(container);
 root.render(
     <I18nProvider locale="en-US">
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{ persister, maxAge: ONE_DAY }}
+        >
             <RouterProvider router={router} />
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
     </I18nProvider>
 );

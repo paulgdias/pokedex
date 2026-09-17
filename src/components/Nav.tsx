@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { Button } from "react-aria-components";
 
 import {
@@ -15,8 +15,14 @@ const iconStyle = "h-6 w-6 text-white";
 
 const Nav: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation();
     const toggleWidth = isOpen ? "w-40" : "w-10";
     const toggleDisplay = isOpen ? "block" : "hidden";
+
+    const toWithPreservedSearch = (to: string) => ({
+        pathname: to,
+        search: location.pathname === to ? location.search : "",
+    });
 
     return (
         <>
@@ -26,7 +32,7 @@ const Nav: React.FC = () => {
                     className={`grid gap-4 bg-gray-800 p-2 w-full content-start`}
                 >
                     <NavLink
-                        to="/"
+                        to={toWithPreservedSearch("/")}
                         className={({ isActive }) =>
                             `react-aria-Button flex flex-row items-end ${hoverShadow} ${isActive ? "active" : ""}`
                         }
@@ -41,7 +47,7 @@ const Nav: React.FC = () => {
                         </span>
                     </NavLink>
                     <NavLink
-                        to="/pokedex"
+                        to={toWithPreservedSearch("/pokedex")}
                         className={({ isActive }) =>
                             `react-aria-Button flex flex-row items-end ${hoverShadow} ${isActive ? "active" : ""}`
                         }
@@ -56,7 +62,7 @@ const Nav: React.FC = () => {
                         </span>
                     </NavLink>
                     <NavLink
-                        to="/teams"
+                        to={toWithPreservedSearch("/teams")}
                         className={(
                             { isActive } // hide since it requires the mongodb API
                         ) =>

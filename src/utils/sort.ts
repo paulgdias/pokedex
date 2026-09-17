@@ -1,5 +1,10 @@
 import { PokemonDetails } from "@customTypes/PokemonTypes";
-import { SortFunction, Sorting, SortingItem } from "@customTypes/SortingTypes";
+import {
+    Sort,
+    SortFunction,
+    Sorting,
+    SortingItem,
+} from "@customTypes/SortingTypes";
 
 export const defaultDescSort: SortingItem = {
     sort: "desc",
@@ -17,6 +22,32 @@ export const getSortingKey = (sorting: Sorting) => {
         const typedKey = key as keyof Sorting;
         return sorting[typedKey].selected === true;
     });
+};
+export const getNextSortDirection = (
+    sorting: Sorting,
+    sortKey: keyof Sorting
+): Sort => {
+    const isActive = getSortingKey(sorting) === sortKey;
+    return isActive && sorting[sortKey].sort === "desc" ? "asc" : "desc";
+};
+export const getSortingFromURLParams = (
+    urlParams: URLSearchParams
+): Sorting => {
+    const sortParam = urlParams.get("sort");
+    const [key, direction] = sortParam?.split(":") ?? [];
+    if (!key || !(key in defaultSorting)) {
+        return {
+            ...defaultSorting,
+            id: { sort: "desc", selected: true },
+        };
+    }
+    return {
+        ...defaultSorting,
+        [key]: {
+            sort: direction === "asc" ? "asc" : "desc",
+            selected: true,
+        },
+    };
 };
 export const basicSortByPokemon = (
     pokemonData: PokemonDetails[]

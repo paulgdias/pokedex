@@ -1,5 +1,5 @@
 import { memo, useRef } from "react";
-import { useLoaderData, useNavigate } from "react-router";
+import { useLoaderData } from "react-router";
 import { preconnect } from "react-dom";
 
 import type { QueryClient } from "@tanstack/react-query";
@@ -20,6 +20,8 @@ import { Button } from "react-aria-components";
 import { ArrowUp } from "lucide-react";
 
 import { PokemonDetails, TeamsResult, Team } from "@customTypes/PokemonTypes";
+
+import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
 
 const teamsQuery = () =>
     queryOptions({
@@ -44,7 +46,7 @@ const Teams: React.FC = () => {
     const pokemonRef = useRef<HTMLDivElement>(null);
     const pokemonData: TeamsResult = useLoaderData();
 
-    const navigate = useNavigate();
+    const navigateToPokemon = useNavigateToPokemon();
 
     return (
         <>
@@ -84,23 +86,9 @@ const Teams: React.FC = () => {
                                                         ...pokemon,
                                                         evolutions: [],
                                                     }}
-                                                    navigateCallback={(
-                                                        _event,
-                                                        pokemon
-                                                    ) => {
-                                                        navigate(
-                                                            `/pokedex/${pokemon.name}`,
-                                                            {
-                                                                state: {
-                                                                    pokemon:
-                                                                        pokemon,
-                                                                    previous:
-                                                                        location.pathname +
-                                                                        location.search,
-                                                                },
-                                                            }
-                                                        );
-                                                    }}
+                                                    navigateCallback={
+                                                        navigateToPokemon
+                                                    }
                                                 />
                                             </div>
                                         )

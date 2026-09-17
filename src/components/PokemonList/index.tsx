@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
 
 import { Grid, AutoSizer } from "react-virtualized";
 
@@ -10,6 +9,8 @@ import { Button } from "react-aria-components";
 import { ArrowUp } from "lucide-react";
 
 import { twMerge } from "tailwind-merge";
+
+import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
 
 import { getPokemonGridProps } from "./utils";
 
@@ -30,7 +31,7 @@ const PokemonList = ({
     previous?: string;
 }) => {
     const grid = useRef<Grid | null>(null);
-    const navigate = useNavigate();
+    const navigateToPokemon = useNavigateToPokemon(previous);
 
     useEffect(() => {
         if (grid.current) {
@@ -110,20 +111,7 @@ const PokemonList = ({
                                         pokemon={pokemon[index]}
                                         isLegendary={isLegendary}
                                         isMythical={isMythical}
-                                        navigateCallback={(_event, pokemon) => {
-                                            navigate(
-                                                `/pokedex/${pokemon.name}`,
-                                                {
-                                                    state: {
-                                                        pokemon: pokemon,
-                                                        previous:
-                                                            previous ||
-                                                            location.pathname +
-                                                                location.search,
-                                                    },
-                                                }
-                                            );
-                                        }}
+                                        navigateCallback={navigateToPokemon}
                                     />
                                 );
                             }}

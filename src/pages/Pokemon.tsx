@@ -14,6 +14,7 @@ import { ArrowLeft, ArrowUp } from "lucide-react";
 import PokemonCard from "@components/PokemonCard";
 
 import { getPokemonEvolutions } from "@utils/pokemon";
+import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
@@ -37,25 +38,27 @@ const Pokemon: React.FC = () => {
     const pokemonName = params?.pokemon;
     const initialData = useLoaderData();
 
-    let pokedexList = [];
-    let pokemon: PokemonDetails = {} as PokemonDetails;
+    const pokedexList: PokemonDetails[] =
+        initialData.length === 1
+            ? initialData
+            : getPokemonEvolutions(initialData);
+    const pokemon = pokedexList.find(
+        (item: PokemonDetails) => item.name === pokemonName
+    );
 
-    if (initialData.length === 1) {
-        pokedexList = initialData;
-        pokemon = initialData[0];
-    } else {
-        pokedexList = getPokemonEvolutions(initialData);
-        const foundPokemon = pokedexList.find((item: PokemonDetails) => {
-            return item.name === pokemonName;
-        });
-        pokemon = foundPokemon as PokemonDetails;
-    }
+    const navigateToPokemon = useNavigateToPokemon(
+        state?.previous || "/pokedex"
+    );
 
     useEffect(() => {
         if (!pokemon) {
             navigate("/pokedex", { replace: true });
         }
-    }, [pokemon]);
+    }, [pokemon, navigate]);
+
+    if (!pokemon) {
+        return null;
+    }
 
     return (
         <>
@@ -82,19 +85,7 @@ const Pokemon: React.FC = () => {
                         pokemon={item}
                         isLegendary={item.isLegendary}
                         isMythical={item.isMythical}
-                        navigateCallback={(_event, pokemon) => {
-                            const previousWithFallback =
-                                state?.previous || "/pokedex";
-
-                            navigate(`/pokedex/${pokemon.name}`, {
-                                state: {
-                                    pokemon: pokemon,
-                                    previous:
-                                        previousWithFallback ||
-                                        location.pathname + location.search,
-                                },
-                            });
-                        }}
+                        navigateCallback={navigateToPokemon}
                     />
                 ))}
             </div>
