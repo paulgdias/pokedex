@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 import { SearchIcon, Info } from "lucide-react";
 

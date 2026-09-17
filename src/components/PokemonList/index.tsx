@@ -127,6 +127,7 @@ const PokemonList = ({
                             columnWidth={columnWidth}
                             tabIndex={-1}
                             overscanRowCount={overscanRowCount}
+                            style={{ overflowX: "hidden" }}
                         />
                     );
                 }}
