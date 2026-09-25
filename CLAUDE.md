@@ -30,10 +30,11 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 
 - The whole dex is fetched once; search, filter, and sort all run client-side in memory.
 - Route ids `"pokedex"` and `"pokemon"` matter: `Nav` reads them with `useRouteLoaderData`.
-- `/pokedex` and `/pokedex/:pokemon` share the same loader.
+- `/pokedex`, `/pokedex/:pokemon` and `/compare` share the same loader. `/types` (type chart) needs no dex data and has no loader.
 - Sprite preconnections: `Pokedex.tsx` and `Pokemon.tsx` preconnect to `https://beta.pokeapi.co` and `https://raw.githubusercontent.com/`.
-- The detail page lazily fetches the 3D (Pokémon HOME) render per pokémon with `homeSpriteQueryOptions` (`src/api/pokedex.ts`) for the Artwork/3D toggle. It is not part of the whole-dex query, which keeps the persisted cache small.
-- Evolution methods (`specs.evolution_methods`), `is_default` and the species id are fetched with the dex; `src/utils/evolution.ts` turns them into the lanes `EvolutionChain` renders. Changing the dex query shape requires bumping the `queryKey` (currently `["pokedex", "v3"]`) so the persisted cache is not reused.
+- The dex query also carries base stats (`stats`, six numbers plus `statTotal` on `PokemonDetails`), evolution methods (`specs.evolution_methods`), `is_default` and the species id. `src/utils/evolution.ts` turns the evolution data into the lanes `EvolutionChain` renders. Changing the dex query shape requires bumping the `queryKey` (currently `["pokedex", "v4"]`) so the persisted cache is not reused. The dex JSON is ~830 KB; watch the localStorage limit (~5 MB) before adding more fields.
+- Heavier per-pokémon data is fetched lazily on the detail page with `queryOptions` factories in `src/api/pokedex.ts`: `pokemonInfoQueryOptions` (size, abilities, entries, cry, species facts), `pokemonSpritesQueryOptions` (3D and shiny renders), and `typeEfficacyQueryOptions` (the 18×18 type chart, fetched once and shared by the matchups section and `/types`). Keep large datasets (moves, encounters) lazy.
+- Theme: `data-theme="light|dark"` on `<html>`, set before first paint by an inline script in `public/index.html` and managed by `src/utils/useTheme.ts` (choice stored in localStorage under `theme`). Dark colours are token overrides in `src/styles/index.css`; the sidebar tokens are the same in both themes. Use tokens (`bg-surface`, `text-ink`, `shadow-hover` ...), not hex values.
 
 ## URL is the source of truth for Pokedex state
 
@@ -43,7 +44,8 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 | `gen` | generation id 1-9 |
 | `type` | comma-separated types |
 | `only` | `legendary` or `mythical` |
-| `sort` | `key:direction` (e.g., `id:asc`) |
+| `sort` | `key:direction` (e.g., `id:asc`; keys include `total` and the six stats) |
+| `view` | `list` for the table view; omitted for cards |
 
 URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the query string on links. Navigating to a detail page passes `{ pokemon, previous: pathname + search }` in router state (`useNavigateToPokemon`) so back navigation returns to the exact same filters and query.
 

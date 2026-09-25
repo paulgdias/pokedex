@@ -11,16 +11,19 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 
 | Path | Purpose |
 |---|---|
-| `Nav.tsx` | Sidebar (desktop) / top bar (mobile): logo, nav items, generation links with per-generation counts. Reads loader data via `useRouteLoaderData` (route ids `"pokedex"`, `"pokemon"`). |
+| `Nav.tsx` | Sidebar (desktop) / top bar (mobile): logo, nav items (Home, Pokédex, Compare, Type chart), theme toggle, generation links with per-generation counts. Reads loader data via `useRouteLoaderData` (route ids `"pokedex"`, `"pokemon"`). |
 | `LoadingSpinner.tsx` | Spinning Pokeball animation; used as the router `HydrateFallback`. |
 | `Buttons/ScrollTopButton.tsx` | Fixed "scroll to top" button (`onPress`). |
 | `Icons/Pokeball.tsx`, `Icons/Logos.tsx` | SVG icons; `Logos` also exports `githubUrl` / `linkedinUrl`. *(Note: directory is `Icons/` on disk but tracked as `icons/` in git).* |
 | `PokemonCard/index.tsx` | Card: official art (with `preload` hint), dex number watermark, type pills, legendary/mythical badge. Supports `size="large" \| "default"`. Optional `sprite` prop overrides the image and `children` render as an overlay in the art area (used by the detail page for `SpriteToggle`). When `navigateCallback` is passed, wraps in an `<a>` tag for accessibility/links while triggering the callback. Prop types in `@customTypes/PokemonCardTypes`. |
 | `PokemonCard/PlaceholderCard.tsx` | Skeleton card reusing the card classes; optional `animated`. |
 | `PokemonList/index.tsx` | Virtualized grid (`react-virtualized` `Grid` + `AutoSizer`). Pulls `-mr-4` to absorb trailing grid gap. Scrolls to top when the list changes. `isLoading` renders placeholder cards. |
+| `PokemonList/PokemonTable.tsx` | List view: virtualized table (`react-virtualized` `List`) with sortable column headers (`aria-sort`), type dots and the six stats plus total (stats hidden below `md`). ARIA: `table` > `rowgroup` > `row` > `cell`; the `List` sets `containerRole="presentation"` and `aria-readonly={null}` because `aria-readonly` is invalid on a rowgroup. The name link is stretched over the row (`after:absolute after:inset-0`). |
 | `PokemonList/utils.ts` | `getPokemonGridProps`: column/row math (gap 16, min card width 190, card height 232, overscan 2). Keep card height in sync with `PokemonCard`. |
 | `EvolutionChain/index.tsx` | Evolution chain on the detail page: compact cards in stages joined by arrows with trigger pills (`Lv. 16`), a dashed "Other forms" box for Mega/Gigantamax, and one lane per regional variant (Alola, Galar, ...). The current pokémon or form gets the accent border and `aria-current`. Stacks vertically below `md`. Data comes from `buildEvolutionLanes` (`@utils/evolution`). |
-| `SpriteToggle.tsx` | "Artwork" / "3D" segmented control (react-aria `ToggleButtonGroup`) overlaid on the detail page's large card. The 3D button is disabled when the pokémon has no HOME render. |
+| `SpriteToggle.tsx` | "Artwork" / "3D" segmented control (react-aria `ToggleButtonGroup`) plus a "Shiny" toggle button, overlaid on the detail page's large card. Each is disabled when the pokémon has no such render (HOME render or shiny). |
+| `ThemeToggle.tsx` | Light / system / dark control (`useTheme`); lives in the sidebar and the mobile top bar, styled with the (theme-independent) sidebar tokens. |
+| `PokemonDetail/*` | Detail-page sections: `Section` (+ `InfoSection`, which shows loading/error for the lazy info query), `StatBars`, `AbilityList`, `PokedexEntry` (game-version select), `CryButton`, `InfoFacts`, `TypeMatchups`. The detail page tints its header and the large card's art by the pokémon's types (`--card-art`, `color-mix` against the theme tokens); `←` / `→` keys and the header buttons move between neighbours in national dex order. |
 | `SearchBar/index.tsx` | Toolbar: search combobox with keyboard-navigable suggestions (ArrowUp/ArrowDown, Enter, Esc), sort select (its leading icon mirrors the active sort), generation dropdown (mobile), category toggle, result count. Owns `SORT_OPTIONS`. |
 | `SearchBar/FilterChips.tsx`, `SearchBar/TypeFilter.tsx` | Active-filter chips and the multi-select type filter popover. |
 

@@ -13,10 +13,13 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everyt
 |---|---|
 | `routes.tsx` | `createAppRouter(queryClient)`. `dataRoute()` adds loader, `errorElement`, `HydrateFallback`. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
 | `generations.ts` | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type. |
-| `pokemon.ts` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `_id`). |
+| `pokemon.ts` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `_id`). |
 | `evolution.ts` | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages). |
 | `search.ts` | Filters: `PokedexFilters`, `EMPTY_FILTERS`, `POKEMON_TYPES`, `CATEGORIES`, `getFiltersFromURLParams`, `withFilters`, `matchesText`, `applyFilters`. Suggestions: `getFilterSuggestions`, `getPokemonSuggestions`. Formatting: `capitalize`, `formatPokedexNumber` (formats to `#0001`). |
-| `sort.ts` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`. |
+| `sort.ts` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`, `getSortLabel`. |
+| `stats.ts` | `STAT_LABELS`, `MAX_STAT`, `TYPE_ORDER`; formatters (`formatName`, `formatFlavorText`, `formatHeight`, `formatWeight`, `getFemaleShare`); `getTypeMatchups` (a defender's damage taken, dual types multiplied) and `getOffense` (what an attacker hits), both from the `TypeEfficacy` map. |
+| `view.ts` | `PokedexView` (`cards` / `list`), `getViewFromURLParams`, `withView` (URL param `view`). |
+| `useTheme.ts` | `useTheme` (preference `light` / `dark` / `system`, resolved theme, setter) and `initTheme` (call once at startup; follows OS changes while on `system`). |
 | `useNavigateToPokemon.ts` | Custom hook returning `(event, pokemon) => void`. Navigates to `/pokedex/:pokemonName` with `{ pokemon, previous }` router state (`PokemonLocationState`) so back navigation preserves previous filters and scroll. |
 
 ## Semantics that are easy to get wrong
@@ -27,7 +30,7 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everyt
 - Ties always fall back to ascending `_id` (`|| a._id - b._id`), regardless of direction.
 - `type` sort compares only primary type (`types[0]`).
 - `getNextSort` flips direction only when the same key is chosen again while it is `asc`; a new key starts at `asc`.
-- Sort keys are defined in `src/types/SortingTypes.ts` (`SORT_KEYS`).
+- Sort keys are defined in `src/types/SortingTypes.ts` (`SORT_KEYS`; the six stat keys in `STAT_SORT_KEYS` map to indexes of `PokemonDetails.stats`). Stat/total columns in the list view start `desc` on first click; the sort select shows an extra option for sorts it does not list.
 
 **Text search** (`matchesText`)
 - A numeric query, with or without a leading `#`, matches the dex number by prefix after stripping leading zeros (`007` matches 7, 70-79, 700+).
@@ -37,7 +40,7 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everyt
 - Types OR together (any selected type matches). Text, generation, category, and types AND together.
 - `category` is a single value (`legendary` or `mythical`), not both.
 - Invalid or empty URL params are dropped silently (bad `gen`/`type`/`only`/`sort` fall back to defaults; empty values are deleted from the URL by `withFilters`).
-- URL param names: `q`, `gen`, `type`, `only` (`search.ts`); `sort` (`sort.ts`).
+- URL param names: `q`, `gen`, `type`, `only` (`search.ts`); `sort` (`sort.ts`); `view` (`view.ts`).
 
 **Suggestions**
 - `getFilterSuggestions` needs at least 2 characters and returns types, then generations (matching region prefix, `gen N` or `genN`), then categories. Already-applied filters are excluded. Applying one clears the text (`patch` sets `text: ""`).
