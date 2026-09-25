@@ -4,6 +4,7 @@ import type { RouteObject } from "react-router";
 
 import LoadingSpinner from "@components/LoadingSpinner";
 
+import Compare from "../pages/Compare";
 import Home from "../pages/Home";
 import Layout from "../pages/Layout";
 import Pokedex, { loader as pokedexLoader } from "../pages/Pokedex";
@@ -51,6 +52,13 @@ export const createAppRouter = (queryClient: QueryClient) => {
                     "pokemon",
                     "/pokedex/:pokemon",
                     <Pokemon />,
+                    pokedexLoader(queryClient),
+                    pokedexError
+                ),
+                dataRoute(
+                    "compare",
+                    "/compare",
+                    <Compare />,
                     pokedexLoader(queryClient),
                     pokedexError
                 ),

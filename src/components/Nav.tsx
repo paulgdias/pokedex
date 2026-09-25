@@ -6,7 +6,7 @@ import {
     useSearchParams,
 } from "react-router";
 
-import { FolderHeart, House, LibraryBig } from "lucide-react";
+import { FolderHeart, House, LibraryBig, Scale } from "lucide-react";
 
 import Pokeball from "@components/Icons/Pokeball";
 import ThemeToggle from "@components/ThemeToggle";
@@ -19,6 +19,7 @@ import { getFiltersFromURLParams, withFilters } from "@utils/search";
 const NAV_ITEMS = [
     { to: "/", label: "Home", Icon: House, hidden: false },
     { to: "/pokedex", label: "Pokédex", Icon: LibraryBig, hidden: false },
+    { to: "/compare", label: "Compare", Icon: Scale, hidden: false },
     // hidden since it requires the mongodb API
     { to: "/teams", label: "Teams", Icon: FolderHeart, hidden: true },
 ].filter(({ hidden }) => !hidden);
@@ -31,7 +32,7 @@ const rowClass =
 const Logo = () => (
     <div className="flex items-center gap-2.5 px-2 py-1">
         <Pokeball width={32} height={32} />
-        <div className="font-display text-xl font-bold tracking-tight">
+        <div className="font-display text-xl font-bold tracking-tight max-sm:sr-only">
             Pokédex
         </div>
     </div>

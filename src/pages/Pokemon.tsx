@@ -10,7 +10,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "react-aria-components";
 
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Scale } from "lucide-react";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import EvolutionChain from "@components/EvolutionChain";
@@ -213,6 +213,13 @@ const Pokemon: React.FC = () => {
                         url={infoQuery.data?.cry ?? null}
                         name={pokemon.name}
                     />
+                    <Button
+                        onPress={() => navigate(`/compare?ids=${pokemon._id}`)}
+                        className="flex h-10 cursor-pointer items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface px-3 text-sm font-semibold text-ink hover:bg-chip"
+                    >
+                        <Scale size={16} aria-hidden="true" />
+                        Compare
+                    </Button>
                 </div>
             </div>
 
