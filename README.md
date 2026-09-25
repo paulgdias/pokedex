@@ -45,7 +45,7 @@ src/
 api/            Legacy Express + MongoDB server (see api/README.md)
 ```
 
-Contributor and AI-agent notes live in [`CLAUDE.md`](CLAUDE.md), with more detail in `src/components/CLAUDE.md` and `src/utils/CLAUDE.md`.
+Contributor and AI-agent notes live in [`CLAUDE.md`](CLAUDE.md), with more detail in path-scoped rules at `.claude/rules/components.md` and `.claude/rules/utils.md`.
 
 ## The `api/` server
 

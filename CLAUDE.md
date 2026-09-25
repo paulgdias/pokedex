@@ -2,7 +2,7 @@
 
 React 19 Pokédex practice app (a testbed for libraries and patterns). Client-side only; all data comes from the PokeAPI GraphQL endpoint (`https://beta.pokeapi.co/graphql/v1beta`). Official artwork sprites are loaded from GitHub's CDN (`https://raw.githubusercontent.com/`).
 
-Scoped docs: [`src/components/CLAUDE.md`](src/components/CLAUDE.md), [`src/utils/CLAUDE.md`](src/utils/CLAUDE.md).
+Path-scoped rules (loaded only when working on matching files): [`.claude/rules/components.md`](.claude/rules/components.md) (`src/components/**`), [`.claude/rules/utils.md`](.claude/rules/utils.md) (`src/utils/**`).
 
 ## Commands
 
@@ -55,7 +55,7 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 
 ## Gotchas
 
-- **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `_id`. See `src/utils/CLAUDE.md`.
+- **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `_id`. See `.claude/rules/utils.md`.
 - **`Icons` vs `icons` casing**: The directory on disk is `src/components/Icons/`, but git tracks `src/components/icons/`. Imports use `@components/Icons/...`, which resolves on case-insensitive file systems (macOS) but fails on case-sensitive OS/CI environments (Linux).
 - **`api/` & Teams route**: `api/` is a legacy Express + MongoDB server. The root `/api` is in `.gitignore` (anchored, so it does not match `src/api/`) but its files are tracked in git. The Pokédex itself does not use it. The `/teams` route exists in `src/utils/routes.tsx` but is hidden in `Nav.tsx` because it requires the local Express server on `http://localhost:3001`.
 - **`postcss.config.ts`**: points at `./tailwindcss-config.ts`, which does not exist (Tailwind 4 uses `@theme` in CSS).

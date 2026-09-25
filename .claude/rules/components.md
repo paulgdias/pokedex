@@ -1,6 +1,11 @@
+---
+paths:
+  - "src/components/**"
+---
+
 # Components
 
-Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in `src/utils` (see `src/utils/CLAUDE.md`); components mostly render and wire it up.
+Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in `src/utils` (see the `utils` rule, `.claude/rules/utils.md`); components mostly render and wire it up.
 
 ## Inventory
 

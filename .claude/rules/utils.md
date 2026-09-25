@@ -1,3 +1,8 @@
+---
+paths:
+  - "src/utils/**"
+---
+
 # Utils
 
 Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everything is a named export. Files are pure functions/constants, except `useNavigateToPokemon.ts` (a hook) and `routes.tsx` (router factory).
