@@ -1,7 +1,6 @@
 import { memo, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { preconnect } from "react-dom";
 
-import type { LoaderFunctionArgs } from "react-router";
 import {
     useLoaderData,
     useNavigationType,
@@ -9,7 +8,6 @@ import {
 } from "react-router";
 
 import type { QueryClient } from "@tanstack/react-query";
-import { queryOptions } from "@tanstack/react-query";
 
 import { useDebounce } from "@uidotdev/usehooks";
 
@@ -26,10 +24,10 @@ import { SortState } from "@customTypes/SortingTypes";
 import { getGeneration } from "@utils/generations";
 import { convertToPokemonDetailsArray, withEvolutions } from "@utils/pokemon";
 import {
-    applyFilters,
     EMPTY_FILTERS,
-    getFiltersFromURLParams,
     PokedexFilters,
+    applyFilters,
+    getFiltersFromURLParams,
     withFilters,
 } from "@utils/search";
 import {
@@ -39,18 +37,13 @@ import {
     withSort,
 } from "@utils/sort";
 
-import { getPokeAPIConfig } from "@api/hooks";
+import { pokedexQueryOptions } from "@api/pokedex";
 
-const pokedexQuery = (_args: LoaderFunctionArgs) => {
-    return queryOptions(getPokeAPIConfig());
+export const loader = (queryClient: QueryClient) => async () => {
+    const data = await queryClient.ensureQueryData(pokedexQueryOptions);
+    const pokemon = convertToPokemonDetailsArray(data.pokemon);
+    return withEvolutions(pokemon);
 };
-
-export const loader =
-    (queryClient: QueryClient) => async (_args: LoaderFunctionArgs) => {
-        const data = await queryClient.ensureQueryData(pokedexQuery(_args));
-        const pokemon = convertToPokemonDetailsArray(data.pokemon);
-        return withEvolutions(pokemon);
-    };
 
 const TEXT_DEBOUNCE_MS = 250;
 
