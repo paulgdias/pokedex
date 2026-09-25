@@ -1,7 +1,12 @@
+// the focus border is a pseudo-element drawn over the card's contents: an
+// outline can be clipped by the virtualized grid and renders unevenly on
+// rounded corners, and an inset ring would sit under the art area's background
 const cardClass = `
-    flex flex-col overflow-hidden rounded-2xl border border-line bg-surface
-    transition-[box-shadow,transform] duration-150
-    hover:-translate-y-px hover:shadow-[0_6px_18px_rgba(40,32,20,.10)]
+    relative flex flex-col overflow-hidden rounded-2xl border border-line
+    bg-surface transition-shadow duration-150
+    hover:shadow-[0_6px_18px_rgba(40,32,20,.10)] focus-visible:outline-none
+    after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit]
+    after:border-2 after:border-transparent focus-visible:after:border-accent
 `;
 const cardArtClass = `relative flex items-center justify-center bg-sand`;
 const cardNumberWatermarkClass = `

@@ -19,16 +19,36 @@ export const typeColors = {
     ice: "bg-ice",
 };
 
+export type RegionalForm = "alola" | "galar" | "hisui" | "paldea";
+export type PokemonForm = RegionalForm | "mega" | "gmax" | "other" | null;
+
 /* graphql types */
+export type NamedResource = { name: string } | null;
+export type EvolutionMethod = {
+    min_level: number | null;
+    min_happiness: number | null;
+    time_of_day: string;
+    trigger: NamedResource;
+    item: NamedResource;
+    held: NamedResource;
+    move: NamedResource;
+    location: NamedResource;
+};
+export type HomeSpriteResult = {
+    pokemon_v2_pokemonsprites: { home: string | null }[];
+};
 export type PokedexResult = {
     pokemon: Pokemon[];
 };
 export type Pokemon = {
     id: number;
     name: string;
+    is_default: boolean;
     sprites: { default: string | null }[];
     types: { type: { name: keyof typeof typeColors } }[];
     specs: {
+        species_id: number;
+        evolution_methods: EvolutionMethod[];
         is_legendary: boolean;
         is_mythical: boolean;
         generation_id: number;
@@ -56,6 +76,26 @@ export type PokemonDetails = {
     isMythical: boolean;
     generationId: number;
     evolutionChainId: number;
+    /** species id; alternate forms share their base form's */
+    speciesId: number;
+    /** species id this one evolves from (0 for the first stage) */
     evolvesFromId: number;
+    isDefault: boolean;
+    form: PokemonForm;
+    /** how the species evolves, one label per PokeAPI evolution row */
+    evolutionMethods: string[];
     evolutions: PokemonDetails[];
+};
+
+/** One node of an evolution chain, with the way it is reached. */
+export type EvolutionStep = {
+    pokemon: PokemonDetails;
+    method: string | null;
+    /** battle-only alternates (Mega, Gigantamax) of this step */
+    forms: PokemonDetails[];
+};
+/** A path through a chain; regional variants get their own lane. */
+export type EvolutionLane = {
+    region: RegionalForm | null;
+    stages: EvolutionStep[][];
 };

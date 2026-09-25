@@ -1,6 +1,6 @@
 import { preload } from "react-dom";
 
-import { Ban, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { PokemonCardType } from "@customTypes/PokemonCardTypes";
 import { typeColors } from "@customTypes/PokemonTypes";
@@ -25,19 +25,24 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     className,
     style,
     pokemon,
+    sprite: spriteOverride,
+    children,
     isLegendary,
     isMythical,
     navigateCallback,
     size = "default",
 }: PokemonCardType) => {
-    if (pokemon.sprite) {
-        preload(pokemon.sprite, {
+    const isLarge = size === "large";
+
+    const sprite = spriteOverride ?? pokemon.sprite;
+
+    if (sprite) {
+        preload(sprite, {
             as: "image",
             fetchPriority: "high",
         });
     }
 
-    const isLarge = size === "large";
     const category = isMythical ? "Mythical" : isLegendary ? "Legendary" : null;
 
     const Card = (
@@ -68,14 +73,6 @@ const PokemonCard: React.FC<PokemonCardType> = ({
             <div
                 className={`${cardArtClass} ${isLarge ? "h-72" : "h-[150px]"}`}
             >
-                {pokemon.sprite && (
-                    <span
-                        aria-hidden="true"
-                        className={`${cardNumberWatermarkClass} ${isLarge ? "text-7xl" : ""}`}
-                    >
-                        {pokemon._id}
-                    </span>
-                )}
                 {category && (
                     <span
                         role="img"
@@ -90,20 +87,23 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                         />
                     </span>
                 )}
-                {pokemon.sprite ? (
+                {children}
+                {sprite ? (
                     <img
                         title={pokemon.name}
                         alt={pokemon.name}
                         loading="lazy"
                         decoding="async"
                         className={`relative w-auto max-w-[80%] object-contain ${isLarge ? "h-64" : "h-[120px]"}`}
-                        src={pokemon.sprite}
+                        src={sprite}
                     />
                 ) : (
-                    <Ban
-                        className="relative text-subtle"
-                        aria-label={pokemon.name}
-                    />
+                    <span
+                        aria-hidden="true"
+                        className={`${cardNumberWatermarkClass} ${isLarge ? "text-7xl" : ""}`}
+                    >
+                        {pokemon._id}
+                    </span>
                 )}
             </div>
             <div className={cardBodyClass}>

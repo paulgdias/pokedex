@@ -22,8 +22,10 @@ const NAV_ITEMS = [
     { to: "/teams", label: "Teams", Icon: FolderHeart, hidden: true },
 ].filter(({ hidden }) => !hidden);
 
+// focus outline is drawn inside: outside it is clipped by the scrolling list
+// and overlaps neighbouring rows
 const rowClass =
-    "flex min-h-11 w-full items-center rounded-[10px] px-3 text-left text-sm";
+    "flex min-h-11 w-full items-center rounded-[10px] px-3 text-left text-sm focus-visible:-outline-offset-2";
 
 const Logo = () => (
     <div className="flex items-center gap-2.5 px-2 py-1">
@@ -127,7 +129,7 @@ const Nav: React.FC = () => {
                             end={to === "/"}
                             aria-label={label}
                             className={({ isActive }) =>
-                                `flex size-11 items-center justify-center rounded-[10px] hover:bg-sidebar-hover ${
+                                `flex size-11 items-center justify-center rounded-[10px] hover:bg-sidebar-hover focus-visible:-outline-offset-2 ${
                                     isActive ? "bg-sidebar-active" : ""
                                 }`
                             }

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { preconnect } from "react-dom";
+import { useEffect, useRef, useState } from "react";
+import { preconnect, preload } from "react-dom";
 import {
     useLoaderData,
     useLocation,
@@ -7,18 +7,20 @@ import {
     useParams,
 } from "react-router";
 
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "react-aria-components";
 
 import { ArrowLeft } from "lucide-react";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
+import EvolutionChain from "@components/EvolutionChain";
 import PokemonCard from "@components/PokemonCard";
+import SpriteToggle, { SpriteView } from "@components/SpriteToggle";
+
+import { homeSpriteQueryOptions } from "@api/pokedex";
 
 import { getGeneration } from "@utils/generations";
-import {
-    PokemonLocationState,
-    useNavigateToPokemon,
-} from "@utils/useNavigateToPokemon";
+import { PokemonLocationState } from "@utils/useNavigateToPokemon";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
@@ -36,9 +38,16 @@ const Pokemon: React.FC = () => {
     const pokedexList = useLoaderData() as PokemonDetails[];
     const pokemon = pokedexList.find((item) => item.name === pokemonName);
 
-    const navigateToPokemon = useNavigateToPokemon(
-        state?.previous || "/pokedex"
-    );
+    // stays selected while moving between pokemon; falls back to the artwork
+    // for the few that have no 3D render
+    const [view, setView] = useState<SpriteView>("artwork");
+    const { data: home } = useQuery({
+        ...homeSpriteQueryOptions(pokemon?._id ?? 0),
+        enabled: Boolean(pokemon),
+    });
+    if (home) {
+        preload(home, { as: "image" });
+    }
 
     useEffect(() => {
         if (!pokemon) {
@@ -55,9 +64,6 @@ const Pokemon: React.FC = () => {
     }
 
     const generation = getGeneration(pokemon.generationId);
-    const relatives = pokemon.evolutions.filter(
-        (item) => item._id !== pokemon._id
-    );
 
     return (
         <div
@@ -90,34 +96,20 @@ const Pokemon: React.FC = () => {
                     className="w-full max-w-sm"
                     size="large"
                     pokemon={pokemon}
+                    sprite={view === "3d" && home ? home : undefined}
                     isLegendary={pokemon.isLegendary}
                     isMythical={pokemon.isMythical}
+                >
+                    <SpriteToggle
+                        value={view === "3d" && home ? "3d" : "artwork"}
+                        onChange={setView}
+                        is3dAvailable={Boolean(home)}
+                    />
+                </PokemonCard>
+                <EvolutionChain
+                    pokemon={pokemon}
+                    previous={state?.previous || "/pokedex"}
                 />
-                {relatives.length > 0 && (
-                    <section
-                        aria-labelledby="evolution-chain"
-                        className="flex flex-col gap-4"
-                    >
-                        <h2
-                            id="evolution-chain"
-                            className="font-display text-2xl font-bold tracking-tight"
-                        >
-                            Evolution chain
-                        </h2>
-                        <div className="flex flex-wrap gap-4">
-                            {relatives.map((item) => (
-                                <PokemonCard
-                                    key={item._id}
-                                    className="w-52 hover:border-line-strong"
-                                    pokemon={item}
-                                    isLegendary={item.isLegendary}
-                                    isMythical={item.isMythical}
-                                    navigateCallback={navigateToPokemon}
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )}
             </div>
             <ScrollTopButton
                 onPress={() => scrollRef.current?.scrollTo({ top: 0 })}

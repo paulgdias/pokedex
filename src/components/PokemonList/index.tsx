@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 import { AutoSizer, Grid } from "react-virtualized";
 
@@ -73,17 +73,20 @@ const PokemonList = ({
                                 style,
                             }) => {
                                 const cellStyle = {
-                                    ...style,
                                     height: rowHeight - gridGap,
                                     width: columnWidth - gridGap,
                                 };
+                                // Grid's inner container is presentational, so
+                                // each cell supplies its own row/gridcell pair
+                                const renderCell = (card: ReactNode) => (
+                                    <div key={key} role="row" style={style}>
+                                        <div role="gridcell">{card}</div>
+                                    </div>
+                                );
 
                                 if (isLoading) {
-                                    return (
-                                        <PlaceholderCard
-                                            key={key}
-                                            style={cellStyle}
-                                        />
+                                    return renderCell(
+                                        <PlaceholderCard style={cellStyle} />
                                     );
                                 }
 
@@ -97,9 +100,8 @@ const PokemonList = ({
                                 const { isLegendary, isMythical } =
                                     pokemon[index];
 
-                                return (
+                                return renderCell(
                                     <PokemonCard
-                                        key={key}
                                         style={cellStyle}
                                         className="hover:border-line-strong"
                                         pokemon={pokemon[index]}
@@ -119,6 +121,8 @@ const PokemonList = ({
                             }
                             width={width}
                             columnWidth={columnWidth}
+                            aria-label="Pokémon"
+                            containerRole="presentation"
                             tabIndex={-1}
                             overscanRowCount={overscanRowCount}
                             style={{ overflowX: "hidden", outline: "none" }}

@@ -18,7 +18,7 @@ const PlaceholderCard = ({
             aria-hidden="true"
             className={twMerge(
                 cardClass,
-                "hover:translate-y-0 hover:shadow-none",
+                "hover:shadow-none",
                 animated && "animate-pulse",
                 className
             )}

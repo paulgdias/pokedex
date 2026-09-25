@@ -1,6 +1,15 @@
 import { useState } from "react";
 
-import { ArrowUpDown, Search, X } from "lucide-react";
+import {
+    ArrowDown01,
+    ArrowDown10,
+    ArrowDownAZ,
+    ArrowDownZA,
+    ArrowUpDown,
+    LucideIcon,
+    Search,
+    X,
+} from "lucide-react";
 import { ToggleButton, ToggleButtonGroup } from "react-aria-components";
 
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
@@ -20,11 +29,27 @@ import { typeDotClass } from "@styles/Pokedex";
 import FilterChips from "./FilterChips";
 import TypeFilter from "./TypeFilter";
 
-const SORT_OPTIONS: { label: string; value: SortState }[] = [
-    { label: "Number Asc", value: { key: "id", direction: "asc" } },
-    { label: "Number Desc", value: { key: "id", direction: "desc" } },
-    { label: "Name A–Z", value: { key: "name", direction: "asc" } },
-    { label: "Name Z–A", value: { key: "name", direction: "desc" } },
+const SORT_OPTIONS: { label: string; value: SortState; icon: LucideIcon }[] = [
+    {
+        label: "Number Asc",
+        value: { key: "id", direction: "asc" },
+        icon: ArrowDown01,
+    },
+    {
+        label: "Number Desc",
+        value: { key: "id", direction: "desc" },
+        icon: ArrowDown10,
+    },
+    {
+        label: "Name A–Z",
+        value: { key: "name", direction: "asc" },
+        icon: ArrowDownAZ,
+    },
+    {
+        label: "Name Z–A",
+        value: { key: "name", direction: "desc" },
+        icon: ArrowDownZA,
+    },
 ];
 
 const sortValue = ({ key, direction }: SortState) => `${key}:${direction}`;
@@ -61,6 +86,11 @@ const SearchBar = ({
     const [isFocused, setIsFocused] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
 
+    // the icon mirrors the active sort (e.g. arrow-down-a-z for Name A–Z)
+    const SortIcon =
+        SORT_OPTIONS.find(({ value }) => sortValue(value) === sortValue(sort))
+            ?.icon ?? ArrowUpDown;
+
     const query = filters.text.trim();
     const filterSuggestions = getFilterSuggestions(query, filters);
     const pokemonSuggestions = getPokemonSuggestions(pokemon, query);
@@ -96,7 +126,7 @@ const SearchBar = ({
         <div className="relative z-5 flex flex-col gap-3.5 border-b border-line bg-paper px-4 pt-5 pb-3.5 lg:px-8">
             <div className="flex items-center gap-3">
                 <div className="relative grow">
-                    <label className="flex h-13 items-center gap-3 rounded-[14px] border-[1.5px] border-line-strong bg-surface px-4 focus-within:border-ink focus-within:shadow-[0_0_0_4px_rgba(27,26,23,.08)]">
+                    <label className="flex h-13 items-center gap-3 rounded-[14px] border-[1.5px] border-line-strong bg-surface px-4 focus-within:border-accent focus-within:shadow-[0_0_0_4px_rgba(179,54,31,.12)]">
                         <Search
                             size={20}
                             className="shrink-0 text-muted"
@@ -283,7 +313,7 @@ const SearchBar = ({
                 </div>
 
                 <label className="flex h-13 shrink-0 items-center gap-2 rounded-[14px] border-[1.5px] border-line-strong bg-surface pr-1.5 pl-3.5 text-sm text-muted">
-                    <ArrowUpDown size={16} aria-hidden="true" />
+                    <SortIcon size={18} aria-hidden="true" />
                     <span className="max-sm:sr-only">Sort</span>
                     <select
                         value={sortValue(sort)}

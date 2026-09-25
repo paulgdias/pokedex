@@ -52,6 +52,11 @@
 }
 
 @layer base {
+    html,
+    body {
+        overflow: hidden;
+    }
+
     body {
         background-color: var(--color-paper);
         color: var(--color-ink);
@@ -66,7 +71,7 @@
     button:focus-visible,
     select:focus-visible,
     [tabindex]:focus-visible {
-        outline: 2px solid var(--color-ink);
+        outline: 2px solid var(--color-accent);
         outline-offset: 2px;
     }
 

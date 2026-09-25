@@ -1,5 +1,7 @@
 import { Pokemon, PokemonDetails } from "@customTypes/PokemonTypes";
 
+import { formatEvolutionMethod, getPokemonForm } from "./evolution";
+
 const toPokemonDetails = (pokemon: Pokemon): PokemonDetails => ({
     _id: pokemon.id ?? 0,
     name: pokemon.name ?? "",
@@ -8,7 +10,12 @@ const toPokemonDetails = (pokemon: Pokemon): PokemonDetails => ({
     isMythical: pokemon.specs?.is_mythical ?? false,
     generationId: pokemon.specs?.generation_id ?? 0,
     evolutionChainId: pokemon.specs?.evolution_chain_id ?? 0,
+    speciesId: pokemon.specs?.species_id ?? pokemon.id ?? 0,
     evolvesFromId: pokemon.specs?.evolves_from_species_id ?? 0,
+    isDefault: pokemon.is_default ?? true,
+    form: getPokemonForm(pokemon.name ?? "", pokemon.is_default ?? true),
+    evolutionMethods:
+        pokemon.specs?.evolution_methods?.map(formatEvolutionMethod) ?? [],
     types: pokemon.types?.map((t) => t.type.name) ?? [],
     evolutions: pokemon.evolutions?.map(toPokemonDetails) ?? [],
 });
