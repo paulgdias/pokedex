@@ -3,12 +3,12 @@ import { SORT_KEYS, SortKey, SortState } from "@customTypes/SortingTypes";
 
 const SORT_PARAM = "sort";
 
-export const DEFAULT_SORT: SortState = { key: "id", direction: "desc" };
+export const DEFAULT_SORT: SortState = { key: "id", direction: "asc" };
 
 type Comparator = (a: PokemonDetails, b: PokemonDetails) => number;
 
-// Each comparator yields the "desc" order (1 → N, A → Z, legendaries first);
-// the "asc" direction is its reverse.
+// Each comparator yields the "asc" order (1 → N, A → Z, legendaries first);
+// the "desc" direction is its reverse.
 const comparators: Record<SortKey, Comparator> = {
     id: (a, b) => a._id - b._id,
     name: (a, b) => a.name.localeCompare(b.name),
@@ -25,7 +25,7 @@ export const sortPokemon = (
     { key, direction }: SortState
 ): PokemonDetails[] => {
     const compare = comparators[key];
-    const sign = direction === "asc" ? -1 : 1;
+    const sign = direction === "desc" ? -1 : 1;
     // ties always fall back to ascending id, regardless of direction
     return [...pokemon].sort((a, b) => sign * compare(a, b) || a._id - b._id);
 };
@@ -33,7 +33,7 @@ export const sortPokemon = (
 export const getNextSort = (current: SortState, key: SortKey): SortState => ({
     key,
     direction:
-        current.key === key && current.direction === "desc" ? "asc" : "desc",
+        current.key === key && current.direction === "asc" ? "desc" : "asc",
 });
 
 export const getSortFromURLParams = (params: URLSearchParams): SortState => {
@@ -41,7 +41,7 @@ export const getSortFromURLParams = (params: URLSearchParams): SortState => {
     if (!key || !isSortKey(key)) {
         return DEFAULT_SORT;
     }
-    return { key, direction: direction === "asc" ? "asc" : "desc" };
+    return { key, direction: direction === "desc" ? "desc" : "asc" };
 };
 
 /** Returns a copy of `params` with the sort applied. */

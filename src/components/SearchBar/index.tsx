@@ -9,10 +9,10 @@ import { SortState } from "@customTypes/SortingTypes";
 import { GENERATIONS } from "@utils/generations";
 import {
     Category,
+    PokedexFilters,
     formatPokedexNumber,
     getFilterSuggestions,
     getPokemonSuggestions,
-    PokedexFilters,
 } from "@utils/search";
 
 import { typeDotClass } from "@styles/Pokedex";
@@ -20,12 +20,11 @@ import { typeDotClass } from "@styles/Pokedex";
 import FilterChips from "./FilterChips";
 import TypeFilter from "./TypeFilter";
 
-// "desc" is this app's ascending order (1 → N, A → Z); see utils/sort.ts
 const SORT_OPTIONS: { label: string; value: SortState }[] = [
-    { label: "Number Desc", value: { key: "id", direction: "desc" } },
     { label: "Number Asc", value: { key: "id", direction: "asc" } },
-    { label: "Name A–Z", value: { key: "name", direction: "desc" } },
-    { label: "Name Z–A", value: { key: "name", direction: "asc" } },
+    { label: "Number Desc", value: { key: "id", direction: "desc" } },
+    { label: "Name A–Z", value: { key: "name", direction: "asc" } },
+    { label: "Name Z–A", value: { key: "name", direction: "desc" } },
 ];
 
 const sortValue = ({ key, direction }: SortState) => `${key}:${direction}`;
