@@ -15,11 +15,13 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 | `LoadingSpinner.tsx` | Spinning Pokeball animation; used as the router `HydrateFallback`. |
 | `Buttons/ScrollTopButton.tsx` | Fixed "scroll to top" button (`onPress`). |
 | `Icons/Pokeball.tsx`, `Icons/Logos.tsx` | SVG icons; `Logos` also exports `githubUrl` / `linkedinUrl`. *(Note: directory is `Icons/` on disk but tracked as `icons/` in git).* |
-| `PokemonCard/index.tsx` | Card: official art (with `preload` hint), dex number watermark, type pills, legendary/mythical badge. Supports `size="large" \| "default"`. When `navigateCallback` is passed, wraps in an `<a>` tag for accessibility/links while triggering the callback. Prop types in `@customTypes/PokemonCardTypes`. |
+| `PokemonCard/index.tsx` | Card: official art (with `preload` hint), dex number watermark, type pills, legendary/mythical badge. Supports `size="large" \| "default"`. Optional `sprite` prop overrides the image and `children` render as an overlay in the art area (used by the detail page for `SpriteToggle`). When `navigateCallback` is passed, wraps in an `<a>` tag for accessibility/links while triggering the callback. Prop types in `@customTypes/PokemonCardTypes`. |
 | `PokemonCard/PlaceholderCard.tsx` | Skeleton card reusing the card classes; optional `animated`. |
 | `PokemonList/index.tsx` | Virtualized grid (`react-virtualized` `Grid` + `AutoSizer`). Pulls `-mr-4` to absorb trailing grid gap. Scrolls to top when the list changes. `isLoading` renders placeholder cards. |
 | `PokemonList/utils.ts` | `getPokemonGridProps`: column/row math (gap 16, min card width 190, card height 232, overscan 2). Keep card height in sync with `PokemonCard`. |
-| `SearchBar/index.tsx` | Toolbar: search combobox with keyboard-navigable suggestions (ArrowUp/ArrowDown, Enter, Esc), sort select, generation dropdown (mobile), category toggle, result count. Owns `SORT_OPTIONS`. |
+| `EvolutionChain/index.tsx` | Evolution chain on the detail page: compact cards in stages joined by arrows with trigger pills (`Lv. 16`), a dashed "Other forms" box for Mega/Gigantamax, and one lane per regional variant (Alola, Galar, ...). The current pokémon or form gets the accent border and `aria-current`. Stacks vertically below `md`. Data comes from `buildEvolutionLanes` (`@utils/evolution`). |
+| `SpriteToggle.tsx` | "Artwork" / "3D" segmented control (react-aria `ToggleButtonGroup`) overlaid on the detail page's large card. The 3D button is disabled when the pokémon has no HOME render. |
+| `SearchBar/index.tsx` | Toolbar: search combobox with keyboard-navigable suggestions (ArrowUp/ArrowDown, Enter, Esc), sort select (its leading icon mirrors the active sort), generation dropdown (mobile), category toggle, result count. Owns `SORT_OPTIONS`. |
 | `SearchBar/FilterChips.tsx`, `SearchBar/TypeFilter.tsx` | Active-filter chips and the multi-select type filter popover. |
 
 ## Conventions
@@ -36,6 +38,7 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 - Shared class strings: `src/styles/Pokedex.ts`, `src/styles/Carousel.ts`.
 - Tokens (in `src/styles/index.css` `@theme`): `paper`, `surface`, `sand`, `track`, `chip`, `chip-hover`, `wash`, `ink`, `muted`, `subtle`, `line`, `line-strong`, `accent`, `accent-strong`, `sidebar-*`, and one color per Pokémon type (`bg-fire`, ...). Fonts: `font-display`, `font-sans`, `font-mono`.
 - `typeColors` in `@customTypes/PokemonTypes` maps type name -> `bg-*` class and is also the source of the type list (`POKEMON_TYPES`). Adding a type color requires both the map entry and the `@theme` token in `src/styles/index.css`.
+- Focus: the global `:focus-visible` outline (accent, `src/styles/index.css`) is drawn outside the element, so inside scroll containers (`Nav` generation list, virtualized grid) it is clipped or overlaps neighbours. Nav rows use `focus-visible:-outline-offset-2`; cards draw a 2px `::after` border instead (see `cardClass`).
 - `.pokedex-scroll` styles scrollbars for the virtualized grid and overflow containers.
 
 ## Loading, empty, error states

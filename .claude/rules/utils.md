@@ -14,6 +14,7 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everyt
 | `routes.tsx` | `createAppRouter(queryClient)`. `dataRoute()` adds loader, `errorElement`, `HydrateFallback`. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
 | `generations.ts` | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type. |
 | `pokemon.ts` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `_id`). |
+| `evolution.ts` | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages). |
 | `search.ts` | Filters: `PokedexFilters`, `EMPTY_FILTERS`, `POKEMON_TYPES`, `CATEGORIES`, `getFiltersFromURLParams`, `withFilters`, `matchesText`, `applyFilters`. Suggestions: `getFilterSuggestions`, `getPokemonSuggestions`. Formatting: `capitalize`, `formatPokedexNumber` (formats to `#0001`). |
 | `sort.ts` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`. |
 | `useNavigateToPokemon.ts` | Custom hook returning `(event, pokemon) => void`. Navigates to `/pokedex/:pokemonName` with `{ pokemon, previous }` router state (`PokemonLocationState`) so back navigation preserves previous filters and scroll. |
@@ -41,6 +42,12 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everyt
 **Suggestions**
 - `getFilterSuggestions` needs at least 2 characters and returns types, then generations (matching region prefix, `gen N` or `genN`), then categories. Already-applied filters are excluded. Applying one clears the text (`patch` sets `text: ""`).
 - `getPokemonSuggestions` searches the whole dex, ignoring current filters, and caps at 5 by default.
+
+**Evolution lanes** (`evolution.ts`)
+- PokeAPI stores evolutions per species, not per form. `speciesId` groups a species' forms; `evolvesFromId` is a species id.
+- Stage = depth via `evolvesFromId`. Mega/Gmax forms become `forms` of their species' step (default lane only); other alternates (costumes, `other`) are dropped.
+- A regional form is a name ending in the region (`meowth-alola`; `pikachu-alola-cap` is a costume). A species that debuted in a region's generation (or later) and evolves from a species with that regional form belongs to that region's lane (Perrserker -> Galar); the latest matching region wins.
+- With several evolution rows on a species, lane N uses row N (Persian: row 0 Kanto, row 1 Alola), falling back to row 0. This is a heuristic; check unusual chains.
 
 **Generations**
 - To support a new generation, add it to `GENERATIONS`. `getFiltersFromURLParams` only accepts ids in that table, and `Nav` builds its links and counts from it.

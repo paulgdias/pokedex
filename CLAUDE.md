@@ -1,6 +1,6 @@
 # Pokedex
 
-React 19 Pokédex practice app (a testbed for libraries and patterns). Client-side only; all data comes from the PokeAPI GraphQL endpoint (`https://beta.pokeapi.co/graphql/v1beta`). Official artwork sprites are loaded from GitHub's CDN (`https://raw.githubusercontent.com/`).
+React 19 Pokédex practice app (a testbed for libraries and patterns). Client-side only; all data comes from the PokeAPI GraphQL endpoint (`https://beta.pokeapi.co/graphql/v1beta`). Official artwork is loaded from GitHub's CDN (`https://raw.githubusercontent.com/`).
 
 Path-scoped rules (loaded only when working on matching files): [`.claude/rules/components.md`](.claude/rules/components.md) (`src/components/**`), [`.claude/rules/utils.md`](.claude/rules/utils.md) (`src/utils/**`).
 
@@ -32,6 +32,8 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 - Route ids `"pokedex"` and `"pokemon"` matter: `Nav` reads them with `useRouteLoaderData`.
 - `/pokedex` and `/pokedex/:pokemon` share the same loader.
 - Sprite preconnections: `Pokedex.tsx` and `Pokemon.tsx` preconnect to `https://beta.pokeapi.co` and `https://raw.githubusercontent.com/`.
+- The detail page lazily fetches the 3D (Pokémon HOME) render per pokémon with `homeSpriteQueryOptions` (`src/api/pokedex.ts`) for the Artwork/3D toggle. It is not part of the whole-dex query, which keeps the persisted cache small.
+- Evolution methods (`specs.evolution_methods`), `is_default` and the species id are fetched with the dex; `src/utils/evolution.ts` turns them into the lanes `EvolutionChain` renders. Changing the dex query shape requires bumping the `queryKey` (currently `["pokedex", "v3"]`) so the persisted cache is not reused.
 
 ## URL is the source of truth for Pokedex state
 
