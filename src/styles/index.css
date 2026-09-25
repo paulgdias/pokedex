@@ -23,6 +23,34 @@
     --color-accent-strong: #8a2915;
     --color-on-accent: #fff;
     --color-pill-text: #3d3a33;
+
+    /* sidebar: the same in light and dark */
+    --color-sidebar: #1d1c19;
+    --color-sidebar-hover: #2b2925;
+    --color-sidebar-active: #3a3833;
+    --color-sidebar-text: #e8e4da;
+    --color-sidebar-muted: #b9b3a6;
+    --color-sidebar-label: #a8a295;
+
+    /* pokémon types */
+    --color-normal: #a8a77a;
+    --color-fire: #ee8130;
+    --color-water: #6390f0;
+    --color-grass: #7ac74c;
+    --color-electric: #f7d02c;
+    --color-ice: #96d9d6;
+    --color-fighting: #c22e28;
+    --color-poison: #a33ea1;
+    --color-ground: #e2bf65;
+    --color-flying: #a98ff3;
+    --color-psychic: #f95587;
+    --color-bug: #a6b91a;
+    --color-rock: #b6a136;
+    --color-ghost: #735797;
+    --color-dragon: #6f35fc;
+    --color-dark: #705746;
+    --color-steel: #b7b7ce;
+    --color-fairy: #d685ad;
 }
 
 /* elevation: tint and strength come from --shade / --shade-boost, which the
@@ -94,10 +122,6 @@
     --color-accent-strong: #f0765f;
     --color-on-accent: #1b1a17;
     --color-pill-text: #d8d3c7;
-
-    --color-sidebar: #0e0d0c;
-    --color-sidebar-hover: #1d1c19;
-    --color-sidebar-active: #2b2925;
 
     --shade: #000;
     --shade-boost: 2.5;
