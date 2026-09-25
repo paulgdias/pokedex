@@ -78,3 +78,35 @@ export const getTypeMatchups = (
             .map((entry) => entry.attacker),
     })).filter((group) => group.types.length > 0);
 };
+
+/** The 18 types in the games' order (also the type chart's order). */
+export const TYPE_ORDER = [
+    "normal",
+    "fighting",
+    "flying",
+    "poison",
+    "ground",
+    "rock",
+    "bug",
+    "ghost",
+    "steel",
+    "fire",
+    "water",
+    "grass",
+    "electric",
+    "psychic",
+    "ice",
+    "dragon",
+    "dark",
+    "fairy",
+] as const satisfies readonly (keyof typeof typeColors)[];
+
+/** Types an attacking type hits for 2×, ½× and 0×. */
+export const getOffense = (attacker: string, efficacy: TypeEfficacy) =>
+    [2, 0.5, 0].map((multiplier) => ({
+        multiplier,
+        label: multiplier === 0.5 ? "½×" : `${multiplier}×`,
+        types: TYPE_ORDER.filter(
+            (defender) => efficacy[attacker]?.[defender] === multiplier
+        ),
+    }));

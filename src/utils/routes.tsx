@@ -10,6 +10,7 @@ import Layout from "../pages/Layout";
 import Pokedex, { loader as pokedexLoader } from "../pages/Pokedex";
 import Pokemon from "../pages/Pokemon";
 import Teams, { loader as teamsLoader } from "../pages/Teams";
+import TypeChart from "../pages/TypeChart";
 
 const dataRoute = (
     id: string,
@@ -62,6 +63,11 @@ export const createAppRouter = (queryClient: QueryClient) => {
                     pokedexLoader(queryClient),
                     pokedexError
                 ),
+                {
+                    path: "/types",
+                    element: <TypeChart />,
+                    HydrateFallback: LoadingSpinner,
+                },
                 dataRoute(
                     "teams",
                     "/teams",
