@@ -10,9 +10,11 @@
     "dev": "rspack --mode=development serve",
     "build": "rspack --mode=production build",
     "start": "rspack --mode=production serve",
-    "lint": "biome lint --verbose ./src/**/*.{ts,tsx}",
-    "lint:fix": "biome lint --write --verbose ./src/**/*.{ts,tsx}",
-    "format": "biome format --write --verbose ./src/**/*.{ts,tsx}"
+    "biome:lint": "biome lint --verbose src",
+    "biome:lint:fix": "biome lint --write --verbose src",
+    "biome:format": "biome format --write --verbose src",
+    "biome:check:fix": "biome check --fix src",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@tanstack/query-async-storage-persister": "^5.103.1",

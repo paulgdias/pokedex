@@ -1,37 +1,41 @@
-# Pokedex
+# Pokedex API (legacy)
 
-## Prerequisites
+A small Express 5 + MongoDB server that used to serve Pokémon data to the Pokédex. The frontend now reads from the PokeAPI GraphQL endpoint instead, so this server is only needed for the hidden `/teams` page, which requests `http://localhost:3001/api/v1/pokemon/teams`.
 
-- Node.js (v14 or higher)
-- npm or yarn
+## Setup
 
-## Installation
+Requires Node.js 18 or higher and access to the MongoDB cluster.
 
-1. Clone the repository
-2. Install dependencies:
 ```bash
+cd api
 npm install
-# or
-yarn install
 ```
 
-## Available Scripts
+Create `api/.env` (gitignored):
 
-- `npm run dev` or `yarn dev`: Starts the development server
-- `npm run build` or `yarn build`: Builds the application for production
-- `npm start` or `yarn start`: Starts the production server
-
-## Development
-
-The application will be available at `http://localhost:3000` when running in development mode.
-
-## Building for Production
-
-To create a production build, run:
-```bash
-npm run build
-# or
-yarn build
+```
+PORT=3001            # optional, defaults to 3001
+MONGODB_USERNAME=...
+MONGODB_PASSWORD=...
+MONGODB_DB=...
 ```
 
-The built files will be in the `dist` directory. 
+## Scripts
+
+- `npm start`: run the server
+- `npm run dev`: run with nodemon
+- `npm run format`: format `src` with Biome
+
+## Endpoints
+
+All routes are `GET` and prefixed with `/api/v1/pokemon`:
+
+| Route | Description |
+|---|---|
+| `/all` | all Pokémon |
+| `/search=:search` | search by text |
+| `/id/:id` | by id |
+| `/name/:name` | by name |
+| `/type/:type` | by type |
+| `/gen/:number` | by generation |
+| `/teams` | teams |
