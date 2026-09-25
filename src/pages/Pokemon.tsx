@@ -9,12 +9,16 @@ import { preconnect } from "react-dom";
 
 import { Button } from "react-aria-components";
 
-import { ArrowLeft, ArrowUp } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import PokemonCard from "@components/PokemonCard";
+import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 
-import { getPokemonEvolutions } from "@utils/pokemon";
-import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
+import {
+    PokemonLocationState,
+    useNavigateToPokemon,
+} from "@utils/useNavigateToPokemon";
+import { getGeneration } from "@utils/generations";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
@@ -22,29 +26,15 @@ const Pokemon: React.FC = () => {
     preconnect("https://beta.pokeapi.co");
     preconnect("https://raw.githubusercontent.com/");
 
-    const pokemonRef = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const params = useParams();
-    const {
-        state,
-    }: {
-        state: {
-            pokemon: PokemonDetails;
-            previous: string;
-        };
-        pathname: string;
-    } = useLocation();
+    const state = useLocation().state as PokemonLocationState | null;
 
     const pokemonName = params?.pokemon;
-    const initialData = useLoaderData();
-
-    const pokedexList: PokemonDetails[] =
-        initialData.length === 1
-            ? initialData
-            : getPokemonEvolutions(initialData);
-    const pokemon = pokedexList.find(
-        (item: PokemonDetails) => item.name === pokemonName
-    );
+    // the pokedex loader already attaches each pokemon's evolutions
+    const pokedexList = useLoaderData() as PokemonDetails[];
+    const pokemon = pokedexList.find((item) => item.name === pokemonName);
 
     const navigateToPokemon = useNavigateToPokemon(
         state?.previous || "/pokedex"
@@ -56,51 +46,83 @@ const Pokemon: React.FC = () => {
         }
     }, [pokemon, navigate]);
 
+    useEffect(() => {
+        scrollRef.current?.scrollTo({ top: 0 });
+    }, [pokemonName]);
+
     if (!pokemon) {
         return null;
     }
 
+    const generation = getGeneration(pokemon.generationId);
+    const relatives = pokemon.evolutions.filter(
+        (item) => item._id !== pokemon._id
+    );
+
     return (
-        <>
-            <Button
-                aria-label="Back to Pokémon"
-                className="fixed rounded-full cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105 my-3 mx-2"
-                onPress={() => navigate(state?.previous || "/pokedex")}
-            >
-                <ArrowLeft color="white" size={42} />
-            </Button>
-            <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
+        <div
+            ref={scrollRef}
+            className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto"
+        >
+            <div className="flex flex-col gap-4 border-b border-line px-4 pt-5 pb-4 lg:px-8">
+                <Button
+                    aria-label="Back to Pokémon"
+                    className="flex h-10 w-fit cursor-pointer items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface pr-4 pl-3 text-sm font-semibold text-ink hover:bg-chip"
+                    onPress={() => navigate(state?.previous || "/pokedex")}
+                >
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    Back to Pokédex
+                </Button>
+                <div className="flex flex-wrap items-baseline gap-x-3.5">
+                    <h1 className="font-display text-[34px] leading-tight font-bold tracking-tight capitalize">
+                        {pokemon.name}
+                    </h1>
+                    {generation && (
+                        <span className="text-[15px] text-muted">
+                            Generation {generation.roman} · {generation.region}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-10 px-4 py-7 lg:px-8">
                 <PokemonCard
-                    ref={pokemonRef}
-                    className="w-xs sm:w-sm hover:shadow-lg cursor-auto m-auto"
+                    className="w-full max-w-sm"
+                    size="large"
                     pokemon={pokemon}
                     isLegendary={pokemon.isLegendary}
                     isMythical={pokemon.isMythical}
                 />
-                <div className="h-0 basis-full" />
-                {pokemon.evolutions.map((item, index) => (
-                    <PokemonCard
-                        key={index}
-                        className="w-[210px] hover:shadow-lg hover:border-sky-500 focus:border-sky-500 m-4"
-                        pokemon={item}
-                        isLegendary={item.isLegendary}
-                        isMythical={item.isMythical}
-                        navigateCallback={navigateToPokemon}
-                    />
-                ))}
+                {relatives.length > 0 && (
+                    <section
+                        aria-labelledby="evolution-chain"
+                        className="flex flex-col gap-4"
+                    >
+                        <h2
+                            id="evolution-chain"
+                            className="font-display text-2xl font-bold tracking-tight"
+                        >
+                            Evolution chain
+                        </h2>
+                        <div className="flex flex-wrap gap-4">
+                            {relatives.map((item) => (
+                                <PokemonCard
+                                    key={item._id}
+                                    className="w-52 hover:border-line-strong"
+                                    pokemon={item}
+                                    isLegendary={item.isLegendary}
+                                    isMythical={item.isMythical}
+                                    navigateCallback={navigateToPokemon}
+                                />
+                            ))}
+                        </div>
+                    </section>
+                )}
             </div>
-            <Button
-                aria-label="Go to Top of Page"
-                className="fixed rounded-full bottom-0 right-0 m-4 cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105"
-                onPress={() => {
-                    if (pokemonRef.current) {
-                        pokemonRef.current.scrollIntoView();
-                    }
-                }}
-            >
-                <ArrowUp color="white" size={42} />
-            </Button>
-        </>
+            <ScrollTopButton
+                onPress={() => scrollRef.current?.scrollTo({ top: 0 })}
+            />
+        </div>
     );
 };
 

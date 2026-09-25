@@ -2,14 +2,7 @@ import { CSSProperties } from "react";
 
 import { twMerge } from "tailwind-merge";
 
-import {
-    cardClass,
-    imgClass,
-    cardStatsClass,
-    pokedexIdClass,
-    placeholderWithBlurClass,
-    placeholderImg,
-} from "@styles/Pokedex";
+import { cardClass, cardArtClass, cardBodyClass } from "@styles/Pokedex";
 
 const PlaceholderCard = ({
     className,
@@ -22,25 +15,19 @@ const PlaceholderCard = ({
 }) => {
     return (
         <div
-            className={`${twMerge(cardClass, className, "cursor-auto")} ${animated && "animate-pulse"}`}
+            aria-hidden="true"
+            className={twMerge(
+                cardClass,
+                "hover:translate-y-0 hover:shadow-none",
+                animated && "animate-pulse",
+                className
+            )}
             style={style}
         >
-            <img
-                title="Placeholder Card"
-                alt="Placeholder Card"
-                className={`${imgClass} blur-sm`}
-                src={placeholderImg}
-            />
-            <div className="px-6 py-4">
-                <div className={`${cardStatsClass} blur-sm`}>
-                    <div className={`${pokedexIdClass} bg-gray-500`}>{"#"}</div>
-                    <span className="bg-gray-500">{"pokemon"}</span>
-                </div>
-            </div>
-            <div className="px-2 py-2">
-                <span className={`${placeholderWithBlurClass}`}>{"type"}</span>
-                <span className={`${placeholderWithBlurClass}`}>{"type"}</span>
-                <span className={`${placeholderWithBlurClass}`}>{"type"}</span>
+            <div className={`${cardArtClass} h-[150px]`} />
+            <div className={cardBodyClass}>
+                <div className="h-5 w-2/3 rounded bg-track" />
+                <div className="h-6 w-20 rounded-full bg-chip" />
             </div>
         </div>
     );

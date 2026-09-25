@@ -1,13 +1,19 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { preconnect } from "react-dom";
 
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData, useSearchParams } from "react-router";
+import {
+    useLoaderData,
+    useNavigationType,
+    useSearchParams,
+} from "react-router";
 
 import type { QueryClient } from "@tanstack/react-query";
 import { queryOptions } from "@tanstack/react-query";
 
-import { useLocalStorage } from "@uidotdev/usehooks";
+import { useDebounce } from "@uidotdev/usehooks";
+
+import { SearchX } from "lucide-react";
 
 import PokemonList from "@components/PokemonList";
 import SearchBar from "@components/SearchBar";
@@ -15,18 +21,22 @@ import SearchBar from "@components/SearchBar";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
-import { Sorting } from "@customTypes/SortingTypes";
+import { SortState } from "@customTypes/SortingTypes";
 
+import { getGeneration } from "@utils/generations";
+import { convertToPokemonDetailsArray, withEvolutions } from "@utils/pokemon";
 import {
-    convertToPokemonDetailsArray,
-    getPokemonEvolutions,
-} from "@utils/pokemon";
-import { advancedSearch, convertToSearch } from "@utils/search";
+    applyFilters,
+    EMPTY_FILTERS,
+    getFiltersFromURLParams,
+    PokedexFilters,
+    withFilters,
+} from "@utils/search";
 import {
-    getNextSortDirection,
-    getSortingFromURLParams,
-    getSortingKey,
-    sortPokemonByType,
+    DEFAULT_SORT,
+    getSortFromURLParams,
+    sortPokemon,
+    withSort,
 } from "@utils/sort";
 
 import { getPokeAPIConfig } from "@api/hooks";
@@ -39,55 +49,43 @@ export const loader =
     (queryClient: QueryClient) => async (_args: LoaderFunctionArgs) => {
         const data = await queryClient.ensureQueryData(pokedexQuery(_args));
         const pokemon = convertToPokemonDetailsArray(data.pokemon);
-        return getPokemonEvolutions(pokemon);
+        return withEvolutions(pokemon);
     };
 
-const transformPokemonData = (
-    data: PokemonDetails[],
-    urlParams: URLSearchParams,
-    sorting: Sorting
-) => {
-    const filteredPokemonData = urlParams.has("query")
-        ? advancedSearch(data, convertToSearch(urlParams))
-        : data;
-    const sort = getSortingKey(sorting) as keyof Sorting;
-    return sortPokemonByType(filteredPokemonData, sorting, sort);
-};
+const TEXT_DEBOUNCE_MS = 250;
 
 const Pokedex: React.FC = () => {
     preconnect("https://beta.pokeapi.co");
     preconnect("https://raw.githubusercontent.com/");
 
     const [urlParams, setURLParams] = useSearchParams();
-    const [showFilters, setShowFilters] = useLocalStorage<boolean>(
-        "showFilters",
-        false
-    );
+    const navigationType = useNavigationType();
 
-    const initialData: PokemonDetails[] = useLoaderData();
-    const [previewData, setPreviewData] = useState<PokemonDetails[] | null>(
-        null
-    );
+    const allPokemon: PokemonDetails[] = useLoaderData();
 
-    const sorting = useMemo(
-        () => getSortingFromURLParams(urlParams),
+    const urlFilters = useMemo(
+        () => getFiltersFromURLParams(urlParams),
         [urlParams]
     );
+    const sort = useMemo(() => getSortFromURLParams(urlParams), [urlParams]);
+
+    // the search text is applied as you type and written to the URL shortly
+    // after, so a reload or back navigation restores it
+    const [text, setText] = useState(urlFilters.text);
+    const filters = useMemo(
+        () => ({ ...urlFilters, text }),
+        [urlFilters, text]
+    );
+    const deferredFilters = useDeferredValue(filters);
+
     const pokemonList = useMemo(
-        () =>
-            transformPokemonData(
-                previewData ?? initialData,
-                urlParams,
-                sorting
-            ),
-        [previewData, initialData, urlParams, sorting]
+        () => sortPokemon(applyFilters(allPokemon, deferredFilters), sort),
+        [allPokemon, deferredFilters, sort]
     );
 
     useEffect(() => {
         if (!urlParams.has("sort")) {
-            const params = new URLSearchParams(urlParams);
-            params.set("sort", "id:desc");
-            setURLParams(params, {
+            setURLParams(withSort(urlParams, DEFAULT_SORT), {
                 replace: true,
                 preventScrollReset: true,
             });
@@ -95,26 +93,70 @@ const Pokedex: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const setSort = (sortKey: keyof Sorting) => {
-        const nextDirection = getNextSortDirection(sorting, sortKey);
-        const params = new URLSearchParams(urlParams);
-        params.set("sort", `${sortKey}:${nextDirection}`);
-        setURLParams(params, { preventScrollReset: true });
+    const debouncedText = useDebounce(text, TEXT_DEBOUNCE_MS);
+    useEffect(() => {
+        if (debouncedText !== urlFilters.text) {
+            setURLParams(
+                withFilters(urlParams, { ...urlFilters, text: debouncedText }),
+                { replace: true, preventScrollReset: true }
+            );
+        }
+        // only when the typed text settles
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedText]);
+
+    // back/forward can change the URL's text behind our back
+    useEffect(() => {
+        if (navigationType === "POP") {
+            setText(urlFilters.text);
+        }
+    }, [navigationType, urlFilters.text]);
+
+    const updateFilters = (patch: Partial<PokedexFilters>) => {
+        const next = { ...filters, ...patch };
+        setText(next.text);
+        setURLParams(withFilters(urlParams, next), {
+            replace: true,
+            preventScrollReset: true,
+        });
     };
 
+    const setSort = (next: SortState) => {
+        setURLParams(withSort(urlParams, next), {
+            replace: true,
+            preventScrollReset: true,
+        });
+    };
+
+    const generation = getGeneration(filters.generation);
+    const generationTotal = generation
+        ? allPokemon.filter((item) => item.generationId === generation.id)
+              .length
+        : allPokemon.length;
+
     return (
-        <>
-            <div className="flex flex-col">
-                <SearchBar
-                    initialData={initialData}
-                    urlParams={urlParams}
-                    setURLParams={setURLParams}
-                    sorting={sorting}
-                    setSort={setSort}
-                    showFilters={showFilters}
-                    setShowFilters={setShowFilters}
-                    setPreviewData={setPreviewData}
-                />
+        <div className="flex min-h-0 flex-1 flex-col">
+            <SearchBar
+                pokemon={allPokemon}
+                filters={filters}
+                onFiltersChange={updateFilters}
+                onTextChange={setText}
+                onClearAll={() => updateFilters(EMPTY_FILTERS)}
+                sort={sort}
+                onSortChange={setSort}
+                resultCount={pokemonList.length}
+            />
+            <div className="flex min-h-0 flex-1 flex-col gap-5 px-4 pt-7 lg:px-8">
+                <div className="flex flex-wrap items-baseline gap-x-3.5">
+                    <h1 className="font-display text-[34px] leading-tight font-bold tracking-tight">
+                        {generation ? generation.region : "All regions"}
+                    </h1>
+                    <span className="text-[15px] text-muted">
+                        {generation
+                            ? `Generation ${generation.roman} · ${generationTotal} Pokémon`
+                            : `National Dex · ${generationTotal} Pokémon`}
+                    </span>
+                </div>
                 <ErrorBoundary
                     fallback={
                         <div className="flex justify-center">
@@ -122,11 +164,56 @@ const Pokedex: React.FC = () => {
                         </div>
                     }
                 >
-                    <PokemonList pokemon={pokemonList} />
+                    {pokemonList.length === 0 ? (
+                        <EmptyState
+                            onSearchAll={() =>
+                                updateFilters({ generation: null })
+                            }
+                            onClear={() => updateFilters(EMPTY_FILTERS)}
+                        />
+                    ) : (
+                        <PokemonList pokemon={pokemonList} />
+                    )}
                 </ErrorBoundary>
             </div>
-        </>
+        </div>
     );
 };
+
+const EmptyState = ({
+    onSearchAll,
+    onClear,
+}: {
+    onSearchAll: () => void;
+    onClear: () => void;
+}) => (
+    <div className="mt-12 flex flex-col items-center gap-3.5 text-center">
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-track">
+            <SearchX size={28} className="text-muted" aria-hidden="true" />
+        </div>
+        <div className="font-display text-[22px] font-bold">
+            Nothing matches these filters
+        </div>
+        <div className="max-w-[380px] text-[15px] text-muted">
+            Try removing a filter, or search across every generation.
+        </div>
+        <div className="flex flex-wrap justify-center gap-2.5">
+            <button
+                type="button"
+                onClick={onSearchAll}
+                className="h-11 rounded-[10px] border-[1.5px] border-line-strong bg-surface px-[18px] text-sm font-semibold"
+            >
+                Search all generations
+            </button>
+            <button
+                type="button"
+                onClick={onClear}
+                className="h-11 rounded-[10px] bg-ink px-[18px] text-sm font-semibold text-white"
+            >
+                Clear filters
+            </button>
+        </div>
+    </div>
+);
 
 export default memo(Pokedex);

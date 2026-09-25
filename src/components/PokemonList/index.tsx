@@ -4,9 +4,8 @@ import { Grid, AutoSizer } from "react-virtualized";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 import PokemonCard from "@components/PokemonCard";
-
-import { Button } from "react-aria-components";
-import { ArrowUp } from "lucide-react";
+import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
+import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 
 import { twMerge } from "tailwind-merge";
 
@@ -15,7 +14,6 @@ import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
 import { getPokemonGridProps } from "./utils";
 
 import "react-virtualized/styles.css";
-import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 
 const PokemonList = ({
     className,
@@ -43,11 +41,12 @@ const PokemonList = ({
     }, [grid, pokemon]);
 
     if (!isLoading && pokemon.length === 0) {
-        return <div className="flex justify-center mt-[50dvh]">No Results</div>;
+        return null;
     }
 
     return (
-        <div className={twMerge("flex h-[95dvh]", className)}>
+        // pulled into the parent's right padding to absorb the trailing grid gap
+        <div className={twMerge("-mr-4 flex min-h-0 flex-1", className)}>
             <AutoSizer>
                 {({ height, width }) => {
                     const {
@@ -66,48 +65,43 @@ const PokemonList = ({
                     return (
                         <Grid
                             ref={grid}
+                            className="pokedex-scroll"
                             cellRenderer={({
                                 key,
                                 columnIndex,
                                 rowIndex,
                                 style,
                             }) => {
+                                const cellStyle = {
+                                    ...style,
+                                    height: rowHeight - gridGap,
+                                    width: columnWidth - gridGap,
+                                };
+
                                 if (isLoading) {
                                     return (
                                         <PlaceholderCard
                                             key={key}
-                                            style={{
-                                                ...style,
-                                                height: rowHeight - gridGap,
-                                                width: columnWidth - gridGap,
-                                            }}
+                                            style={cellStyle}
                                         />
                                     );
                                 }
 
                                 const index =
-                                    itemCount < columnCount
-                                        ? columnIndex
-                                        : columnIndex + rowIndex * columnCount;
+                                    columnIndex + rowIndex * columnCount;
 
                                 if (index >= pokemon.length) {
                                     return null;
                                 }
 
-                                const {
-                                    isLegendary,
-                                    isMythical,
-                                } = pokemon[index];
+                                const { isLegendary, isMythical } =
+                                    pokemon[index];
 
                                 return (
                                     <PokemonCard
                                         key={key}
-                                        style={{
-                                            ...style,
-                                            height: rowHeight - gridGap,
-                                            width: columnWidth - gridGap,
-                                        }}
-                                        className="hover:border-sky-500 focus:border-sky-500"
+                                        style={cellStyle}
+                                        className="hover:border-line-strong"
                                         pokemon={pokemon[index]}
                                         isLegendary={isLegendary}
                                         isMythical={isMythical}
@@ -127,16 +121,14 @@ const PokemonList = ({
                             columnWidth={columnWidth}
                             tabIndex={-1}
                             overscanRowCount={overscanRowCount}
-                            style={{ overflowX: "hidden" }}
+                            style={{ overflowX: "hidden", outline: "none" }}
                         />
                     );
                 }}
             </AutoSizer>
 
             {scrollToPosition && (
-                <Button
-                    aria-label="Go to Top of Page"
-                    className="fixed rounded-full bottom-0 right-0 m-4 cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105"
+                <ScrollTopButton
                     onPress={() => {
                         if (grid.current) {
                             grid.current.scrollToPosition({
@@ -145,9 +137,7 @@ const PokemonList = ({
                             });
                         }
                     }}
-                >
-                    <ArrowUp color="white" size={42} />
-                </Button>
+                />
             )}
         </div>
     );

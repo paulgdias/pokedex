@@ -1,27 +1,29 @@
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
+const GRID_GAP = 16;
+const MIN_CARD_WIDTH = 190;
+const CARD_HEIGHT = 232;
+
+/**
+ * `width` includes one trailing gap (the list is pulled into its parent's
+ * padding by the gap), so each card is `columnWidth - gap` wide.
+ */
 export const getPokemonGridProps = ({
     width,
     pokemon = [],
-    cardWidth = 210,
     isPlacehodler = false,
 }: {
     width: number;
     pokemon?: PokemonDetails[];
-    cardWidth?: number;
     isPlacehodler?: boolean;
 }) => {
-    const columnCount = Math.floor(width / cardWidth) || 1;
+    const gridGap = GRID_GAP;
+    const columnCount = Math.floor(width / (MIN_CARD_WIDTH + gridGap)) || 1;
     const columnWidth = width / columnCount;
-    const rowHeight = columnWidth * 1.6;
-    const itemCount = isPlacehodler
-        ? 36
-        : pokemon.length
-          ? pokemon.length
-          : columnCount ** columnCount;
+    const rowHeight = CARD_HEIGHT + gridGap;
+    const itemCount = isPlacehodler ? 36 : pokemon.length;
     const rowCount = Math.ceil(itemCount / columnCount);
-    const gridGap = 10;
-    const overscanRowCount = 1; // Math.round(columnCount / 3);
+    const overscanRowCount = 2;
 
     return {
         columnCount,

@@ -8,6 +8,7 @@ export interface PokemonCardType {
     pokemon: PokemonDetails;
     isLegendary?: boolean;
     isMythical?: boolean;
+    size?: "default" | "large";
     navigateCallback?: (
         event:
             | React.MouseEvent<HTMLDivElement>

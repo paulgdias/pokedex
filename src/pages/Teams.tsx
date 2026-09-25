@@ -15,9 +15,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import PokemonCard from "@components/PokemonCard";
 
-import { Button } from "react-aria-components";
-
-import { ArrowUp } from "lucide-react";
+import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 
 import { PokemonDetails, TeamsResult, Team } from "@customTypes/PokemonTypes";
 
@@ -50,7 +48,7 @@ const Teams: React.FC = () => {
 
     return (
         <>
-            <div className="flex flex-row flex-wrap overflow-auto max-h-[95dvh] justify-center">
+            <div className="pokedex-scroll flex min-h-0 flex-1 flex-row flex-wrap justify-center overflow-auto px-4 py-6 lg:px-8">
                 <ErrorBoundary
                     fallback={
                         <div className="flex justify-center">
@@ -65,7 +63,7 @@ const Teams: React.FC = () => {
                             className="flex flex-col items-center justify-center"
                         >
                             <h2
-                                className={`text-2xl font-bold underline ${index === 0 ? "mb-4" : "m-4"}`}
+                                className={`font-display text-2xl font-bold tracking-tight ${index === 0 ? "mb-4" : "m-4"}`}
                             >
                                 {data.name}
                             </h2>
@@ -81,7 +79,7 @@ const Teams: React.FC = () => {
                                                 className={carouselSlideClass}
                                             >
                                                 <PokemonCard
-                                                    className="w-[210px] hover:border-sky-500 focus:border-sky-500"
+                                                    className="w-[210px] hover:border-line-strong"
                                                     pokemon={{
                                                         ...pokemon,
                                                         evolutions: [],
@@ -97,17 +95,13 @@ const Teams: React.FC = () => {
                             </div>
                         </div>
                     ))}
-                    <Button
-                        aria-label="Go to Top of Page"
-                        className="fixed rounded-full bottom-0 right-0 m-4 cursor-pointer bg-gray-700 hover:drop-shadow-md hover:drop-shadow-sky-400 transition-transform duration-300 ease-out transform hover:scale-105"
+                    <ScrollTopButton
                         onPress={() => {
                             if (pokemonRef.current) {
                                 pokemonRef.current.scrollIntoView();
                             }
                         }}
-                    >
-                        <ArrowUp color="white" size={42} />
-                    </Button>
+                    />
                 </ErrorBoundary>
             </div>
         </>

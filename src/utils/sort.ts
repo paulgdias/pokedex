@@ -1,107 +1,55 @@
 import { PokemonDetails } from "@customTypes/PokemonTypes";
-import {
-    Sort,
-    SortFunction,
-    Sorting,
-    SortingItem,
-} from "@customTypes/SortingTypes";
+import { SORT_KEYS, SortKey, SortState } from "@customTypes/SortingTypes";
 
-export const defaultDescSort: SortingItem = {
-    sort: "desc",
-    selected: false,
+const SORT_PARAM = "sort";
+
+export const DEFAULT_SORT: SortState = { key: "id", direction: "desc" };
+
+type Comparator = (a: PokemonDetails, b: PokemonDetails) => number;
+
+// Each comparator yields the "desc" order (1 → N, A → Z, legendaries first);
+// the "asc" direction is its reverse.
+const comparators: Record<SortKey, Comparator> = {
+    id: (a, b) => a._id - b._id,
+    name: (a, b) => a.name.localeCompare(b.name),
+    type: (a, b) => (a.types[0] ?? "").localeCompare(b.types[0] ?? ""),
+    isLegendary: (a, b) => Number(b.isLegendary) - Number(a.isLegendary),
+    isMythical: (a, b) => Number(b.isMythical) - Number(a.isMythical),
 };
-export const defaultSorting: Sorting = {
-    name: defaultDescSort,
-    id: defaultDescSort,
-    type: defaultDescSort,
-    isLegendary: defaultDescSort,
-    isMythical: defaultDescSort,
-};
-export const getSortingKey = (sorting: Sorting) => {
-    return Object.keys(sorting).find((key) => {
-        const typedKey = key as keyof Sorting;
-        return sorting[typedKey].selected === true;
-    });
-};
-export const getNextSortDirection = (
-    sorting: Sorting,
-    sortKey: keyof Sorting
-): Sort => {
-    const isActive = getSortingKey(sorting) === sortKey;
-    return isActive && sorting[sortKey].sort === "desc" ? "asc" : "desc";
-};
-export const getSortingFromURLParams = (
-    urlParams: URLSearchParams
-): Sorting => {
-    const sortParam = urlParams.get("sort");
-    const [key, direction] = sortParam?.split(":") ?? [];
-    if (!key || !(key in defaultSorting)) {
-        return {
-            ...defaultSorting,
-            id: { sort: "desc", selected: true },
-        };
-    }
-    return {
-        ...defaultSorting,
-        [key]: {
-            sort: direction === "asc" ? "asc" : "desc",
-            selected: true,
-        },
-    };
-};
-export const basicSortByPokemon = (
-    pokemonData: PokemonDetails[]
+
+const isSortKey = (value: string): value is SortKey =>
+    (SORT_KEYS as readonly string[]).includes(value);
+
+export const sortPokemon = (
+    pokemon: PokemonDetails[],
+    { key, direction }: SortState
 ): PokemonDetails[] => {
-    return [...pokemonData].sort(
-        (a: PokemonDetails, b: PokemonDetails) => a._id - b._id
-    );
+    const compare = comparators[key];
+    const sign = direction === "asc" ? -1 : 1;
+    // ties always fall back to ascending id, regardless of direction
+    return [...pokemon].sort((a, b) => sign * compare(a, b) || a._id - b._id);
 };
-export const sortPokemonByType: SortFunction = (pokemonData, sorting, sort) => {
-    if (sort === "id") {
-        return [...pokemonData].sort((a: PokemonDetails, b: PokemonDetails) =>
-            sorting[sort].sort === "asc" ? b._id - a._id : a._id - b._id
-        );
-    }
-    if (sort === "type") {
-        return basicSortByPokemon([...pokemonData]).sort(
-            (a: PokemonDetails, b: PokemonDetails) =>
-                sorting[sort].sort === "asc"
-                    ? b.types[0].localeCompare(a.types[0])
-                    : a.types[0].localeCompare(b.types[0])
-        );
-    }
-    if (sort === "isLegendary") {
-        return basicSortByPokemon([...pokemonData]).sort(
-            (a: PokemonDetails, b: PokemonDetails) =>
-                sorting[sort].sort === "desc"
-                    ? b.isLegendary
-                        ? 1
-                        : -1
-                    : a.isLegendary
-                      ? -1
-                      : 1
-        );
-    }
-    if (sort === "isMythical") {
-        return basicSortByPokemon([...pokemonData]).sort(
-            (a: PokemonDetails, b: PokemonDetails) =>
-                sorting[sort].sort === "desc"
-                    ? b.isMythical
-                        ? 1
-                        : -1
-                    : a.isMythical
-                      ? -1
-                      : 1
-        );
-    }
 
-    if (sort === "name") {
-        return basicSortByPokemon([...pokemonData]).sort(
-            (a: PokemonDetails, b: PokemonDetails) =>
-                sorting[sort].sort === "desc"
-                    ? a.name.localeCompare(b.name)
-                    : b.name.localeCompare(a.name)
-        );
+export const getNextSort = (current: SortState, key: SortKey): SortState => ({
+    key,
+    direction:
+        current.key === key && current.direction === "desc" ? "asc" : "desc",
+});
+
+export const getSortFromURLParams = (params: URLSearchParams): SortState => {
+    const [key, direction] = params.get(SORT_PARAM)?.split(":") ?? [];
+    if (!key || !isSortKey(key)) {
+        return DEFAULT_SORT;
     }
-    return basicSortByPokemon(pokemonData);
+    return { key, direction: direction === "asc" ? "asc" : "desc" };
+};
+
+/** Returns a copy of `params` with the sort applied. */
+export const withSort = (
+    params: URLSearchParams,
+    { key, direction }: SortState
+): URLSearchParams => {
+    const next = new URLSearchParams(params);
+    next.set(SORT_PARAM, `${key}:${direction}`);
+    return next;
 };

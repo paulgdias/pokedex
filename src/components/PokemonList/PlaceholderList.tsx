@@ -22,7 +22,10 @@ const PlaceholderList = ({
     const grid = useRef<Grid | null>(null);
 
     return (
-        <div className={twMerge("flex h-[95dvh]", className)} style={style}>
+        <div
+            className={twMerge("-mr-4 flex min-h-0 flex-1", className)}
+            style={style}
+        >
             <AutoSizer>
                 {({ height, width }) => {
                     const {
@@ -64,7 +67,6 @@ const PlaceholderList = ({
                                             height: rowHeight - gridGap,
                                             width: columnWidth - gridGap,
                                         }}
-                                        className="hover:border-sky-500 focus:border-sky-500"
                                         animated={animated}
                                     />
                                 );

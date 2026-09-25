@@ -1,52 +1,41 @@
 import { Pokemon, PokemonDetails } from "@customTypes/PokemonTypes";
 
-export function convertToPokemonDetailsArray(
-    pokemonArr: Pokemon[]
-): PokemonDetails[] {
-    return pokemonArr.map((pokemon) => ({
-        _id: pokemon.id ?? 0,
-        name: pokemon.name ?? "",
-        sprite: pokemon.sprites?.[0]?.default ?? "",
-        isLegendary: pokemon.specs?.is_legendary ?? false,
-        isMythical: pokemon.specs?.is_mythical ?? false,
-        generationId: pokemon.specs?.generation_id ?? 0,
-        evolutionChainId: pokemon.specs?.evolution_chain_id ?? 0,
-        evolvesFromId: pokemon.specs?.evolves_from_species_id ?? 0,
-        types: pokemon.types ? pokemon.types.map((t) => t.type.name) : [],
-        evolutions: pokemon.evolutions
-            ? convertToPokemonDetailsArray(pokemon.evolutions)
-            : [],
-    }));
-}
+const toPokemonDetails = (pokemon: Pokemon): PokemonDetails => ({
+    _id: pokemon.id ?? 0,
+    name: pokemon.name ?? "",
+    sprite: pokemon.sprites?.[0]?.default ?? "",
+    isLegendary: pokemon.specs?.is_legendary ?? false,
+    isMythical: pokemon.specs?.is_mythical ?? false,
+    generationId: pokemon.specs?.generation_id ?? 0,
+    evolutionChainId: pokemon.specs?.evolution_chain_id ?? 0,
+    evolvesFromId: pokemon.specs?.evolves_from_species_id ?? 0,
+    types: pokemon.types?.map((t) => t.type.name) ?? [],
+    evolutions: pokemon.evolutions?.map(toPokemonDetails) ?? [],
+});
 
-export const getGroupedEvolutions = (data: PokemonDetails[]) => {
-    if (data) {
-        const groupedPokemonData = data.reduce(
-            (acc, pokemon) => {
-                const chainId = pokemon.evolutionChainId;
-                if (!acc[chainId]) {
-                    acc[chainId] = [];
-                }
-                acc[chainId].push(pokemon);
-                return acc;
-            },
-            {} as Record<number, PokemonDetails[]>
-        );
-        for (const chainId in groupedPokemonData) {
-            groupedPokemonData[chainId].sort((a, b) => a._id - b._id);
+export const convertToPokemonDetailsArray = (
+    pokemon: Pokemon[]
+): PokemonDetails[] => pokemon.map(toPokemonDetails);
+
+const groupByEvolutionChain = (pokemon: PokemonDetails[]) => {
+    const chains = new Map<number, PokemonDetails[]>();
+    for (const item of pokemon) {
+        const chain = chains.get(item.evolutionChainId);
+        if (chain) {
+            chain.push(item);
+        } else {
+            chains.set(item.evolutionChainId, [item]);
         }
-
-        return groupedPokemonData;
     }
-    return {};
+    chains.forEach((chain) => chain.sort((a, b) => a._id - b._id));
+    return chains;
 };
 
-export const getPokemonEvolutions = (data: PokemonDetails[]) => {
-    const evolutions = getGroupedEvolutions(data);
-    return data.map((pokemon) => {
-        return {
-            ...pokemon,
-            evolutions: evolutions[pokemon.evolutionChainId],
-        };
-    });
+/** Sets each pokemon's `evolutions` to the members of its evolution chain. */
+export const withEvolutions = (pokemon: PokemonDetails[]): PokemonDetails[] => {
+    const chains = groupByEvolutionChain(pokemon);
+    return pokemon.map((item) => ({
+        ...item,
+        evolutions: chains.get(item.evolutionChainId) ?? [],
+    }));
 };

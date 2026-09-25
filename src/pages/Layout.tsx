@@ -7,13 +7,13 @@ import { Toaster } from "sonner";
 
 const Layout: React.FC = () => {
     return (
-        <div className="flex flex-row h-dvh">
+        <div className="flex h-dvh flex-col bg-paper text-ink lg:flex-row">
             <Nav />
             <Toaster richColors position="bottom-left" />
-            <div className="page w-screen m-4 overflow-y-hidden">
+            <main className="page flex min-h-0 min-w-0 flex-1 flex-col">
                 <ErrorBoundary
                     fallback={
-                        <div>
+                        <div className="p-8">
                             There was an error loading the page. Please try
                             again.
                         </div>
@@ -21,7 +21,7 @@ const Layout: React.FC = () => {
                 >
                     <Outlet />
                 </ErrorBoundary>
-            </div>
+            </main>
         </div>
     );
 };

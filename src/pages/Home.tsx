@@ -1,4 +1,5 @@
 import { preload } from "react-dom";
+import { Link } from "react-router";
 
 import { LinkedIn, GitHub, Email } from "@components/Icons/Logos";
 
@@ -9,28 +10,35 @@ const Home: React.FC = () => {
         as: "image",
     });
     return (
-        <>
-            <div className="flex flex-col items-center justify-center">
-                <div className="text-xl sm:text-4xl font-bold font-stretch-expanded mt-4">
-                    Paul Dias
-                </div>
+        <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
+            <div className="flex w-full max-w-md flex-col items-center gap-5 rounded-2xl border border-line bg-surface px-8 py-10 text-center">
                 <img
                     title="Profile Picture"
                     alt="Profile Picture"
-                    tabIndex={0}
-                    className="object-contain size-32 rounded-full bg-black m-4"
+                    className="size-32 rounded-full bg-sand object-contain"
                     src={logo}
                 />
-                <div className="text-lg sm:text-2xl font-bold font-stretch-expanded">
-                    Pokémon Trainer
+                <div>
+                    <h1 className="font-display text-4xl leading-tight font-bold tracking-tight">
+                        Paul Dias
+                    </h1>
+                    <div className="mt-1 text-[15px] text-muted">
+                        Pokémon Trainer
+                    </div>
                 </div>
-                <div className="flex flex-row space-x-4 mt-4">
+                <div className="flex flex-row items-center gap-4">
                     <LinkedIn />
                     <GitHub />
                     <Email />
                 </div>
+                <Link
+                    to="/pokedex"
+                    className="flex h-11 items-center rounded-[10px] bg-ink px-5 text-sm font-semibold text-white"
+                >
+                    Open the Pokédex
+                </Link>
             </div>
-        </>
+        </div>
     );
 };
 

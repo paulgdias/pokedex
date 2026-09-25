@@ -5,16 +5,19 @@ import { Ban, Sparkles } from "lucide-react";
 import { PokemonCardType } from "@customTypes/PokemonCardTypes";
 import { typeColors } from "@customTypes/PokemonTypes";
 
+import { formatPokedexNumber } from "@utils/search";
+
 import { twMerge } from "tailwind-merge";
 import {
     cardClass,
-    imgClass,
-    cardStatsClass,
-    pokedexIdClass,
-    placeholderClass,
+    cardArtClass,
+    cardNumberWatermarkClass,
+    cardBodyClass,
+    typePillClass,
+    typeDotClass,
     legendaryPokemonClass,
     mythicalPokemonClass,
-    placeholderImg,
+    categoryBadgeClass,
 } from "@styles/Pokedex";
 
 const PokemonCard: React.FC<PokemonCardType> = ({
@@ -25,6 +28,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     isLegendary,
     isMythical,
     navigateCallback,
+    size = "default",
 }: PokemonCardType) => {
     if (pokemon.sprite) {
         preload(pokemon.sprite, {
@@ -33,6 +37,9 @@ const PokemonCard: React.FC<PokemonCardType> = ({
         });
     }
 
+    const isLarge = size === "large";
+    const category = isMythical ? "Mythical" : isLegendary ? "Legendary" : null;
+
     const Card = (
         <div
             ref={ref}
@@ -40,7 +47,11 @@ const PokemonCard: React.FC<PokemonCardType> = ({
             style={style}
             tabIndex={navigateCallback ? 0 : -1}
             aria-label={`Pokemon Card for ${pokemon.name}`}
-            className={`pokemonCard ${twMerge(cardClass, className)}`}
+            className={`pokemonCard ${twMerge(
+                cardClass,
+                navigateCallback ? "cursor-pointer" : "cursor-auto",
+                className
+            )}`}
             onClick={(event) => {
                 if (navigateCallback) {
                     navigateCallback(event, pokemon);
@@ -54,52 +65,69 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                 }
             }}
         >
-            {isLegendary && <Sparkles className={legendaryPokemonClass} />}
-            {isMythical && <Sparkles className={mythicalPokemonClass} />}
-            {pokemon.sprite ? (
-                <img
-                    title={pokemon.name}
-                    alt={pokemon.name}
-                    className={`${imgClass} bg-gray-500`}
-                    src={placeholderImg}
-                    onLoad={(e) => {
-                        if (e.currentTarget.src === placeholderImg) {
-                            e.currentTarget.src = pokemon.sprite || "";
-                        } else {
-                            e.currentTarget.classList.add("image-loaded");
-                        }
-                    }}
-                />
-            ) : (
-                <Ban
-                    className={`${imgClass} bg-gray-500`}
-                    aria-label={pokemon.name}
-                />
-            )}
-            <div className="px-3 py-1">
-                <div className={cardStatsClass}>
-                    <div className={pokedexIdClass}>#{pokemon._id}</div>
-                    <span title={pokemon.name} className="truncate block">
+            <div
+                className={`${cardArtClass} ${isLarge ? "h-72" : "h-[150px]"}`}
+            >
+                {pokemon.sprite && (
+                    <span
+                        aria-hidden="true"
+                        className={`${cardNumberWatermarkClass} ${isLarge ? "text-7xl" : ""}`}
+                    >
+                        {pokemon._id}
+                    </span>
+                )}
+                {category && (
+                    <span
+                        role="img"
+                        aria-label={category}
+                        title={category}
+                        className={`${categoryBadgeClass} ${isMythical ? mythicalPokemonClass : legendaryPokemonClass}`}
+                    >
+                        <Sparkles
+                            size={22}
+                            fill="currentColor"
+                            strokeLinejoin="round"
+                        />
+                    </span>
+                )}
+                {pokemon.sprite ? (
+                    <img
+                        title={pokemon.name}
+                        alt={pokemon.name}
+                        loading="lazy"
+                        decoding="async"
+                        className={`relative w-auto max-w-[80%] object-contain ${isLarge ? "h-64" : "h-[120px]"}`}
+                        src={pokemon.sprite}
+                    />
+                ) : (
+                    <Ban
+                        className="relative text-subtle"
+                        aria-label={pokemon.name}
+                    />
+                )}
+            </div>
+            <div className={cardBodyClass}>
+                <div className="flex items-baseline justify-between gap-2">
+                    <span
+                        title={pokemon.name}
+                        className={`truncate font-bold capitalize ${isLarge ? "text-2xl" : "text-base"}`}
+                    >
                         {pokemon.name}
                     </span>
+                    <span className="font-mono text-xs text-subtle">
+                        {formatPokedexNumber(pokemon._id)}
+                    </span>
                 </div>
-            </div>
-            <div className="px-2 py-2">
-                {pokemon.types.map(
-                    (
-                        type: keyof typeof typeColors,
-                        index: number
-                    ) => {
-                        return (
+                <div className="flex gap-1.5">
+                    {pokemon.types.map((type) => (
+                        <span key={type} className={typePillClass}>
                             <span
-                                key={index}
-                                className={`inline-block ${typeColors[type]} ${placeholderClass} min-w-12 text-center`}
-                            >
-                                {type}
-                            </span>
-                        );
-                    }
-                )}
+                                className={`${typeDotClass} ${typeColors[type]}`}
+                            />
+                            {type}
+                        </span>
+                    ))}
+                </div>
             </div>
         </div>
     );
