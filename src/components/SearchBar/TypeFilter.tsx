@@ -35,7 +35,7 @@ const TypeFilter = ({
                 <ListFilter size={16} aria-hidden="true" />
                 Type
                 {types.length > 0 && (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1.5 text-xs text-white">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1.5 text-xs text-paper">
                         {types.length}
                     </span>
                 )}
@@ -44,7 +44,7 @@ const TypeFilter = ({
             <Popover
                 placement="bottom start"
                 offset={8}
-                className="w-[460px] max-w-[calc(100vw-2rem)] rounded-[14px] border border-line-strong bg-surface p-4 shadow-[0_18px_40px_rgba(40,32,20,.16)]"
+                className="w-[460px] max-w-[calc(100vw-2rem)] rounded-[14px] border border-line-strong bg-surface p-4 shadow-popover"
             >
                 <Dialog
                     aria-label="Filter by type"
@@ -87,7 +87,7 @@ const TypeFilter = ({
                             </div>
                             <button
                                 type="button"
-                                className="h-11 rounded-[10px] bg-ink text-sm font-semibold text-white"
+                                className="h-11 rounded-[10px] bg-ink text-sm font-semibold text-paper"
                                 onClick={close}
                             >
                                 Show {resultCount} results

@@ -201,7 +201,7 @@ const EmptyState = ({
             <button
                 type="button"
                 onClick={onClear}
-                className="h-11 rounded-[10px] bg-ink px-[18px] text-sm font-semibold text-white"
+                className="h-11 rounded-[10px] bg-ink px-[18px] text-sm font-semibold text-paper"
             >
                 Clear filters
             </button>

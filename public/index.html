@@ -6,6 +6,22 @@
             name="viewport"
             content="width=device-width, initial-scale=1"
         />
+        <meta name="color-scheme" content="light dark" />
+        <script>
+            // set the theme before first paint to avoid a light flash
+            (function () {
+                try {
+                    var saved = localStorage.getItem("theme");
+                    var dark =
+                        saved === "dark" ||
+                        (saved !== "light" &&
+                            matchMedia("(prefers-color-scheme: dark)").matches);
+                    document.documentElement.dataset.theme = dark
+                        ? "dark"
+                        : "light";
+                } catch (e) {}
+            })();
+        </script>
         <title>Pokémon Trainer Guide</title>
         <meta name="description" content="Pokémon Trainer Guide" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

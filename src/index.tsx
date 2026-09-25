@@ -8,8 +8,11 @@ import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 
 import { createAppRouter } from "./utils/routes";
+import { initTheme } from "./utils/useTheme";
 
 import "./styles/index.css";
+
+initTheme();
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root container not found");

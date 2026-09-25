@@ -5,11 +5,15 @@ import Nav from "../components/Nav";
 
 import { Toaster } from "sonner";
 
+import { useTheme } from "@utils/useTheme";
+
 const Layout: React.FC = () => {
+    const { resolved } = useTheme();
+
     return (
         <div className="flex h-dvh flex-col bg-paper text-ink lg:flex-row">
             <Nav />
-            <Toaster richColors position="bottom-left" />
+            <Toaster richColors position="bottom-left" theme={resolved} />
             <main className="page flex min-h-0 min-w-0 flex-1 flex-col">
                 <ErrorBoundary
                     fallback={

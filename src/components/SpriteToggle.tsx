@@ -35,7 +35,7 @@ const SpriteToggle = ({
                 className={({ isSelected, isDisabled }) =>
                     `h-8 cursor-pointer rounded-[9px] px-3 text-sm font-semibold ${
                         isSelected
-                            ? "bg-accent text-white shadow-[0_1px_3px_rgba(40,32,20,.15)]"
+                            ? "bg-accent text-on-accent shadow-segment"
                             : "text-muted"
                     } ${isDisabled ? "cursor-not-allowed opacity-50" : ""}`
                 }

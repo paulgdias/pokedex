@@ -63,7 +63,7 @@ const Thumbnail = ({
 const Connector = ({ method }: { method: string | null }) => (
     <div className="flex h-9 items-center justify-center gap-2 text-subtle md:h-30 md:w-36 md:shrink-0 md:px-2 md:flex-col md:gap-1">
         {method && (
-            <span className="rounded-full bg-chip px-2.5 py-0.5 text-center text-xs leading-snug font-semibold text-[#3d3a33]">
+            <span className="rounded-full bg-chip px-2.5 py-0.5 text-center text-xs leading-snug font-semibold text-pill-text">
                 <span className="sr-only">Evolves by </span>
                 {method}
             </span>
@@ -107,7 +107,7 @@ const Node = ({
                     {pokemon.types.map((type) => (
                         <span
                             key={type}
-                            className="flex items-center gap-1.5 text-sm font-semibold capitalize text-[#3d3a33]"
+                            className="flex items-center gap-1.5 text-sm font-semibold capitalize text-pill-text"
                         >
                             <span
                                 className={`${typeDotClass} ${typeColors[type]}`}

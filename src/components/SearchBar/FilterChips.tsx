@@ -76,7 +76,7 @@ const FilterChips = ({
                     type="button"
                     aria-label={`Remove filter ${kind} ${label}`}
                     onClick={remove}
-                    className="flex h-8 items-center gap-2 rounded-full border border-[#d6d1c4] bg-chip pr-2 pl-3 text-[13px] font-semibold text-ink hover:bg-chip-hover"
+                    className="flex h-8 items-center gap-2 rounded-full border border-line-strong bg-chip pr-2 pl-3 text-[13px] font-semibold text-ink hover:bg-chip-hover"
                 >
                     <span className="font-medium text-subtle">{kind}</span>
                     {label}

@@ -21,34 +21,86 @@
     --color-line-strong: #dcd7cb;
     --color-accent: #b3361f;
     --color-accent-strong: #8a2915;
+    --color-on-accent: #fff;
+    --color-pill-text: #3d3a33;
+}
 
-    /* sidebar */
-    --color-sidebar: #1d1c19;
-    --color-sidebar-hover: #2b2925;
-    --color-sidebar-active: #3a3833;
-    --color-sidebar-text: #e8e4da;
-    --color-sidebar-muted: #b9b3a6;
-    --color-sidebar-label: #a8a295;
+/* elevation: tint and strength come from --shade / --shade-boost, which the
+   dark theme overrides. Plain utilities rather than @theme shadow tokens,
+   because Tailwind inlines (and here mis-parses) colours in those */
+:root {
+    --shade: #28200f;
+    --shade-boost: 1;
+}
 
-    /* pokémon types */
-    --color-normal: #a8a77a;
-    --color-fire: #ee8130;
-    --color-water: #6390f0;
-    --color-grass: #7ac74c;
-    --color-electric: #f7d02c;
-    --color-ice: #96d9d6;
-    --color-fighting: #c22e28;
-    --color-poison: #a33ea1;
-    --color-ground: #e2bf65;
-    --color-flying: #a98ff3;
-    --color-psychic: #f95587;
-    --color-bug: #a6b91a;
-    --color-rock: #b6a136;
-    --color-ghost: #735797;
-    --color-dragon: #6f35fc;
-    --color-dark: #705746;
-    --color-steel: #b7b7ce;
-    --color-fairy: #d685ad;
+@utility shadow-hover {
+    box-shadow: 0 6px 18px
+        color-mix(
+            in srgb,
+            var(--shade) calc(10% * var(--shade-boost)),
+            transparent
+        );
+}
+
+@utility shadow-popover {
+    box-shadow: 0 18px 40px
+        color-mix(
+            in srgb,
+            var(--shade) calc(16% * var(--shade-boost)),
+            transparent
+        );
+}
+
+@utility shadow-segment {
+    box-shadow: 0 1px 3px
+        color-mix(
+            in srgb,
+            var(--shade) calc(15% * var(--shade-boost)),
+            transparent
+        );
+}
+
+@utility shadow-fab {
+    box-shadow: 0 6px 18px
+        color-mix(
+            in srgb,
+            var(--shade) calc(25% * var(--shade-boost)),
+            transparent
+        );
+}
+
+/* dark palette: same token names, so components need no per-theme classes.
+   set on <html data-theme> by public/index.html (first paint) and useTheme */
+:root[data-theme="light"] {
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --color-paper: #141311;
+    --color-surface: #1e1d1a;
+    --color-sand: #2a2824;
+    --color-track: #2a2824;
+    --color-chip: #2b2925;
+    --color-chip-hover: #36342e;
+    --color-wash: #191815;
+    --color-ink: #f1eee6;
+    --color-muted: #b9b3a6;
+    --color-subtle: #a29c8f;
+    --color-line: #34322d;
+    --color-line-strong: #47443c;
+    --color-accent: #e4583f;
+    --color-accent-strong: #f0765f;
+    --color-on-accent: #1b1a17;
+    --color-pill-text: #d8d3c7;
+
+    --color-sidebar: #0e0d0c;
+    --color-sidebar-hover: #1d1c19;
+    --color-sidebar-active: #2b2925;
+
+    --shade: #000;
+    --shade-boost: 2.5;
 }
 
 @layer base {

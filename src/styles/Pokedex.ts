@@ -4,7 +4,7 @@
 const cardClass = `
     relative flex flex-col overflow-hidden rounded-2xl border border-line
     bg-surface transition-shadow duration-150
-    hover:shadow-[0_6px_18px_rgba(40,32,20,.10)] focus-visible:outline-none
+    hover:shadow-hover focus-visible:outline-none
     after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit]
     after:border-2 after:border-transparent focus-visible:after:border-accent
 `;
@@ -15,7 +15,7 @@ const cardNumberWatermarkClass = `
 const cardBodyClass = `flex flex-col gap-2 px-3.5 pt-3 pb-3.5`;
 const typePillClass = `
     flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full
-    bg-chip px-2.5 text-xs font-semibold capitalize text-[#3d3a33]
+    bg-chip px-2.5 text-xs font-semibold capitalize text-pill-text
 `;
 const typeDotClass = `size-2 shrink-0 rounded-full ring-1 ring-inset ring-black/20`;
 const legendaryPokemonClass = `text-[#9aa3b5]`;

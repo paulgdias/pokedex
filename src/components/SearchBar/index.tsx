@@ -126,7 +126,7 @@ const SearchBar = ({
         <div className="relative z-5 flex flex-col gap-3.5 border-b border-line bg-paper px-4 pt-5 pb-3.5 lg:px-8">
             <div className="flex items-center gap-3">
                 <div className="relative grow">
-                    <label className="flex h-13 items-center gap-3 rounded-[14px] border-[1.5px] border-line-strong bg-surface px-4 focus-within:border-accent focus-within:shadow-[0_0_0_4px_rgba(179,54,31,.12)]">
+                    <label className="flex h-13 items-center gap-3 rounded-[14px] border-[1.5px] border-line-strong bg-surface px-4 focus-within:border-accent focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-accent)_12%,transparent)]">
                         <Search
                             size={20}
                             className="shrink-0 text-muted"
@@ -182,7 +182,7 @@ const SearchBar = ({
                             <button
                                 type="button"
                                 aria-label="Clear search"
-                                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f0ede5] text-muted"
+                                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-chip text-muted"
                                 onClick={() => onTextChange("")}
                             >
                                 <X size={14} aria-hidden="true" />
@@ -195,7 +195,7 @@ const SearchBar = ({
                             id="pokedex-suggestions"
                             role="listbox"
                             aria-label="Suggestions"
-                            className="absolute inset-x-0 top-15 flex flex-col gap-1 rounded-[14px] border border-line-strong bg-surface p-2 shadow-[0_18px_40px_rgba(40,32,20,.16)]"
+                            className="absolute inset-x-0 top-15 flex flex-col gap-1 rounded-[14px] border border-line-strong bg-surface p-2 shadow-popover"
                         >
                             {filterSuggestions.length > 0 && (
                                 <>
@@ -289,7 +289,7 @@ const SearchBar = ({
                                                     {item.types.map((type) => (
                                                         <span
                                                             key={type}
-                                                            className="flex items-center gap-1.5 text-xs text-[#4a463e] capitalize"
+                                                            className="flex items-center gap-1.5 text-xs text-muted capitalize"
                                                         >
                                                             <span
                                                                 className={`${typeDotClass} ${typeColors[type]}`}
@@ -383,7 +383,7 @@ const SearchBar = ({
                             className={({ isSelected }) =>
                                 `h-[34px] cursor-pointer rounded-[9px] px-3.5 text-sm font-semibold ${
                                     isSelected
-                                        ? "bg-surface text-ink shadow-[0_1px_3px_rgba(40,32,20,.15)]"
+                                        ? "bg-surface text-ink shadow-segment"
                                         : "text-muted"
                                 }`
                             }

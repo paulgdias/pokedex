@@ -33,7 +33,7 @@ const Home: React.FC = () => {
                 </div>
                 <Link
                     to="/pokedex"
-                    className="flex h-11 items-center rounded-[10px] bg-ink px-5 text-sm font-semibold text-white"
+                    className="flex h-11 items-center rounded-[10px] bg-ink px-5 text-sm font-semibold text-paper"
                 >
                     Open the Pokédex
                 </Link>

@@ -9,6 +9,7 @@ import {
 import { FolderHeart, House, LibraryBig } from "lucide-react";
 
 import Pokeball from "@components/Icons/Pokeball";
+import ThemeToggle from "@components/ThemeToggle";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
@@ -138,6 +139,7 @@ const Nav: React.FC = () => {
                         </NavLink>
                     ))}
                 </nav>
+                <ThemeToggle />
             </header>
 
             <aside className="hidden w-66 shrink-0 flex-col gap-6 bg-sidebar px-3.5 py-5 text-[#f3f0e8] lg:flex">
@@ -162,6 +164,9 @@ const Nav: React.FC = () => {
                     ))}
                 </nav>
                 {onPokedex && <GenerationList />}
+                <div className="mt-auto">
+                    <ThemeToggle />
+                </div>
             </aside>
         </>
     );
