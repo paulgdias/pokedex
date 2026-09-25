@@ -1,7 +1,15 @@
 import { queryOptions } from "@tanstack/react-query";
 import { gql, request } from "graphql-request";
 
-import { HomeSpriteResult, PokedexResult } from "@customTypes/PokemonTypes";
+import {
+    PokedexResult,
+    PokemonInfoResult,
+    PokemonSpritesResult,
+    TypeEfficacy,
+    TypeEfficacyResult,
+} from "@customTypes/PokemonTypes";
+
+import { convertToPokemonInfo } from "@utils/pokemon";
 
 const POKEAPI_URL = "https://beta.pokeapi.co/graphql/v1beta";
 
@@ -11,6 +19,10 @@ const pokedexQuery = gql`
             id
             name
             is_default
+            stats: pokemon_v2_pokemonstats {
+                stat_id
+                base_stat
+            }
             sprites: pokemon_v2_pokemonsprites {
                 default: sprites(
                     path: "other[\\"official-artwork\\"].front_default"
@@ -54,29 +66,157 @@ const pokedexQuery = gql`
 `;
 
 export const pokedexQueryOptions = queryOptions({
-    queryKey: ["pokedex", "v3"],
+    queryKey: ["pokedex", "v4"],
     queryFn: () => request<PokedexResult>(POKEAPI_URL, pokedexQuery),
 });
 
-const homeSpriteQuery = gql`
-    query getHomeSprite($id: Int!) {
+const spritesQuery = gql`
+    query getPokemonSprites($id: Int!) {
         pokemon_v2_pokemonsprites(where: { pokemon_id: { _eq: $id } }) {
             home: sprites(path: "other.home.front_default")
+            homeShiny: sprites(path: "other.home.front_shiny")
+            artworkShiny: sprites(
+                path: "other[\\"official-artwork\\"].front_shiny"
+            )
         }
     }
 `;
 
-/** The 3D (Pokémon HOME) render of one pokemon, or null when it has none. */
-export const homeSpriteQueryOptions = (id: number) =>
+/** Extra renders of one pokemon: the 3D (HOME) one and shiny variants. */
+export const pokemonSpritesQueryOptions = (id: number) =>
     queryOptions({
-        queryKey: ["pokemon-home-sprite", id],
+        queryKey: ["pokemon-sprites", id],
         queryFn: async () => {
-            const result = await request<HomeSpriteResult>(
+            const result = await request<PokemonSpritesResult>(
                 POKEAPI_URL,
-                homeSpriteQuery,
+                spritesQuery,
                 { id }
             );
-            return result.pokemon_v2_pokemonsprites[0]?.home ?? null;
+            return (
+                result.pokemon_v2_pokemonsprites[0] ?? {
+                    home: null,
+                    homeShiny: null,
+                    artworkShiny: null,
+                }
+            );
         },
         staleTime: Infinity,
     });
+
+const infoQuery = gql`
+    query getPokemonInfo($id: Int!) {
+        pokemon_v2_pokemon(where: { id: { _eq: $id } }) {
+            height
+            weight
+            base_experience
+            abilities: pokemon_v2_pokemonabilities(order_by: { slot: asc }) {
+                is_hidden
+                ability: pokemon_v2_ability {
+                    name
+                    effects: pokemon_v2_abilityeffecttexts(
+                        where: { language_id: { _eq: 9 } }
+                    ) {
+                        short_effect
+                    }
+                }
+            }
+            cries: pokemon_v2_pokemoncries {
+                cries
+            }
+            species: pokemon_v2_pokemonspecy {
+                gender_rate
+                capture_rate
+                base_happiness
+                hatch_counter
+                habitat: pokemon_v2_pokemonhabitat {
+                    name
+                }
+                color: pokemon_v2_pokemoncolor {
+                    name
+                }
+                shape: pokemon_v2_pokemonshape {
+                    name
+                }
+                growth: pokemon_v2_growthrate {
+                    name
+                }
+                eggGroups: pokemon_v2_pokemonegggroups {
+                    group: pokemon_v2_egggroup {
+                        name
+                    }
+                }
+                genus: pokemon_v2_pokemonspeciesnames(
+                    where: { language_id: { _eq: 9 } }
+                ) {
+                    genus
+                }
+                flavor: pokemon_v2_pokemonspeciesflavortexts(
+                    where: { language_id: { _eq: 9 } }
+                    order_by: { version_id: desc }
+                ) {
+                    text: flavor_text
+                    version: pokemon_v2_version {
+                        name
+                    }
+                }
+            }
+        }
+    }
+`;
+
+/** Abilities, size, species facts, entries and the cry of one pokemon. */
+export const pokemonInfoQueryOptions = (id: number) =>
+    queryOptions({
+        queryKey: ["pokemon-info", id],
+        queryFn: async () => {
+            const result = await request<PokemonInfoResult>(
+                POKEAPI_URL,
+                infoQuery,
+                { id }
+            );
+            return convertToPokemonInfo(result.pokemon_v2_pokemon[0]);
+        },
+        staleTime: Infinity,
+    });
+
+const efficacyQuery = gql`
+    query getTypeEfficacy {
+        efficacy: pokemon_v2_typeefficacy(
+            where: {
+                damage_type_id: { _lte: 18 }
+                target_type_id: { _lte: 18 }
+            }
+        ) {
+            damage_type_id
+            target_type_id
+            damage_factor
+        }
+        types: pokemon_v2_type(where: { id: { _lte: 18 } }) {
+            id
+            name
+        }
+    }
+`;
+
+/** attacker -> defender -> multiplier for the 18 types; fetched once. */
+export const typeEfficacyQueryOptions = queryOptions({
+    queryKey: ["type-efficacy"],
+    queryFn: async (): Promise<TypeEfficacy> => {
+        const { efficacy, types } = await request<TypeEfficacyResult>(
+            POKEAPI_URL,
+            efficacyQuery
+        );
+        const names = new Map(types.map(({ id, name }) => [id, name]));
+        const chart: TypeEfficacy = {};
+        for (const row of efficacy) {
+            const attacker = names.get(row.damage_type_id);
+            const defender = names.get(row.target_type_id);
+            if (attacker && defender) {
+                chart[attacker] ??= {};
+                chart[attacker][defender] = row.damage_factor / 100;
+            }
+        }
+        return chart;
+    },
+    staleTime: Infinity,
+});
