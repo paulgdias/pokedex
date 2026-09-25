@@ -4,8 +4,12 @@ import {
     ArrowDown01,
     ArrowDown10,
     ArrowDownAZ,
+    ArrowDownWideNarrow,
     ArrowDownZA,
     ArrowUpDown,
+    ArrowUpNarrowWide,
+    LayoutGrid,
+    List,
     LucideIcon,
     Search,
     X,
@@ -23,6 +27,8 @@ import {
     getFilterSuggestions,
     getPokemonSuggestions,
 } from "@utils/search";
+import { getSortLabel } from "@utils/sort";
+import { PokedexView } from "@utils/view";
 
 import { typeDotClass } from "@styles/Pokedex";
 
@@ -50,6 +56,21 @@ const SORT_OPTIONS: { label: string; value: SortState; icon: LucideIcon }[] = [
         value: { key: "name", direction: "desc" },
         icon: ArrowDownZA,
     },
+    {
+        label: "Total stats Low–High",
+        value: { key: "total", direction: "asc" },
+        icon: ArrowUpNarrowWide,
+    },
+    {
+        label: "Total stats High–Low",
+        value: { key: "total", direction: "desc" },
+        icon: ArrowDownWideNarrow,
+    },
+];
+
+const VIEW_OPTIONS: { id: PokedexView; label: string; Icon: LucideIcon }[] = [
+    { id: "cards", label: "Card view", Icon: LayoutGrid },
+    { id: "list", label: "List view", Icon: List },
 ];
 
 const sortValue = ({ key, direction }: SortState) => `${key}:${direction}`;
@@ -71,6 +92,8 @@ const SearchBar = ({
     onClearAll,
     sort,
     onSortChange,
+    view,
+    onViewChange,
     resultCount,
 }: {
     /** the whole dex; suggestions ignore the current filters */
@@ -81,6 +104,8 @@ const SearchBar = ({
     onClearAll: () => void;
     sort: SortState;
     onSortChange: (sort: SortState) => void;
+    view: PokedexView;
+    onViewChange: (view: PokedexView) => void;
     resultCount: number;
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -326,6 +351,14 @@ const SearchBar = ({
                         }}
                         className="h-10 bg-transparent pr-1.5 text-sm font-semibold text-ink"
                     >
+                        {/* sorted from a list-view column header */}
+                        {!SORT_OPTIONS.some(
+                            ({ value }) => sortValue(value) === sortValue(sort)
+                        ) && (
+                            <option value={sortValue(sort)}>
+                                {getSortLabel(sort)}
+                            </option>
+                        )}
                         {SORT_OPTIONS.map(({ label, value }) => (
                             <option key={label} value={sortValue(value)}>
                                 {label}
@@ -397,6 +430,35 @@ const SearchBar = ({
                 <div className="text-sm text-muted" aria-live="polite">
                     <strong className="text-ink">{resultCount}</strong> shown
                 </div>
+
+                <ToggleButtonGroup
+                    aria-label="View"
+                    selectionMode="single"
+                    disallowEmptySelection
+                    selectedKeys={[view]}
+                    onSelectionChange={(keys) => {
+                        const [id] = Array.from(keys);
+                        onViewChange(id as PokedexView);
+                    }}
+                    className="flex gap-0.5 rounded-xl bg-track p-[3px]"
+                >
+                    {VIEW_OPTIONS.map(({ id, label, Icon }) => (
+                        <ToggleButton
+                            key={id}
+                            id={id}
+                            aria-label={label}
+                            className={({ isSelected }) =>
+                                `flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] ${
+                                    isSelected
+                                        ? "bg-surface text-ink shadow-segment"
+                                        : "text-muted"
+                                }`
+                            }
+                        >
+                            <Icon size={18} aria-hidden="true" />
+                        </ToggleButton>
+                    ))}
+                </ToggleButtonGroup>
             </div>
 
             <FilterChips

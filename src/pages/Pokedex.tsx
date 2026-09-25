@@ -14,6 +14,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { SearchX } from "lucide-react";
 
 import PokemonList from "@components/PokemonList";
+import PokemonTable from "@components/PokemonList/PokemonTable";
 import SearchBar from "@components/SearchBar";
 
 import { ErrorBoundary } from "react-error-boundary";
@@ -36,6 +37,7 @@ import {
     sortPokemon,
     withSort,
 } from "@utils/sort";
+import { PokedexView, getViewFromURLParams, withView } from "@utils/view";
 
 import { pokedexQueryOptions } from "@api/pokedex";
 
@@ -61,6 +63,7 @@ const Pokedex: React.FC = () => {
         [urlParams]
     );
     const sort = useMemo(() => getSortFromURLParams(urlParams), [urlParams]);
+    const view = getViewFromURLParams(urlParams);
 
     // the search text is applied as you type and written to the URL shortly
     // after, so a reload or back navigation restores it
@@ -121,6 +124,13 @@ const Pokedex: React.FC = () => {
         });
     };
 
+    const setView = (next: PokedexView) => {
+        setURLParams(withView(urlParams, next), {
+            replace: true,
+            preventScrollReset: true,
+        });
+    };
+
     const generation = getGeneration(filters.generation);
     const generationTotal = generation
         ? allPokemon.filter((item) => item.generationId === generation.id)
@@ -137,6 +147,8 @@ const Pokedex: React.FC = () => {
                 onClearAll={() => updateFilters(EMPTY_FILTERS)}
                 sort={sort}
                 onSortChange={setSort}
+                view={view}
+                onViewChange={setView}
                 resultCount={pokemonList.length}
             />
             <div className="flex min-h-0 flex-1 flex-col gap-5 px-4 pt-7 lg:px-8">
@@ -163,6 +175,12 @@ const Pokedex: React.FC = () => {
                                 updateFilters({ generation: null })
                             }
                             onClear={() => updateFilters(EMPTY_FILTERS)}
+                        />
+                    ) : view === "list" ? (
+                        <PokemonTable
+                            pokemon={pokemonList}
+                            sort={sort}
+                            onSortChange={setSort}
                         />
                     ) : (
                         <PokemonList pokemon={pokemonList} />

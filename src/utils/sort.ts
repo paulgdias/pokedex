@@ -1,5 +1,10 @@
 import { PokemonDetails } from "@customTypes/PokemonTypes";
-import { SORT_KEYS, SortKey, SortState } from "@customTypes/SortingTypes";
+import {
+    SORT_KEYS,
+    STAT_SORT_KEYS,
+    SortKey,
+    SortState,
+} from "@customTypes/SortingTypes";
 
 const SORT_PARAM = "sort";
 
@@ -15,6 +20,14 @@ const comparators: Record<SortKey, Comparator> = {
     type: (a, b) => (a.types[0] ?? "").localeCompare(b.types[0] ?? ""),
     isLegendary: (a, b) => Number(b.isLegendary) - Number(a.isLegendary),
     isMythical: (a, b) => Number(b.isMythical) - Number(a.isMythical),
+    total: (a, b) => a.statTotal - b.statTotal,
+    ...(Object.fromEntries(
+        STAT_SORT_KEYS.map((key, index) => [
+            key,
+            (a: PokemonDetails, b: PokemonDetails) =>
+                (a.stats[index] ?? 0) - (b.stats[index] ?? 0),
+        ])
+    ) as Record<(typeof STAT_SORT_KEYS)[number], Comparator>),
 };
 
 const isSortKey = (value: string): value is SortKey =>
@@ -53,3 +66,22 @@ export const withSort = (
     next.set(SORT_PARAM, `${key}:${direction}`);
     return next;
 };
+
+const SORT_KEY_LABELS: Record<SortKey, string> = {
+    id: "Number",
+    name: "Name",
+    type: "Type",
+    isLegendary: "Legendary",
+    isMythical: "Mythical",
+    hp: "HP",
+    attack: "Attack",
+    defense: "Defense",
+    specialAttack: "Sp. Atk",
+    specialDefense: "Sp. Def",
+    speed: "Speed",
+    total: "Total stats",
+};
+
+/** e.g. "Attack High–Low"; for a sort that has no entry in the sort select. */
+export const getSortLabel = ({ key, direction }: SortState) =>
+    `${SORT_KEY_LABELS[key]} ${direction === "asc" ? "Low–High" : "High–Low"}`;
