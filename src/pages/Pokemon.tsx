@@ -35,6 +35,18 @@ import { PokemonLocationState } from "@utils/useNavigateToPokemon";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
+/** Tints derived from the pokémon's types; they follow the light/dark theme. */
+const getTypeTheme = (types: string[]) => {
+    const mix = (type: string, percent: number, base: string) =>
+        `color-mix(in srgb, var(--color-${type}) ${percent}%, var(--color-${base}))`;
+    const [first, second = first] = types;
+
+    return {
+        header: `linear-gradient(100deg, ${mix(first, 16, "paper")}, ${mix(second, 16, "paper")})`,
+        art: `linear-gradient(135deg, ${mix(first, 26, "sand")}, ${mix(second, 26, "sand")})`,
+    };
+};
+
 const isTypingTarget = (target: EventTarget | null) =>
     target instanceof HTMLElement &&
     (target.isContentEditable ||
@@ -143,13 +155,17 @@ const Pokemon: React.FC = () => {
     }
 
     const generation = getGeneration(pokemon.generationId);
+    const theme = getTypeTheme(pokemon.types);
 
     return (
         <div
             ref={scrollRef}
             className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto"
         >
-            <div className="flex flex-col gap-4 border-b border-line px-4 pt-5 pb-4 lg:px-8">
+            <div
+                style={{ background: theme.header }}
+                className="flex flex-col gap-4 border-b border-line px-4 pt-5 pb-4 lg:px-8"
+            >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <Button
                         aria-label="Back to Pokémon"
@@ -204,6 +220,11 @@ const Pokemon: React.FC = () => {
                 <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
                     <div className="flex flex-col gap-6">
                         <PokemonCard
+                            style={
+                                {
+                                    "--card-art": theme.art,
+                                } as React.CSSProperties
+                            }
                             className="w-full"
                             size="large"
                             pokemon={pokemon}

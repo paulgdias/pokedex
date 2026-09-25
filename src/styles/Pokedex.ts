@@ -8,7 +8,8 @@ const cardClass = `
     after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit]
     after:border-2 after:border-transparent focus-visible:after:border-accent
 `;
-const cardArtClass = `relative flex items-center justify-center bg-sand`;
+// --card-art lets a page tint the art area (e.g. by type); sand by default
+const cardArtClass = `relative flex items-center justify-center bg-[var(--card-art,var(--color-sand))]`;
 const cardNumberWatermarkClass = `
     absolute select-none font-mono text-[40px] font-semibold text-ink/10
 `;
