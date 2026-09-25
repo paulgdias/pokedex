@@ -12,7 +12,7 @@ import Pokeball from "@components/Icons/Pokeball";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
-import { countByGeneration, GENERATIONS } from "@utils/generations";
+import { GENERATIONS, countByGeneration } from "@utils/generations";
 import { getFiltersFromURLParams, withFilters } from "@utils/search";
 
 const NAV_ITEMS = [

@@ -1,24 +1,24 @@
 import { useEffect, useRef } from "react";
+import { preconnect } from "react-dom";
 import {
+    useLoaderData,
     useLocation,
     useNavigate,
-    useLoaderData,
     useParams,
 } from "react-router";
-import { preconnect } from "react-dom";
 
 import { Button } from "react-aria-components";
 
 import { ArrowLeft } from "lucide-react";
 
-import PokemonCard from "@components/PokemonCard";
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
+import PokemonCard from "@components/PokemonCard";
 
+import { getGeneration } from "@utils/generations";
 import {
     PokemonLocationState,
     useNavigateToPokemon,
 } from "@utils/useNavigateToPokemon";
-import { getGeneration } from "@utils/generations";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 

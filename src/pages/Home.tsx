@@ -1,7 +1,7 @@
 import { preload } from "react-dom";
 import { Link } from "react-router";
 
-import { LinkedIn, GitHub, Email } from "@components/Icons/Logos";
+import { Email, GitHub, LinkedIn } from "@components/Icons/Logos";
 
 const logo: string = new URL("../images/profile.jpg", import.meta.url).href;
 

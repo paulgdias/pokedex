@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 
-import Nav from "../components/Nav";
 import { ErrorBoundary } from "react-error-boundary";
+import Nav from "../components/Nav";
 
 import { Toaster } from "sonner";
 

@@ -1,9 +1,9 @@
 import { memo, useRef } from "react";
-import { useLoaderData } from "react-router";
 import { preconnect } from "react-dom";
+import { useLoaderData } from "react-router";
 
 import type { QueryClient } from "@tanstack/react-query";
-import { queryOptions, keepPreviousData } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 import {
     carouselClass,
@@ -17,7 +17,7 @@ import PokemonCard from "@components/PokemonCard";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 
-import { PokemonDetails, TeamsResult, Team } from "@customTypes/PokemonTypes";
+import { PokemonDetails, Team, TeamsResult } from "@customTypes/PokemonTypes";
 
 import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
 

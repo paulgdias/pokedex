@@ -7,18 +7,18 @@ import { typeColors } from "@customTypes/PokemonTypes";
 
 import { formatPokedexNumber } from "@utils/search";
 
-import { twMerge } from "tailwind-merge";
 import {
-    cardClass,
     cardArtClass,
-    cardNumberWatermarkClass,
     cardBodyClass,
-    typePillClass,
-    typeDotClass,
+    cardClass,
+    cardNumberWatermarkClass,
+    categoryBadgeClass,
     legendaryPokemonClass,
     mythicalPokemonClass,
-    categoryBadgeClass,
+    typeDotClass,
+    typePillClass,
 } from "@styles/Pokedex";
+import { twMerge } from "tailwind-merge";
 
 const PokemonCard: React.FC<PokemonCardType> = ({
     ref,

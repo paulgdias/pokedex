@@ -2,7 +2,7 @@ import { CSSProperties } from "react";
 
 import { twMerge } from "tailwind-merge";
 
-import { cardClass, cardArtClass, cardBodyClass } from "@styles/Pokedex";
+import { cardArtClass, cardBodyClass, cardClass } from "@styles/Pokedex";
 
 const PlaceholderCard = ({
     className,

@@ -9,7 +9,7 @@ import {
 
 import { typeColors } from "@customTypes/PokemonTypes";
 
-import { capitalize, POKEMON_TYPES, PokemonType } from "@utils/search";
+import { POKEMON_TYPES, PokemonType, capitalize } from "@utils/search";
 
 import { typeDotClass } from "@styles/Pokedex";
 
