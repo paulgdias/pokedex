@@ -34,9 +34,6 @@ export type EvolutionMethod = {
     move: NamedResource;
     location: NamedResource;
 };
-export type PokemonSpritesResult = {
-    pokemon_v2_pokemonsprites: { inGame: string | null }[];
-};
 export type PokemonInfoResult = {
     pokemon_v2_pokemon: {
         height: number;
@@ -77,7 +74,7 @@ export type Pokemon = {
     id: number;
     name: string;
     is_default: boolean;
-    sprites: { default: string | null }[];
+    sprites: { default: string | null; pixel: string | null }[];
     types: { type: { name: keyof typeof typeColors } }[];
     stats: { stat_id: number; base_stat: number }[];
     specs: {
@@ -105,6 +102,8 @@ export type PokemonDetails = {
     _id: number;
     name: string;
     sprite: string;
+    /** the 96px in-game sprite; null when the pokémon has none */
+    inGameSprite: string | null;
     types: (keyof typeof typeColors)[];
     isLegendary: boolean;
     isMythical: boolean;
@@ -148,7 +147,6 @@ export type PokemonInfo = {
     /** newest game version first */
     flavorTexts: { text: string; version: string }[];
 };
-export type PokemonSprites = { inGame: string | null };
 
 /** One node of an evolution chain, with the way it is reached. */
 export type EvolutionStep = {

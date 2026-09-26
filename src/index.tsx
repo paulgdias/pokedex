@@ -7,6 +7,7 @@ import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persi
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 
+import { idbStorage, removeLegacyLocalStorageCache } from "./utils/idbStorage";
 import { createAppRouter } from "./utils/routes";
 import { initTheme } from "./utils/useTheme";
 
@@ -28,9 +29,9 @@ const queryClient = new QueryClient({
     },
 });
 
-const persister = createAsyncStoragePersister({
-    storage: window.localStorage,
-});
+// IndexedDB instead of localStorage: no ~5 MB quota, no synchronous writes
+removeLegacyLocalStorageCache();
+const persister = createAsyncStoragePersister({ storage: idbStorage });
 
 const router = createAppRouter(queryClient);
 

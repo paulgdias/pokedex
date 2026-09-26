@@ -24,6 +24,7 @@ const toPokemonDetails = (pokemon: Pokemon): PokemonDetails => ({
     _id: pokemon.id ?? 0,
     name: pokemon.name ?? "",
     sprite: pokemon.sprites?.[0]?.default ?? "",
+    inGameSprite: pokemon.sprites?.[0]?.pixel ?? null,
     isLegendary: pokemon.specs?.is_legendary ?? false,
     isMythical: pokemon.specs?.is_mythical ?? false,
     generationId: pokemon.specs?.generation_id ?? 0,

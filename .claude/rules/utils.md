@@ -19,6 +19,7 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everyt
 | `sort.ts` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`, `getSortLabel`. |
 | `stats.ts` | `STAT_LABELS`, `MAX_STAT`, `TYPE_ORDER`; formatters (`formatName`, `formatFlavorText`, `formatHeight`, `formatWeight`, `getFemaleShare`); `getTypeMatchups` (a defender's damage taken, dual types multiplied) `getOffense` (what an attacker hits) and `describeMatchup` (one-line "Fire → Grass: 2× (super effective)"), both from the `TypeEfficacy` map. |
 | `view.ts` | `PokedexView` (`cards` / `list`), `getViewFromURLParams`, `withView` (URL param `view`). |
+| `idbStorage.ts` | `idbStorage` (async `getItem` / `setItem` / `removeItem` on IndexedDB, failures swallowed; the React Query persister's storage) and `removeLegacyLocalStorageCache`. |
 | `useTheme.ts` | `useTheme` (preference `light` / `dark` / `system`, resolved theme, setter) and `initTheme` (call once at startup; follows OS changes while on `system`). |
 | `useNavigateToPokemon.ts` | Custom hook returning `(event, pokemon) => void`. Navigates to `/pokedex/:pokemonName` with `{ pokemon, previous }` router state (`PokemonLocationState`) so back navigation preserves previous filters and scroll. |
 

@@ -4,8 +4,6 @@ import { gql, request } from "graphql-request";
 import {
     PokedexResult,
     PokemonInfoResult,
-    PokemonSprites,
-    PokemonSpritesResult,
     TypeEfficacy,
     TypeEfficacyResult,
 } from "@customTypes/PokemonTypes";
@@ -25,6 +23,7 @@ const pokedexQuery = gql`
                 base_stat
             }
             sprites: pokemon_v2_pokemonsprites {
+                pixel: sprites(path: "front_default")
                 default: sprites(
                     path: "other[\\"official-artwork\\"].front_default"
                 )
@@ -67,34 +66,9 @@ const pokedexQuery = gql`
 `;
 
 export const pokedexQueryOptions = queryOptions({
-    queryKey: ["pokedex", "v4"],
+    queryKey: ["pokedex", "v5"],
     queryFn: () => request<PokedexResult>(POKEAPI_URL, pokedexQuery),
 });
-
-const spritesQuery = gql`
-    query getPokemonSprites($id: Int!) {
-        pokemon_v2_pokemonsprites(where: { pokemon_id: { _eq: $id } }) {
-            inGame: sprites(path: "front_default")
-        }
-    }
-`;
-
-/** The in-game (pixel) sprite of one pokemon, or null when it has none. */
-export const pokemonSpritesQueryOptions = (id: number) =>
-    queryOptions({
-        queryKey: ["pokemon-sprites", id],
-        queryFn: async (): Promise<PokemonSprites> => {
-            const result = await request<PokemonSpritesResult>(
-                POKEAPI_URL,
-                spritesQuery,
-                { id }
-            );
-            return {
-                inGame: result.pokemon_v2_pokemonsprites[0]?.inGame ?? null,
-            };
-        },
-        staleTime: Infinity,
-    });
 
 const infoQuery = gql`
     query getPokemonInfo($id: Int!) {

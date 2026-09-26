@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
 import { Button } from "react-aria-components";
 
 import { ArrowLeft, ChevronLeft, ChevronRight, Scale } from "lucide-react";
@@ -26,7 +27,6 @@ import SpriteToggle, { SpriteView } from "@components/SpriteToggle";
 
 import {
     pokemonInfoQueryOptions,
-    pokemonSpritesQueryOptions,
     typeEfficacyQueryOptions,
 } from "@api/pokedex";
 
@@ -42,10 +42,12 @@ const getTypeTheme = (types: string[]) => {
     const [first, second = first] = types;
 
     return {
-        header: `linear-gradient(100deg, ${mix(first, 16, "paper")}, ${mix(second, 16, "paper")})`,
+        header: `linear-gradient(100deg, ${mix(first, 26, "paper")}, ${mix(second, 26, "paper")})`,
         art: `linear-gradient(135deg, ${mix(first, 26, "sand")}, ${mix(second, 26, "sand")})`,
     };
 };
+
+const INFO_DEBOUNCE_MS = 300;
 
 const isTypingTarget = (target: EventTarget | null) =>
     target instanceof HTMLElement &&
@@ -118,15 +120,19 @@ const Pokemon: React.FC = () => {
     // the choice stays while moving between pokemon; falls back to the
     // artwork for the few that have no in-game sprite
     const [view, setView] = useState<SpriteView>("artwork");
-    const enabled = Boolean(pokemon);
-    const spritesQuery = useQuery({
-        ...pokemonSpritesQueryOptions(id),
-        enabled,
+
+    // the lazy queries only start once the user rests on a pokémon, so holding
+    // ←/→ or skimming the evolution chain does not send a request per stop.
+    // Cached data still shows immediately (a disabled query returns it).
+    const settledId = useDebounce(id, INFO_DEBOUNCE_MS);
+    const canFetch = Boolean(pokemon) && settledId === id;
+    const infoQuery = useQuery({
+        ...pokemonInfoQueryOptions(id),
+        enabled: canFetch,
     });
-    const infoQuery = useQuery({ ...pokemonInfoQueryOptions(id), enabled });
     const efficacyQuery = useQuery(typeEfficacyQueryOptions);
 
-    const inGameSprite = spritesQuery.data?.inGame ?? undefined;
+    const inGameSprite = pokemon?.inGameSprite ?? undefined;
     const isInGame = view === "in-game" && Boolean(inGameSprite);
     if (inGameSprite) {
         preload(inGameSprite, { as: "image" });
@@ -242,19 +248,10 @@ const Pokemon: React.FC = () => {
                                 isInGameAvailable={Boolean(inGameSprite)}
                             />
                         </PokemonCard>
-                        <InfoSection title="Details" query={infoQuery}>
-                            {(info) => <InfoFacts info={info} />}
-                        </InfoSection>
                     </div>
                     <div className="grid gap-6 xl:grid-cols-2">
-                        <InfoSection
-                            title="Pokédex entry"
-                            query={infoQuery}
-                            className="xl:col-span-2"
-                        >
-                            {(info) => (
-                                <PokedexEntry key={pokemon._id} info={info} />
-                            )}
+                        <InfoSection title="Details" query={infoQuery}>
+                            {(info) => <InfoFacts info={info} />}
                         </InfoSection>
                         <Section title="Base stats">
                             <StatBars
@@ -262,7 +259,11 @@ const Pokemon: React.FC = () => {
                                 total={pokemon.statTotal}
                             />
                         </Section>
-                        <InfoSection title="Abilities" query={infoQuery}>
+                        <InfoSection
+                            title="Abilities"
+                            query={infoQuery}
+                            className="xl:col-span-2"
+                        >
                             {(info) => (
                                 <AbilityList abilities={info.abilities} />
                             )}
