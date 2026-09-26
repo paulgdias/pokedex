@@ -26,10 +26,11 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 
 ## Data flow
 
-`src/index.tsx` (providers) -> `createAppRouter` in `src/utils/routes.tsx` -> route loaders call `queryClient.ensureQueryData(pokedexQueryOptions)` (`src/api/pokedex.ts`) -> `convertToPokemonDetailsArray` + `withEvolutions` (`src/utils/pokemon.ts`) -> pages read `useLoaderData`.
+`src/index.tsx` (providers) -> `createAppRouter` in `src/utils/routes.tsx` -> route loaders call `queryClient.ensureQueryData(pokedexQueryOptions)` (`src/api/pokedex.ts`; the shared `pokedexLoader` lives in `src/utils/pokedexLoader.ts`) -> `convertToPokemonDetailsArray` + `withEvolutions` (`src/utils/pokemon.ts`) -> pages read `useLoaderData`.
 
 - The whole dex is fetched once; search, filter, and sort all run client-side in memory.
 - Route ids `"pokedex"` and `"pokemon"` matter: `Nav` reads them with `useRouteLoaderData`.
+- Pages other than Home are code-split with React Router's `lazy` in `src/utils/routes.tsx` (`dataRoute` takes `() => import("../pages/X")`). The loader is passed statically, so data fetching runs in parallel with the page chunk. Import `react-virtualized` by deep path (`react-virtualized/dist/es/Grid`), not the barrel, which bundles the whole library; the sonner `Toaster` is lazy-loaded in `Layout`. `rspack.config.ts` splits `framework` (react, react-dom, react-router) into its own chunk and sets a size budget (`performance`); keep the entry under it.
 - `/pokedex`, `/pokedex/:pokemon` and `/compare` share the same loader. `/types` (type chart) needs no dex data and has no loader.
 - Sprite preconnections: `Pokedex.tsx` and `Pokemon.tsx` preconnect to `https://beta.pokeapi.co` and `https://raw.githubusercontent.com/`.
 - The dex query also carries base stats (`stats`, six numbers plus `statTotal` on `PokemonDetails`), evolution methods (`specs.evolution_methods`), `is_default` and the species id. `src/utils/evolution.ts` turns the evolution data into the lanes `EvolutionChain` renders. Changing the dex query shape requires bumping the `queryKey` (currently `["pokedex", "v5"]`) so the persisted cache is not reused. The dex JSON is ~960 KB. The React Query cache is persisted to IndexedDB (`src/utils/idbStorage.ts`, database `pokedex-cache`) rather than localStorage, so there is no ~5 MB quota; the old localStorage key is removed at startup. It includes the in-game (pixel) sprite URL (`inGameSprite`), so the detail page needs no extra request for it.
@@ -55,7 +56,7 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 - React 19: `ref` is a plain prop, no `forwardRef`.
 - Tailwind classes inline, `twMerge` so a `className` prop can override. Shared class strings are in `src/styles/*.ts`.
 - Types live in `src/types/` (PascalCase files, imported via `@customTypes/...`).
-- Pages (`src/pages`) default-export the component and, for data routes, a `loader(queryClient)` factory.
+- Pages (`src/pages`) default-export the component (they are lazy-loaded, so keep them default exports). Loaders for routes that share the dex live in `src/utils/pokedexLoader.ts`; a page-specific loader (Teams) is exported from the page and returned by its `lazy` function.
 
 ## Gotchas
 

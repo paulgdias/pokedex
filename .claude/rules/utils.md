@@ -11,7 +11,8 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everyt
 
 | File | Exports |
 |---|---|
-| `routes.tsx` | `createAppRouter(queryClient)`. `dataRoute()` adds loader, `errorElement`, `HydrateFallback`. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
+| `pokedexLoader.ts` | `pokedexLoader(queryClient)`: the loader shared by `/pokedex`, `/pokedex/:pokemon` and `/compare` (dex from the query cache -> `PokemonDetails[]` with evolutions). Kept out of the lazy pages so it starts immediately. |
+| `routes.tsx` | `createAppRouter(queryClient)`. `dataRoute()` takes a page import (`() => import(...)`, used as the route's `lazy`) plus loader, `errorElement`, `HydrateFallback`; Home and Layout are in the entry chunk. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
 | `generations.ts` | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type. |
 | `pokemon.ts` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `_id`). |
 | `evolution.ts` | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages). |

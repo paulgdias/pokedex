@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react";
 
-import { AutoSizer, Grid } from "react-virtualized";
+import AutoSizer from "react-virtualized/dist/es/AutoSizer";
+import Grid from "react-virtualized/dist/es/Grid";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import PokemonCard from "@components/PokemonCard";

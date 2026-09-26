@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { AutoSizer, List } from "react-virtualized";
+import AutoSizer from "react-virtualized/dist/es/AutoSizer";
+import List from "react-virtualized/dist/es/List";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";

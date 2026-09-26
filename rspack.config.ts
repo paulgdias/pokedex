@@ -15,7 +15,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "dist"),
         publicPath: "/",
-        filename: "[name].js",
+        filename: "[name].[contenthash].js",
         chunkFilename: "[id].[chunkhash].js",
     },
     module: {
@@ -81,6 +81,21 @@ module.exports = {
     optimization: {
         splitChunks: {
             chunks: "all",
+            cacheGroups: {
+                // rarely changes, so it stays cached across app deploys
+                framework: {
+                    test: /[\\/]node_modules[\\/](react|react-dom|scheduler|react-router)[\\/]/,
+                    name: "framework",
+                    priority: 20,
+                    enforce: true,
+                },
+            },
         },
+    },
+    // a regression alarm rather than the 244 KiB default, which the framework
+    // alone (react-dom + react-router) already exceeds
+    performance: {
+        maxEntrypointSize: 600_000,
+        maxAssetSize: 420_000,
     },
 };

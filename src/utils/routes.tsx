@@ -4,25 +4,27 @@ import type { RouteObject } from "react-router";
 
 import LoadingSpinner from "@components/LoadingSpinner";
 
-import Compare from "../pages/Compare";
 import Home from "../pages/Home";
 import Layout from "../pages/Layout";
-import Pokedex, { loader as pokedexLoader } from "../pages/Pokedex";
-import Pokemon from "../pages/Pokemon";
-import Teams, { loader as teamsLoader } from "../pages/Teams";
-import TypeChart from "../pages/TypeChart";
+import { pokedexLoader } from "./pokedexLoader";
 
+type PageModule = { default: React.ComponentType };
+
+/**
+ * A page is downloaded on first visit (`lazy`), while its data loader runs
+ * straight away, so the two overlap instead of queueing.
+ */
 const dataRoute = (
     id: string,
     path: string,
-    element: React.ReactElement,
+    importPage: () => Promise<PageModule>,
     loader: RouteObject["loader"],
     errorMessage: string
 ): RouteObject => ({
     id,
     path,
-    element,
     loader,
+    lazy: async () => ({ Component: (await importPage()).default }),
     errorElement: <div>{errorMessage}</div>,
     HydrateFallback: LoadingSpinner,
 });
@@ -30,6 +32,7 @@ const dataRoute = (
 export const createAppRouter = (queryClient: QueryClient) => {
     const pokedexError =
         "There was an error loading the Pokédex. Please try again.";
+    const loader = pokedexLoader(queryClient);
 
     return createBrowserRouter([
         {
@@ -45,36 +48,48 @@ export const createAppRouter = (queryClient: QueryClient) => {
                 dataRoute(
                     "pokedex",
                     "/pokedex",
-                    <Pokedex />,
-                    pokedexLoader(queryClient),
+                    () => import("../pages/Pokedex"),
+                    loader,
                     pokedexError
                 ),
                 dataRoute(
                     "pokemon",
                     "/pokedex/:pokemon",
-                    <Pokemon />,
-                    pokedexLoader(queryClient),
+                    () => import("../pages/Pokemon"),
+                    loader,
                     pokedexError
                 ),
                 dataRoute(
                     "compare",
                     "/compare",
-                    <Compare />,
-                    pokedexLoader(queryClient),
+                    () => import("../pages/Compare"),
+                    loader,
                     pokedexError
                 ),
                 {
                     path: "/types",
-                    element: <TypeChart />,
+                    lazy: async () => ({
+                        Component: (await import("../pages/TypeChart")).default,
+                    }),
                     HydrateFallback: LoadingSpinner,
                 },
-                dataRoute(
-                    "teams",
-                    "/teams",
-                    <Teams />,
-                    teamsLoader(queryClient),
-                    "There was an error loading teams. Please try again."
-                ),
+                {
+                    id: "teams",
+                    path: "/teams",
+                    lazy: async () => {
+                        const page = await import("../pages/Teams");
+                        return {
+                            Component: page.default,
+                            loader: page.loader(queryClient),
+                        };
+                    },
+                    errorElement: (
+                        <div>
+                            There was an error loading teams. Please try again.
+                        </div>
+                    ),
+                    HydrateFallback: LoadingSpinner,
+                },
             ],
         },
     ]);

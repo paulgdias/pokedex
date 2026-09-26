@@ -7,8 +7,6 @@ import {
     useSearchParams,
 } from "react-router";
 
-import type { QueryClient } from "@tanstack/react-query";
-
 import { useDebounce } from "@uidotdev/usehooks";
 
 import { SearchX } from "lucide-react";
@@ -23,7 +21,6 @@ import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { SortState } from "@customTypes/SortingTypes";
 
 import { getGeneration } from "@utils/generations";
-import { convertToPokemonDetailsArray, withEvolutions } from "@utils/pokemon";
 import {
     EMPTY_FILTERS,
     PokedexFilters,
@@ -38,14 +35,6 @@ import {
     withSort,
 } from "@utils/sort";
 import { PokedexView, getViewFromURLParams, withView } from "@utils/view";
-
-import { pokedexQueryOptions } from "@api/pokedex";
-
-export const loader = (queryClient: QueryClient) => async () => {
-    const data = await queryClient.ensureQueryData(pokedexQueryOptions);
-    const pokemon = convertToPokemonDetailsArray(data.pokemon);
-    return withEvolutions(pokemon);
-};
 
 const TEXT_DEBOUNCE_MS = 250;
 
