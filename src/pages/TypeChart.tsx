@@ -151,10 +151,23 @@ const TypeHeader = ({
     children: React.ReactNode;
 }) => {
     const label = role === "attacker" ? "Attacking" : "Defending";
+    const [isOpen, setIsOpen] = useState(false);
+    const ignoreClose = useRef(false);
+    // react-aria closes a tooltip when its trigger is pressed; a click on the
+    // header should leave it open, so closes caused by a press are ignored
+    const swallowPress = () => {
+        ignoreClose.current = true;
+        setTimeout(() => {
+            ignoreClose.current = false;
+        }, 0);
+    };
     const button = (
         <Button
             aria-label={`${label} ${type}`}
-            className="flex h-9 w-full cursor-pointer items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold uppercase hover:bg-chip focus-visible:-outline-offset-2"
+            className={`flex h-9 w-full items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold uppercase hover:bg-chip focus-visible:-outline-offset-2 ${
+                // with a mouse the header only shows a tooltip; nothing to click
+                canHover ? "cursor-default" : "cursor-pointer"
+            }`}
         >
             <span className={`${typeDotClass} ${typeColors[type]}`} />
             {children}
@@ -184,8 +197,27 @@ const TypeHeader = ({
     }
 
     return (
-        <TooltipTrigger delay={150} closeDelay={100}>
-            {button}
+        <TooltipTrigger
+            delay={150}
+            closeDelay={100}
+            isOpen={isOpen}
+            onOpenChange={(next) => {
+                if (next || !ignoreClose.current) {
+                    setIsOpen(next);
+                }
+            }}
+        >
+            <span
+                className="contents"
+                onPointerDownCapture={swallowPress}
+                onKeyDownCapture={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        swallowPress();
+                    }
+                }}
+            >
+                {button}
+            </span>
             <Tooltip placement="bottom" offset={6} className={surfaceClass}>
                 {details}
             </Tooltip>
