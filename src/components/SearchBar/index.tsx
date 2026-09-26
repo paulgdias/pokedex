@@ -4,10 +4,8 @@ import {
     ArrowDown01,
     ArrowDown10,
     ArrowDownAZ,
-    ArrowDownWideNarrow,
     ArrowDownZA,
     ArrowUpDown,
-    ArrowUpNarrowWide,
     LayoutGrid,
     List,
     LucideIcon,
@@ -55,16 +53,6 @@ const SORT_OPTIONS: { label: string; value: SortState; icon: LucideIcon }[] = [
         label: "Name Z–A",
         value: { key: "name", direction: "desc" },
         icon: ArrowDownZA,
-    },
-    {
-        label: "Total stats Low–High",
-        value: { key: "total", direction: "asc" },
-        icon: ArrowUpNarrowWide,
-    },
-    {
-        label: "Total stats High–Low",
-        value: { key: "total", direction: "desc" },
-        icon: ArrowDownWideNarrow,
     },
 ];
 
