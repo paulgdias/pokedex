@@ -86,7 +86,6 @@ const Pokedex: React.FC = () => {
                 { replace: true, preventScrollReset: true }
             );
         }
-        // only when the typed text settles
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedText]);
 

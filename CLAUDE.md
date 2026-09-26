@@ -16,7 +16,7 @@ Path-scoped rules (loaded only when working on matching files): [`.claude/rules/
 
 ## Stack
 
-React 19, react-router 7 (data router), TanStack Query 5 (cache persisted to localStorage, 1 day), Tailwind 4, react-aria-components, lucide-react, sonner (toasts), react-virtualized, react-error-boundary, Rspack, Biome.
+React 19, react-router 7 (data router), TanStack Query 5 (cache persisted to IndexedDB, 1 day), Tailwind 4, react-aria-components, lucide-react, sonner (toasts), react-virtualized, react-error-boundary, Rspack, Biome.
 
 Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tailwind.config.ts` is not where the theme is defined.
 
@@ -63,7 +63,6 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 - **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `_id`. See `.claude/rules/utils.md`.
 - **`Icons` vs `icons` casing**: The directory on disk is `src/components/Icons/`, but git tracks `src/components/icons/`. Imports use `@components/Icons/...`, which resolves on case-insensitive file systems (macOS) but fails on case-sensitive OS/CI environments (Linux).
 - **`api/` & Teams route**: `api/` is a legacy Express + MongoDB server. The root `/api` is in `.gitignore` (anchored, so it does not match `src/api/`) but its files are tracked in git. The Pokédex itself does not use it. The `/teams` route exists in `src/utils/routes.tsx` but is hidden in `Nav.tsx` because it requires the local Express server on `http://localhost:3001`.
-- **`postcss.config.ts`**: points at `./tailwindcss-config.ts`, which does not exist (Tailwind 4 uses `@theme` in CSS).
 
 ## Working agreements
 

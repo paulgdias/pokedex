@@ -11,17 +11,17 @@ const CARD_HEIGHT = 232;
 export const getPokemonGridProps = ({
     width,
     pokemon = [],
-    isPlacehodler = false,
+    isPlaceholder = false,
 }: {
     width: number;
     pokemon?: PokemonDetails[];
-    isPlacehodler?: boolean;
+    isPlaceholder?: boolean;
 }) => {
     const gridGap = GRID_GAP;
     const columnCount = Math.floor(width / (MIN_CARD_WIDTH + gridGap)) || 1;
     const columnWidth = width / columnCount;
     const rowHeight = CARD_HEIGHT + gridGap;
-    const itemCount = isPlacehodler ? 36 : pokemon.length;
+    const itemCount = isPlaceholder ? 36 : pokemon.length;
     const rowCount = Math.ceil(itemCount / columnCount);
     const overscanRowCount = 2;
 

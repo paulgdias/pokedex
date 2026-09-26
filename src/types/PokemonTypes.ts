@@ -22,7 +22,6 @@ export const typeColors = {
 export type RegionalForm = "alola" | "galar" | "hisui" | "paldea";
 export type PokemonForm = RegionalForm | "mega" | "gmax" | "other" | null;
 
-/* graphql types */
 export type NamedResource = { name: string } | null;
 export type EvolutionMethod = {
     min_level: number | null;
@@ -89,7 +88,6 @@ export type Pokemon = {
     evolutions?: Pokemon[];
 };
 
-/* custom types */
 export type TeamsResult = Team[];
 export type Team = {
     _id: string;

@@ -95,8 +95,6 @@ export const applyFilters = (
             matchesText(item, text)
     );
 
-/* suggestions shown while typing in the search field */
-
 export interface FilterSuggestion {
     key: string;
     label: string;
