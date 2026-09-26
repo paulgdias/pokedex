@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { preconnect } from "react-dom";
 
 import { useQuery } from "@tanstack/react-query";
+import {
+    Button,
+    Dialog,
+    DialogTrigger,
+    Popover,
+    Tooltip,
+    TooltipTrigger,
+} from "react-aria-components";
 
 import { TypeEfficacy, typeColors } from "@customTypes/PokemonTypes";
 
 import { typeEfficacyQueryOptions } from "@api/pokedex";
 
-import { TYPE_ORDER, getOffense, getTypeMatchups } from "@utils/stats";
+import {
+    TYPE_ORDER,
+    describeMatchup,
+    formatName,
+    getOffense,
+    getTypeMatchups,
+} from "@utils/stats";
 
 import { typeDotClass, typePillClass } from "@styles/Pokedex";
 
@@ -40,106 +54,198 @@ const TypeChip = ({ type }: { type: PokemonType }) => (
     </span>
 );
 
-const Summary = ({
-    attacker,
-    defender,
-    efficacy,
+const GroupRow = ({
+    label,
+    types,
 }: {
-    attacker: PokemonType | null;
-    defender: PokemonType | null;
-    efficacy: TypeEfficacy;
+    label: string;
+    types: PokemonType[];
 }) => (
-    <div aria-live="polite" className="flex flex-col gap-4">
-        {!attacker && !defender && (
-            <p className="text-sm text-muted">
-                Select a row or column header to see what a type hits and what
-                it takes.
-            </p>
-        )}
-        {attacker && (
-            <div className="flex flex-col gap-2">
-                <h2 className="text-[13px] font-bold tracking-wider text-muted uppercase">
-                    <span className="capitalize">{attacker}</span> attacking
-                </h2>
-                {getOffense(attacker, efficacy).map(
-                    ({ multiplier, label, types }) => (
-                        <div
-                            key={multiplier}
-                            className="flex flex-wrap items-center gap-1.5"
-                        >
-                            <span className="w-9 font-mono text-sm font-bold">
-                                {label}
-                            </span>
-                            {types.length > 0 ? (
-                                types.map((type) => (
-                                    <TypeChip key={type} type={type} />
-                                ))
-                            ) : (
-                                <span className="text-sm text-muted">None</span>
-                            )}
-                        </div>
-                    )
-                )}
-            </div>
-        )}
-        {defender && (
-            <div className="flex flex-col gap-2">
-                <h2 className="text-[13px] font-bold tracking-wider text-muted uppercase">
-                    <span className="capitalize">{defender}</span> defending
-                </h2>
-                {getTypeMatchups([defender], efficacy).map(
-                    ({ multiplier, label, types }) => (
-                        <div
-                            key={multiplier}
-                            className="flex flex-wrap items-center gap-1.5"
-                        >
-                            <span className="w-9 font-mono text-sm font-bold">
-                                {label}
-                            </span>
-                            {types.map((type) => (
-                                <TypeChip key={type} type={type} />
-                            ))}
-                        </div>
-                    )
-                )}
-            </div>
+    <div className="flex flex-wrap items-center gap-1.5">
+        <span className="w-9 font-mono text-sm font-bold">{label}</span>
+        {types.length > 0 ? (
+            types.map((type) => <TypeChip key={type} type={type} />)
+        ) : (
+            <span className="text-sm text-muted">None</span>
         )}
     </div>
 );
 
-const HeaderButton = ({
+const OffenseDetails = ({
     type,
-    isSelected,
-    onPress,
-    label,
+    efficacy,
+}: {
+    type: PokemonType;
+    efficacy: TypeEfficacy;
+}) => (
+    <div className="flex flex-col gap-2">
+        <div className="text-[13px] font-bold tracking-wider text-muted uppercase">
+            <span className="capitalize">{type}</span> attacking
+        </div>
+        {getOffense(type, efficacy).map(({ multiplier, label, types }) => (
+            <GroupRow key={multiplier} label={label} types={types} />
+        ))}
+    </div>
+);
+
+const DefenseDetails = ({
+    type,
+    efficacy,
+}: {
+    type: PokemonType;
+    efficacy: TypeEfficacy;
+}) => (
+    <div className="flex flex-col gap-2">
+        <div className="text-[13px] font-bold tracking-wider text-muted uppercase">
+            <span className="capitalize">{type}</span> defending
+        </div>
+        {getTypeMatchups([type], efficacy).map(
+            ({ multiplier, label, types }) => (
+                <GroupRow
+                    key={multiplier}
+                    label={label}
+                    types={types as PokemonType[]}
+                />
+            )
+        )}
+    </div>
+);
+
+const surfaceClass =
+    "max-w-sm rounded-xl border border-line-strong bg-surface p-3 text-ink shadow-popover outline-none";
+
+/** Whether the primary input can hover; tooltips need it, touch needs a tap. */
+const useCanHover = () => {
+    const [canHover, setCanHover] = useState(
+        () => window.matchMedia?.("(hover: hover)").matches ?? true
+    );
+
+    useEffect(() => {
+        const query = window.matchMedia?.("(hover: hover)");
+        if (!query) {
+            return;
+        }
+        const update = () => setCanHover(query.matches);
+        query.addEventListener("change", update);
+        return () => query.removeEventListener("change", update);
+    }, []);
+
+    return canHover;
+};
+
+type Hovered = { attacker: PokemonType | null; defender: PokemonType | null };
+
+/**
+ * A row (attacker) or column (defender) header. Mouse and keyboard get a
+ * tooltip; touch gets the same content in a popover opened by a tap.
+ */
+const TypeHeader = ({
+    type,
+    role,
+    efficacy,
+    canHover,
+    onHover,
     children,
 }: {
     type: PokemonType;
-    isSelected: boolean;
-    onPress: () => void;
-    label: string;
+    role: "attacker" | "defender";
+    efficacy: TypeEfficacy;
+    canHover: boolean;
+    onHover: (hovered: boolean) => void;
     children: React.ReactNode;
-}) => (
-    <button
-        type="button"
-        aria-pressed={isSelected}
-        aria-label={`${label} ${type}`}
-        onClick={onPress}
-        className={`flex h-9 w-full cursor-pointer items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold uppercase focus-visible:-outline-offset-2 ${
-            isSelected ? "bg-chip-hover text-ink" : "hover:bg-chip"
-        }`}
-    >
-        <span className={`${typeDotClass} ${typeColors[type]}`} />
-        {children}
-    </button>
-);
+}) => {
+    const label = role === "attacker" ? "Attacking" : "Defending";
+    const button = (
+        <Button
+            aria-label={`${label} ${type}`}
+            onHoverChange={onHover}
+            onFocusChange={onHover}
+            className="flex h-9 w-full cursor-pointer items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold uppercase hover:bg-chip focus-visible:-outline-offset-2"
+        >
+            <span className={`${typeDotClass} ${typeColors[type]}`} />
+            {children}
+        </Button>
+    );
+    const details =
+        role === "attacker" ? (
+            <OffenseDetails type={type} efficacy={efficacy} />
+        ) : (
+            <DefenseDetails type={type} efficacy={efficacy} />
+        );
+
+    if (!canHover) {
+        return (
+            <DialogTrigger>
+                {button}
+                <Popover placement="bottom" offset={6}>
+                    <Dialog
+                        aria-label={`${label} ${type}`}
+                        className={surfaceClass}
+                    >
+                        {details}
+                    </Dialog>
+                </Popover>
+            </DialogTrigger>
+        );
+    }
+
+    return (
+        <TooltipTrigger delay={150} closeDelay={100}>
+            {button}
+            <Tooltip placement="bottom" offset={6} className={surfaceClass}>
+                {details}
+            </Tooltip>
+        </TooltipTrigger>
+    );
+};
 
 const TypeChart: React.FC = () => {
     preconnect("https://beta.pokeapi.co");
 
     const { data: efficacy, isError } = useQuery(typeEfficacyQueryOptions);
-    const [attacker, setAttacker] = useState<PokemonType | null>(null);
-    const [defender, setDefender] = useState<PokemonType | null>(null);
+    const canHover = useCanHover();
+    const [hovered, setHovered] = useState<Hovered>({
+        attacker: null,
+        defender: null,
+    });
+    // one tooltip for all 324 cells, anchored to the hovered one
+    const [cell, setCell] = useState<{
+        element: HTMLElement;
+        attacker: PokemonType;
+        defender: PokemonType;
+    } | null>(null);
+    const cellRef = useRef<HTMLElement | null>(null);
+    cellRef.current = cell?.element ?? null;
+
+    const hoverHeader =
+        (role: keyof Hovered, type: PokemonType) => (isHovered: boolean) =>
+            setHovered((current) => ({
+                ...current,
+                [role]: isHovered ? type : null,
+            }));
+
+    const handleCellHover = (event: React.PointerEvent<HTMLTableElement>) => {
+        if (event.pointerType !== "mouse") {
+            return;
+        }
+        const element = (event.target as HTMLElement).closest<HTMLElement>(
+            "td[data-attacker]"
+        );
+        if (!element) {
+            setCell(null);
+            setHovered({ attacker: null, defender: null });
+            return;
+        }
+        const attacker = element.dataset.attacker as PokemonType;
+        const defender = element.dataset.defender as PokemonType;
+        setCell({ element, attacker, defender });
+        setHovered({ attacker, defender });
+    };
+
+    const clearCellHover = () => {
+        setCell(null);
+        setHovered({ attacker: null, defender: null });
+    };
 
     return (
         <div className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -148,7 +254,10 @@ const TypeChart: React.FC = () => {
                     Type chart
                 </h1>
                 <p className="text-[15px] text-muted">
-                    Rows attack, columns defend. Empty cells are neutral (1×).
+                    Rows attack, columns defend. Empty cells are neutral (1×).{" "}
+                    {canHover
+                        ? "Hover or focus a type for details."
+                        : "Tap a type for details."}
                 </p>
             </div>
 
@@ -160,106 +269,116 @@ const TypeChart: React.FC = () => {
                             : "Loading…"}
                     </p>
                 ) : (
-                    <>
-                        <div className="pokedex-scroll overflow-auto rounded-2xl border border-line bg-surface">
-                            <table className="border-separate border-spacing-0 text-center">
-                                <caption className="sr-only">
-                                    Damage multiplier of each attacking type
-                                    (rows) against each defending type (columns)
-                                </caption>
-                                <thead>
-                                    <tr>
-                                        <th className="sticky top-0 left-0 z-20 bg-surface" />
-                                        {TYPE_ORDER.map((type) => (
-                                            <th
-                                                key={type}
-                                                scope="col"
-                                                className="sticky top-0 z-10 min-w-12 bg-surface p-0.5"
+                    <div className="pokedex-scroll overflow-auto rounded-2xl border border-line bg-surface">
+                        <table
+                            onPointerOver={handleCellHover}
+                            onPointerLeave={clearCellHover}
+                            className="w-full min-w-[60rem] border-separate border-spacing-0 text-center"
+                        >
+                            <caption className="sr-only">
+                                Damage multiplier of each attacking type (rows)
+                                against each defending type (columns)
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th className="sticky top-0 left-0 z-20 bg-surface" />
+                                    {TYPE_ORDER.map((type) => (
+                                        <th
+                                            key={type}
+                                            scope="col"
+                                            className="sticky top-0 z-10 min-w-14 bg-surface p-0.5"
+                                        >
+                                            <TypeHeader
+                                                type={type}
+                                                role="defender"
+                                                efficacy={efficacy}
+                                                canHover={canHover}
+                                                onHover={hoverHeader(
+                                                    "defender",
+                                                    type
+                                                )}
                                             >
-                                                <HeaderButton
-                                                    type={type}
-                                                    label="Defending"
-                                                    isSelected={
-                                                        defender === type
-                                                    }
-                                                    onPress={() =>
-                                                        setDefender(
-                                                            defender === type
-                                                                ? null
-                                                                : type
-                                                        )
-                                                    }
-                                                >
-                                                    {type.slice(0, 3)}
-                                                </HeaderButton>
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {TYPE_ORDER.map((row) => (
-                                        <tr key={row}>
-                                            <th
-                                                scope="row"
-                                                className="sticky left-0 z-10 min-w-28 bg-surface p-0.5 text-left"
-                                            >
-                                                <HeaderButton
-                                                    type={row}
-                                                    label="Attacking"
-                                                    isSelected={
-                                                        attacker === row
-                                                    }
-                                                    onPress={() =>
-                                                        setAttacker(
-                                                            attacker === row
-                                                                ? null
-                                                                : row
-                                                        )
-                                                    }
-                                                >
-                                                    {row}
-                                                </HeaderButton>
-                                            </th>
-                                            {TYPE_ORDER.map((column) => {
-                                                const multiplier =
-                                                    efficacy[row]?.[column] ??
-                                                    1;
-                                                const isHighlighted =
-                                                    attacker === row ||
-                                                    defender === column;
-
-                                                return (
-                                                    <td
-                                                        key={column}
-                                                        className={`h-9 border border-line/60 text-sm ${cellClass(multiplier)} ${
-                                                            isHighlighted
-                                                                ? "outline-2 -outline-offset-2 outline-accent/60"
-                                                                : ""
-                                                        }`}
-                                                    >
-                                                        {CELL_LABELS[
-                                                            multiplier
-                                                        ] ?? (
-                                                            <span className="sr-only">
-                                                                1×
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                );
-                                            })}
-                                        </tr>
+                                                {type.slice(0, 3)}
+                                            </TypeHeader>
+                                        </th>
                                     ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <Summary
-                            attacker={attacker}
-                            defender={defender}
-                            efficacy={efficacy}
-                        />
-                    </>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {TYPE_ORDER.map((row) => (
+                                    <tr key={row}>
+                                        <th
+                                            scope="row"
+                                            className="sticky left-0 z-10 w-32 min-w-32 bg-surface p-0.5 text-left"
+                                        >
+                                            <TypeHeader
+                                                type={row}
+                                                role="attacker"
+                                                efficacy={efficacy}
+                                                canHover={canHover}
+                                                onHover={hoverHeader(
+                                                    "attacker",
+                                                    row
+                                                )}
+                                            >
+                                                {row}
+                                            </TypeHeader>
+                                        </th>
+                                        {TYPE_ORDER.map((column) => {
+                                            const multiplier =
+                                                efficacy[row]?.[column] ?? 1;
+                                            const isHighlighted =
+                                                hovered.attacker === row ||
+                                                hovered.defender === column;
+
+                                            return (
+                                                <td
+                                                    key={column}
+                                                    data-attacker={row}
+                                                    data-defender={column}
+                                                    className={`h-9 border border-line/60 text-sm ${cellClass(multiplier)} ${
+                                                        isHighlighted
+                                                            ? "outline-2 -outline-offset-2 outline-accent/60"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    {CELL_LABELS[
+                                                        multiplier
+                                                    ] ?? (
+                                                        <span className="sr-only">
+                                                            1×
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
+            {efficacy && cell && (
+                // a standalone Tooltip needs a TooltipTrigger, so the shared cell
+                // tip is a non-modal popover; it is visual only (the header
+                // tooltips and the sr-only multipliers carry the same info)
+                <Popover
+                    isOpen
+                    isNonModal
+                    triggerRef={cellRef}
+                    placement="top"
+                    offset={6}
+                    aria-hidden="true"
+                    className="pointer-events-none rounded-lg border border-line-strong bg-surface px-2.5 py-1.5 text-sm font-semibold text-ink shadow-popover"
+                >
+                    {describeMatchup(
+                        cell.attacker,
+                        cell.defender,
+                        efficacy[cell.attacker]?.[cell.defender] ?? 1
+                    )}
+                </Popover>
+            )}
         </div>
     );
 };

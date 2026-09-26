@@ -110,3 +110,20 @@ export const getOffense = (attacker: string, efficacy: TypeEfficacy) =>
             (defender) => efficacy[attacker]?.[defender] === multiplier
         ),
     }));
+
+const MATCHUP_DESCRIPTIONS: Record<number, string> = {
+    4: "4× (double super effective)",
+    2: "2× (super effective)",
+    1: "1× (neutral)",
+    0.5: "½× (not very effective)",
+    0.25: "¼× (barely effective)",
+    0: "0× (no effect)",
+};
+
+/** "Fire → Grass: 2× (super effective)" */
+export const describeMatchup = (
+    attacker: string,
+    defender: string,
+    multiplier: number
+) =>
+    `${formatName(attacker)} → ${formatName(defender)}: ${MATCHUP_DESCRIPTIONS[multiplier] ?? `${multiplier}×`}`;
