@@ -214,7 +214,11 @@ const Pokemon: React.FC = () => {
                         name={pokemon.name}
                     />
                     <Button
-                        onPress={() => navigate(`/compare?ids=${pokemon._id}`)}
+                        onPress={() =>
+                            navigate(`/compare?ids=${pokemon._id}`, {
+                                state: { previous },
+                            })
+                        }
                         className="flex h-10 cursor-pointer items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface px-3 text-sm font-semibold text-ink hover:bg-chip"
                     >
                         <Scale size={16} aria-hidden="true" />

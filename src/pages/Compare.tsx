@@ -131,8 +131,13 @@ const Compare: React.FC = () => {
 
     const allPokemon = useLoaderData() as PokemonDetails[];
     const [params, setParams] = useSearchParams();
-    const { pathname, search } = useLocation();
-    const navigateToPokemon = useNavigateToPokemon(pathname + search);
+    const { pathname, search, state } = useLocation();
+    // arriving from a pokémon page hands over where that page came from, so
+    // Back from the next pokémon returns there rather than to this page
+    const cameFrom = (state as { previous?: string } | null)?.previous;
+    const navigateToPokemon = useNavigateToPokemon(
+        cameFrom ?? pathname + search
+    );
 
     const ids = parseIds(params).slice(0, MAX_COMPARED);
     const selected = ids
@@ -150,7 +155,8 @@ const Compare: React.FC = () => {
         } else {
             updated.delete(IDS_PARAM);
         }
-        setParams(updated, { replace: true, preventScrollReset: true });
+        // keep the router state, or editing the list forgets where we came from
+        setParams(updated, { replace: true, preventScrollReset: true, state });
     };
 
     const selectedIds = selected.map((item) => item._id);
