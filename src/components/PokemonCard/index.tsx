@@ -15,6 +15,7 @@ import {
     categoryBadgeClass,
     legendaryPokemonClass,
     mythicalPokemonClass,
+    pixelArtClass,
     typeDotClass,
     typePillClass,
 } from "@styles/Pokedex";
@@ -26,6 +27,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     style,
     pokemon,
     sprite: spriteOverride,
+    pixelated = false,
     children,
     isLegendary,
     isMythical,
@@ -94,7 +96,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                         alt={pokemon.name}
                         loading="lazy"
                         decoding="async"
-                        className={`relative w-auto max-w-[80%] object-contain ${isLarge ? "h-64" : "h-[120px]"}`}
+                        className={`relative w-auto max-w-[80%] object-contain ${isLarge ? (pixelated ? "h-48" : "h-64") : "h-[120px]"} ${pixelated ? pixelArtClass : ""}`}
                         src={sprite}
                     />
                 ) : (

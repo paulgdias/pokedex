@@ -35,11 +35,7 @@ export type EvolutionMethod = {
     location: NamedResource;
 };
 export type PokemonSpritesResult = {
-    pokemon_v2_pokemonsprites: {
-        home: string | null;
-        homeShiny: string | null;
-        artworkShiny: string | null;
-    }[];
+    pokemon_v2_pokemonsprites: { inGame: string | null }[];
 };
 export type PokemonInfoResult = {
     pokemon_v2_pokemon: {
@@ -152,11 +148,7 @@ export type PokemonInfo = {
     /** newest game version first */
     flavorTexts: { text: string; version: string }[];
 };
-export type PokemonSprites = {
-    home: string | null;
-    homeShiny: string | null;
-    artworkShiny: string | null;
-};
+export type PokemonSprites = { inGame: string | null };
 
 /** One node of an evolution chain, with the way it is reached. */
 export type EvolutionStep = {

@@ -13,6 +13,7 @@ const cardArtClass = `relative flex items-center justify-center bg-[var(--card-a
 const cardNumberWatermarkClass = `
     absolute select-none font-mono text-[40px] font-semibold text-ink/10
 `;
+const pixelArtClass = `[image-rendering:pixelated]`;
 const cardBodyClass = `flex flex-col gap-2 px-3.5 pt-3 pb-3.5`;
 const typePillClass = `
     flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full
@@ -30,6 +31,7 @@ export {
     cardArtClass,
     cardNumberWatermarkClass,
     cardBodyClass,
+    pixelArtClass,
     typePillClass,
     typeDotClass,
     legendaryPokemonClass,

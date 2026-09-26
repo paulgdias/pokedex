@@ -4,6 +4,7 @@ import { gql, request } from "graphql-request";
 import {
     PokedexResult,
     PokemonInfoResult,
+    PokemonSprites,
     PokemonSpritesResult,
     TypeEfficacy,
     TypeEfficacyResult,
@@ -73,32 +74,24 @@ export const pokedexQueryOptions = queryOptions({
 const spritesQuery = gql`
     query getPokemonSprites($id: Int!) {
         pokemon_v2_pokemonsprites(where: { pokemon_id: { _eq: $id } }) {
-            home: sprites(path: "other.home.front_default")
-            homeShiny: sprites(path: "other.home.front_shiny")
-            artworkShiny: sprites(
-                path: "other[\\"official-artwork\\"].front_shiny"
-            )
+            inGame: sprites(path: "front_default")
         }
     }
 `;
 
-/** Extra renders of one pokemon: the 3D (HOME) one and shiny variants. */
+/** The in-game (pixel) sprite of one pokemon, or null when it has none. */
 export const pokemonSpritesQueryOptions = (id: number) =>
     queryOptions({
         queryKey: ["pokemon-sprites", id],
-        queryFn: async () => {
+        queryFn: async (): Promise<PokemonSprites> => {
             const result = await request<PokemonSpritesResult>(
                 POKEAPI_URL,
                 spritesQuery,
                 { id }
             );
-            return (
-                result.pokemon_v2_pokemonsprites[0] ?? {
-                    home: null,
-                    homeShiny: null,
-                    artworkShiny: null,
-                }
-            );
+            return {
+                inGame: result.pokemon_v2_pokemonsprites[0]?.inGame ?? null,
+            };
         },
         staleTime: Infinity,
     });

@@ -8,6 +8,8 @@ export interface PokemonCardType {
     pokemon: PokemonDetails;
     /** shown instead of `pokemon.sprite` */
     sprite?: string;
+    /** render `sprite` as pixel art (crisp, at a whole-number scale) */
+    pixelated?: boolean;
     /** overlay content inside the art area (e.g. a toggle) */
     children?: ReactNode;
     isLegendary?: boolean;

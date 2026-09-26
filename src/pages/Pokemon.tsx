@@ -115,10 +115,9 @@ const Pokemon: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [prev, next, previous]);
 
-    // the choices stay while moving between pokemon; each falls back when a
-    // pokemon has no such render
+    // the choice stays while moving between pokemon; falls back to the
+    // artwork for the few that have no in-game sprite
     const [view, setView] = useState<SpriteView>("artwork");
-    const [isShiny, setIsShiny] = useState(false);
     const enabled = Boolean(pokemon);
     const spritesQuery = useQuery({
         ...pokemonSpritesQueryOptions(id),
@@ -127,17 +126,10 @@ const Pokemon: React.FC = () => {
     const infoQuery = useQuery({ ...pokemonInfoQueryOptions(id), enabled });
     const efficacyQuery = useQuery(typeEfficacyQueryOptions);
 
-    const sprites = spritesQuery.data;
-    const is3d = view === "3d" && Boolean(sprites?.home);
-    const shinySprite = is3d ? sprites?.homeShiny : sprites?.artworkShiny;
-    const sprite =
-        isShiny && shinySprite
-            ? shinySprite
-            : is3d
-              ? (sprites?.home ?? undefined)
-              : undefined;
-    if (sprites?.home) {
-        preload(sprites.home, { as: "image" });
+    const inGameSprite = spritesQuery.data?.inGame ?? undefined;
+    const isInGame = view === "in-game" && Boolean(inGameSprite);
+    if (inGameSprite) {
+        preload(inGameSprite, { as: "image" });
     }
 
     useEffect(() => {
@@ -239,17 +231,15 @@ const Pokemon: React.FC = () => {
                             className="w-full"
                             size="large"
                             pokemon={pokemon}
-                            sprite={sprite}
+                            sprite={isInGame ? inGameSprite : undefined}
+                            pixelated={isInGame}
                             isLegendary={pokemon.isLegendary}
                             isMythical={pokemon.isMythical}
                         >
                             <SpriteToggle
-                                value={is3d ? "3d" : "artwork"}
+                                value={isInGame ? "in-game" : "artwork"}
                                 onChange={setView}
-                                is3dAvailable={Boolean(sprites?.home)}
-                                isShiny={Boolean(isShiny && shinySprite)}
-                                onShinyChange={setIsShiny}
-                                isShinyAvailable={Boolean(shinySprite)}
+                                isInGameAvailable={Boolean(inGameSprite)}
                             />
                         </PokemonCard>
                         <InfoSection title="Details" query={infoQuery}>
