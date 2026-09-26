@@ -133,8 +133,6 @@ const useCanHover = () => {
     return canHover;
 };
 
-type Hovered = { attacker: PokemonType | null; defender: PokemonType | null };
-
 /**
  * A row (attacker) or column (defender) header. Mouse and keyboard get a
  * tooltip; touch gets the same content in a popover opened by a tap.
@@ -144,22 +142,18 @@ const TypeHeader = ({
     role,
     efficacy,
     canHover,
-    onHover,
     children,
 }: {
     type: PokemonType;
     role: "attacker" | "defender";
     efficacy: TypeEfficacy;
     canHover: boolean;
-    onHover: (hovered: boolean) => void;
     children: React.ReactNode;
 }) => {
     const label = role === "attacker" ? "Attacking" : "Defending";
     const button = (
         <Button
             aria-label={`${label} ${type}`}
-            onHoverChange={onHover}
-            onFocusChange={onHover}
             className="flex h-9 w-full cursor-pointer items-center gap-1.5 rounded-lg px-1.5 text-xs font-bold uppercase hover:bg-chip focus-visible:-outline-offset-2"
         >
             <span className={`${typeDotClass} ${typeColors[type]}`} />
@@ -204,10 +198,6 @@ const TypeChart: React.FC = () => {
 
     const { data: efficacy, isError } = useQuery(typeEfficacyQueryOptions);
     const canHover = useCanHover();
-    const [hovered, setHovered] = useState<Hovered>({
-        attacker: null,
-        defender: null,
-    });
     // one tooltip for all 324 cells, anchored to the hovered one
     const [cell, setCell] = useState<{
         element: HTMLElement;
@@ -216,13 +206,6 @@ const TypeChart: React.FC = () => {
     } | null>(null);
     const cellRef = useRef<HTMLElement | null>(null);
     cellRef.current = cell?.element ?? null;
-
-    const hoverHeader =
-        (role: keyof Hovered, type: PokemonType) => (isHovered: boolean) =>
-            setHovered((current) => ({
-                ...current,
-                [role]: isHovered ? type : null,
-            }));
 
     const handleCellHover = (event: React.PointerEvent<HTMLTableElement>) => {
         if (event.pointerType !== "mouse") {
@@ -233,19 +216,14 @@ const TypeChart: React.FC = () => {
         );
         if (!element) {
             setCell(null);
-            setHovered({ attacker: null, defender: null });
             return;
         }
         const attacker = element.dataset.attacker as PokemonType;
         const defender = element.dataset.defender as PokemonType;
         setCell({ element, attacker, defender });
-        setHovered({ attacker, defender });
     };
 
-    const clearCellHover = () => {
-        setCell(null);
-        setHovered({ attacker: null, defender: null });
-    };
+    const clearCellHover = () => setCell(null);
 
     return (
         <div className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -293,10 +271,6 @@ const TypeChart: React.FC = () => {
                                                 role="defender"
                                                 efficacy={efficacy}
                                                 canHover={canHover}
-                                                onHover={hoverHeader(
-                                                    "defender",
-                                                    type
-                                                )}
                                             >
                                                 {type.slice(0, 3)}
                                             </TypeHeader>
@@ -316,10 +290,6 @@ const TypeChart: React.FC = () => {
                                                 role="attacker"
                                                 efficacy={efficacy}
                                                 canHover={canHover}
-                                                onHover={hoverHeader(
-                                                    "attacker",
-                                                    row
-                                                )}
                                             >
                                                 {row}
                                             </TypeHeader>
@@ -328,8 +298,8 @@ const TypeChart: React.FC = () => {
                                             const multiplier =
                                                 efficacy[row]?.[column] ?? 1;
                                             const isHighlighted =
-                                                hovered.attacker === row ||
-                                                hovered.defender === column;
+                                                cell?.attacker === row &&
+                                                cell.defender === column;
 
                                             return (
                                                 <td
@@ -338,7 +308,7 @@ const TypeChart: React.FC = () => {
                                                     data-defender={column}
                                                     className={`h-9 border border-line/60 text-sm ${cellClass(multiplier)} ${
                                                         isHighlighted
-                                                            ? "outline-2 -outline-offset-2 outline-accent/60"
+                                                            ? "outline-2 -outline-offset-2 outline-accent"
                                                             : ""
                                                     }`}
                                                 >
