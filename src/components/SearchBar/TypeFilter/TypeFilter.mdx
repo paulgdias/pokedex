@@ -1,0 +1,33 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./TypeFilter.stories";
+
+<Meta of={Stories} />
+
+# TypeFilter
+
+A multi-select popover to filter by type.
+
+## Behaviour
+
+- The popover is portalled outside the component's container.
+- Selecting a type adds it to the selection; selecting it again removes only that type.
+- The button shows the selection count; the popover ends with a "Show N results" button.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Picks Types
+
+Selecting and deselecting types calls `onChange`.
+
+<Canvas of={Stories.PicksTypes} />
+
+### Shows Selection Count
+
+Three types selected.
+
+<Canvas of={Stories.ShowsSelectionCount} />

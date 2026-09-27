@@ -1,0 +1,32 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./AbilityList.stories";
+
+<Meta of={Stories} />
+
+# AbilityList
+
+A pokémon's abilities with their effect text, on the detail page. Hidden abilities get a "Hidden" badge.
+
+## Behaviour
+
+- Names are formatted with `formatName` (`overgrow` → `Overgrow`).
+- The effect line is omitted when there is no effect text.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### With Hidden Ability
+
+A hidden ability marked with a badge.
+
+<Canvas of={Stories.WithHiddenAbility} />
+
+### Without Effect Text
+
+An ability without effect text shows only its name.
+
+<Canvas of={Stories.WithoutEffectText} />

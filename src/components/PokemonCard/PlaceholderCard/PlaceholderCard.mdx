@@ -1,0 +1,32 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PlaceholderCard.stories";
+
+<Meta of={Stories} />
+
+# PlaceholderCard
+
+A skeleton card that reuses the card classes. `PokemonList` renders these while `isLoading` is set.
+
+## Behaviour
+
+- Decorative: hidden from assistive tech with `aria-hidden`.
+- No motion unless `animated` is set.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Static
+
+The default, motionless skeleton.
+
+<Canvas of={Stories.Static} />
+
+### Animated
+
+Pulses while content loads.
+
+<Canvas of={Stories.Animated} />

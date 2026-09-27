@@ -1,0 +1,53 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PokemonList.stories";
+
+<Meta of={Stories} />
+
+# PokemonList
+
+The card grid: a virtualized `react-virtualized` `Grid` inside an `AutoSizer`. Column and row math lives in `getPokemonGridProps` (`PokemonList/utils.ts`).
+
+## Behaviour
+
+- Only cards near the viewport are mounted.
+- Scrolls back to the top whenever `pokemon` changes.
+- `scrollToPosition` (default on) shows a `ScrollTopButton` that scrolls the grid to the top; pass `false` to leave it out.
+- `isLoading` renders `PlaceholderCard`s instead of `pokemon`.
+- Clicking a card navigates to its page and passes `previous` in router state, so back navigation returns to the same filters.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Virtualized Grid
+
+A 60-pokémon dex: only what is near the viewport is mounted.
+
+<Canvas of={Stories.VirtualizedGrid} />
+
+### Navigates To APokemon
+
+Clicking a card goes to its page and remembers the filters.
+
+<Canvas of={Stories.NavigatesToAPokemon} />
+
+### Loading
+
+Placeholder cards while loading.
+
+<Canvas of={Stories.Loading} />
+
+### Empty
+
+No pokémon.
+
+<Canvas of={Stories.Empty} />
+
+### Without Scroll Button
+
+`scrollToPosition` off.
+
+<Canvas of={Stories.WithoutScrollButton} />

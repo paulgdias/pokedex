@@ -149,7 +149,7 @@ const SearchBar = ({
                         <input
                             type="search"
                             role="combobox"
-                            aria-expanded={showSuggestions}
+                            aria-expanded={showSuggestions && !isEmpty}
                             aria-controls="pokedex-suggestions"
                             aria-autocomplete="list"
                             aria-activedescendant={
@@ -206,8 +206,10 @@ const SearchBar = ({
                     {showSuggestions && (
                         <div
                             id="pokedex-suggestions"
-                            role="listbox"
-                            aria-label="Suggestions"
+                            // a listbox needs options: with none, the popup is
+                            // only the "No matches" status
+                            role={isEmpty ? undefined : "listbox"}
+                            aria-label={isEmpty ? undefined : "Suggestions"}
                             className="absolute inset-x-0 top-15 flex flex-col gap-1 rounded-[14px] border border-line-strong bg-surface p-2 shadow-popover"
                         >
                             {filterSuggestions.length > 0 && (
@@ -317,7 +319,10 @@ const SearchBar = ({
                                 </>
                             )}
                             {isEmpty && (
-                                <div className="px-2.5 py-3.5 text-sm text-subtle">
+                                <div
+                                    role="status"
+                                    className="px-2.5 py-3.5 text-sm text-subtle"
+                                >
                                     No matches for “{query}”
                                 </div>
                             )}

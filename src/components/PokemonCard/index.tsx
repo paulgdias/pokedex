@@ -102,10 +102,9 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                 ) : (
                     <span
                         aria-hidden="true"
+                        data-number={pokemon._id}
                         className={`${cardNumberWatermarkClass} ${isLarge ? "text-7xl" : ""}`}
-                    >
-                        {pokemon._id}
-                    </span>
+                    />
                 )}
             </div>
             <div className={cardBodyClass}>

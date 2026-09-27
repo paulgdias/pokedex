@@ -1,0 +1,28 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./ThemeToggle.stories";
+
+<Meta of={Stories} />
+
+# ThemeToggle
+
+A Light / System / Dark control managed by `useTheme` (`@utils/useTheme`). It sits in the sidebar and the mobile top bar and uses the sidebar tokens, which are the same in both themes.
+
+## Behaviour
+
+- Takes no props.
+- The choice is saved in `localStorage` under `theme` and applied as `data-theme` on `<html>`; "System" follows the OS setting.
+
+## Examples
+
+### Chooses Theme
+
+Each option sets the theme.
+
+<Canvas of={Stories.ChoosesTheme} />
+
+### Restores Saved Choice
+
+A saved choice is selected on first render.
+
+<Canvas of={Stories.RestoresSavedChoice} />

@@ -1,0 +1,67 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import SearchBar from ".";
+import * as Stories from "./SearchBar.stories";
+
+<Meta of={Stories} />
+
+# SearchBar
+
+The Pokédex toolbar: a search combobox with keyboard-navigable suggestions, the sort select, a generation dropdown (mobile), the category toggle, the card / list view switch and the result count. `FilterChips` and `TypeFilter` are part of it.
+
+## Behaviour
+
+- Suggestions: ArrowUp / ArrowDown to move, Enter to pick, Esc to close. Type and generation filters are suggested from two characters, alongside pokémon by name.
+- Picking a filter suggestion applies the filter and clears the text.
+- Search text is passed to `onTextChange` on every keystroke; the page debounces the URL write.
+- The sort select's leading icon mirrors the active sort. `SORT_OPTIONS` is exported from this file.
+- The whole dex is passed as `pokemon` for suggestions; they ignore the current filters.
+- The stories render a harness (`__fixtures__/SearchBarHarness`) that keeps the filters, sort and view in state, the way the Pokédex page does.
+
+## Props
+
+<ArgTypes of={SearchBar} />
+
+## Examples
+
+### Suggests And Picks With Keyboard
+
+Typing suggests filters; arrow keys and Enter pick one.
+
+<Canvas of={Stories.SuggestsAndPicksWithKeyboard} />
+
+### Suggests Pokemon
+
+Typing a name suggests matching pokémon.
+
+<Canvas of={Stories.SuggestsPokemon} />
+
+### No Matches
+
+Text that matches nothing.
+
+<Canvas of={Stories.NoMatches} />
+
+### Changes Sort And View
+
+The sort select and the view switch.
+
+<Canvas of={Stories.ChangesSortAndView} />
+
+### Filters By Category
+
+The All / Legendary / Mythical category toggle.
+
+<Canvas of={Stories.FiltersByCategory} />
+
+### Clears Everything
+
+Clearing removes the text and every filter.
+
+<Canvas of={Stories.ClearsEverything} />
+
+### Type Popover
+
+The type filter popover opened from the toolbar.
+
+<Canvas of={Stories.TypePopover} />

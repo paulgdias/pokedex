@@ -1,0 +1,46 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PokemonTable.stories";
+
+<Meta of={Stories} />
+
+# PokemonTable
+
+The list view: a virtualized table (`react-virtualized` `List`) with sortable column headers, type dots and the six base stats plus total. The stat columns are hidden below the `md` breakpoint.
+
+## Behaviour
+
+- Semantics: `table` > `rowgroup` > `row` > `cell`. The active column header has `aria-sort`.
+- Pressing a header sorts by it; number columns start with the highest, and pressing the active one flips the direction.
+- The name link is stretched over the whole row.
+- Scrolls back to the top when the list changes.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Sorts From Headers
+
+Header presses call `onSortChange`.
+
+<Canvas of={Stories.SortsFromHeaders} />
+
+### Rows And Navigation
+
+Rows show the pokémon and link to their page.
+
+<Canvas of={Stories.RowsAndNavigation} />
+
+### Sorted Descending
+
+The next press on the active header flips to ascending.
+
+<Canvas of={Stories.SortedDescending} />
+
+### Long List Scrolls To Top
+
+A long list scrolls back to the top when it changes.
+
+<Canvas of={Stories.LongListScrollsToTop} />

@@ -1,0 +1,31 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./Pokeball.stories";
+
+<Meta of={Stories} />
+
+# Pokeball
+
+The Pokéball logo as an inline SVG, used in the sidebar logo and by `LoadingSpinner`.
+
+## Behaviour
+
+- The `viewBox` follows `width` and `height`, so the image is never cropped at other sizes.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Default
+
+32 × 32.
+
+<Canvas of={Stories.Default} />
+
+### Large
+
+A custom size.
+
+<Canvas of={Stories.Large} />

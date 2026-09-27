@@ -1,0 +1,32 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./StatBars.stories";
+
+<Meta of={Stories} />
+
+# StatBars
+
+The six base stats as bars, with the total underneath.
+
+## Behaviour
+
+- Stats are in the order HP, Attack, Defense, Sp. Atk, Sp. Def, Speed; each bar is an accessible `meter`.
+- Bar length is the stat's share of the highest possible stat (`MAX_STAT` in `@utils/stats`) and is capped at full width.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Bulbasaur
+
+Typical base stats.
+
+<Canvas of={Stories.Bulbasaur} />
+
+### Caps At The Maximum
+
+A stat at or above the maximum fills the bar and no further.
+
+<Canvas of={Stories.CapsAtTheMaximum} />

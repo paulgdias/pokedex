@@ -1,0 +1,32 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PokedexEntry.stories";
+
+<Meta of={Stories} />
+
+# PokedexEntry
+
+The species genus and flavour text on the detail page, with a select to pick the game version.
+
+## Behaviour
+
+- Shows the newest entry first, with PokeAPI's hard line wraps removed.
+- With no entries it shows "No entry available.".
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Switches Game Version
+
+Choosing another version changes the text.
+
+<Canvas of={Stories.SwitchesGameVersion} />
+
+### No Entries
+
+A pokémon without flavour text.
+
+<Canvas of={Stories.NoEntries} />

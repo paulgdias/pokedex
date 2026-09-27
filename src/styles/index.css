@@ -55,7 +55,7 @@
 
 /* elevation: tint and strength come from --shade / --shade-boost, which the
    dark theme overrides. Plain utilities rather than @theme shadow tokens,
-   because Tailwind inlines (and here mis-parses) colours in those */
+   because Tailwind inlines (and here mis-parses) colors in those */
 :root {
     --shade: #28200f;
     --shade-boost: 1;

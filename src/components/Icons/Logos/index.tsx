@@ -10,7 +10,12 @@ export const linkedinUrl = "https://www.linkedin.com/in/paul-dias-a642a124/";
 
 const GitHub = ({ width = 32, height = 32 }: LogoProps) => {
     return (
-        <a href={githubUrl} target="_blank" rel="noopener noreferrer">
+        <a
+            href={githubUrl}
+            aria-label="GitHub"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
@@ -27,7 +32,12 @@ const GitHub = ({ width = 32, height = 32 }: LogoProps) => {
 
 const LinkedIn = ({ width = 32, height = 32 }: LogoProps) => {
     return (
-        <a href={linkedinUrl} target="_blank" rel="noopener noreferrer">
+        <a
+            href={linkedinUrl}
+            aria-label="LinkedIn"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
@@ -53,6 +63,7 @@ const Email = ({ width = 32, height = 32 }: LogoProps) => {
     return (
         <a
             href="mailto:pdias92@gmail.com"
+            aria-label="Email"
             target="_blank"
             rel="noopener noreferrer"
         >

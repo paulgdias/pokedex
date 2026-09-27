@@ -1,0 +1,139 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PokemonCard.stories";
+
+<Meta of={Stories} />
+
+# PokemonCard
+
+A pokémon's card: official artwork with a dex number watermark, type pills and a Legendary / Mythical badge. It is used in the grid, and at `size="large"` as the detail page's hero card.
+
+## Behaviour
+
+- With `navigateCallback` the card is a focusable link: click or Enter calls it with the event and the pokémon. Without it the card is static (not focusable, no pointer cursor).
+- The artwork is preloaded with `fetchPriority: "high"`.
+- `sprite` replaces the artwork (the detail page uses it for the in-game sprite); `pixelated` renders it crisply at a whole-number scale.
+- `children` render as an overlay in the art area (the detail page puts `SpriteToggle` there).
+- Mythical wins if both `isMythical` and `isLegendary` are set.
+- A pokémon without artwork shows its dex number in place of the image.
+
+## Props
+
+The props are typed in `src/types/PokemonCardTypes.ts` (`PokemonCardType`).
+
+<table>
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>pokemon</code></td>
+      <td><code>PokemonDetails</code></td>
+      <td>required</td>
+      <td>The pokémon to show: name, number, types, artwork.</td>
+    </tr>
+    <tr>
+      <td><code>navigateCallback</code></td>
+      <td><code>(event, pokemon, evolutions?) =&gt; void</code></td>
+      <td></td>
+      <td>Makes the card a focusable link that calls this on click or Enter.</td>
+    </tr>
+    <tr>
+      <td><code>size</code></td>
+      <td><code>"default" | "large"</code></td>
+      <td><code>"default"</code></td>
+      <td><code>large</code> is the detail page's hero card.</td>
+    </tr>
+    <tr>
+      <td><code>sprite</code></td>
+      <td><code>string</code></td>
+      <td></td>
+      <td>Shown instead of <code>pokemon.sprite</code>.</td>
+    </tr>
+    <tr>
+      <td><code>pixelated</code></td>
+      <td><code>boolean</code></td>
+      <td><code>false</code></td>
+      <td>Render <code>sprite</code> as pixel art.</td>
+    </tr>
+    <tr>
+      <td><code>isLegendary</code></td>
+      <td><code>boolean</code></td>
+      <td></td>
+      <td>Show the Legendary badge.</td>
+    </tr>
+    <tr>
+      <td><code>isMythical</code></td>
+      <td><code>boolean</code></td>
+      <td></td>
+      <td>Show the Mythical badge (wins over Legendary).</td>
+    </tr>
+    <tr>
+      <td><code>children</code></td>
+      <td><code>ReactNode</code></td>
+      <td></td>
+      <td>Overlay content inside the art area.</td>
+    </tr>
+    <tr>
+      <td><code>className</code></td>
+      <td><code>string</code></td>
+      <td></td>
+      <td>Merged onto the card with <code>twMerge</code>, so it can override.</td>
+    </tr>
+    <tr>
+      <td><code>style</code></td>
+      <td><code>CSSProperties</code></td>
+      <td></td>
+      <td>Positioning from the virtualized grid.</td>
+    </tr>
+    <tr>
+      <td><code>ref</code></td>
+      <td><code>Ref&lt;HTMLDivElement&gt;</code></td>
+      <td></td>
+      <td>Passed straight through (React 19, no <code>forwardRef</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+## Examples
+
+### Navigates
+
+Click or Enter calls `navigateCallback`; other keys do nothing.
+
+<Canvas of={Stories.Navigates} />
+
+### Static
+
+No callback: not a link, not focusable.
+
+<Canvas of={Stories.Static} />
+
+### Legendary
+
+The Legendary badge.
+
+<Canvas of={Stories.Legendary} />
+
+### Mythical
+
+The Mythical badge wins over Legendary.
+
+<Canvas of={Stories.Mythical} />
+
+### Without Artwork
+
+The dex number stands in for the art.
+
+<Canvas of={Stories.WithoutArtwork} />
+
+### Large Pixelated
+
+The large card with an in-game sprite.
+
+<Canvas of={Stories.LargePixelated} />

@@ -10,8 +10,11 @@ const cardClass = `
 `;
 // --card-art lets a page tint the art area (e.g. by type); sand by default
 const cardArtClass = `relative flex items-center justify-center bg-[var(--card-art,var(--color-sand))]`;
+// The number is drawn from `data-number` as generated content: it is a faint
+// decoration (below any text contrast ratio), so it is kept out of the text.
 const cardNumberWatermarkClass = `
     absolute select-none font-mono text-[40px] font-semibold text-ink/10
+    before:content-[attr(data-number)]
 `;
 const pixelArtClass = `[image-rendering:pixelated]`;
 const cardBodyClass = `flex flex-col gap-2 px-3.5 pt-3 pb-3.5`;

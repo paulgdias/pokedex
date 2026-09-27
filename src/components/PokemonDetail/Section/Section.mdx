@@ -1,0 +1,44 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./Section.stories";
+
+<Meta of={Stories} />
+
+# Section
+
+A titled card that groups one part of the detail page. `InfoSection` (a named export of the same file) wraps it for content that needs the lazily fetched pokémon info and shows a loading or error state until `data` arrives.
+
+## Behaviour
+
+- The `title` is the section's heading and its accessible name (`aria-labelledby`).
+- `InfoSection` takes the info query and a render function for the loaded content.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Titled
+
+A plain section.
+
+<Canvas of={Stories.Titled} />
+
+### Info Loading
+
+`InfoSection` while the info is loading.
+
+<Canvas of={Stories.InfoLoading} />
+
+### Info Error
+
+`InfoSection` when the info query failed.
+
+<Canvas of={Stories.InfoError} />
+
+### Info Loaded
+
+`InfoSection` rendering its content.
+
+<Canvas of={Stories.InfoLoaded} />

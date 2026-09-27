@@ -1,0 +1,43 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./Nav.stories";
+
+<Meta of={Stories} />
+
+# Nav
+
+App navigation: a sidebar on desktop and a compact top bar below the `lg` breakpoint. It holds the logo, the page links (Home, Pokédex, Compare, Type chart), the theme toggle and the generation links with per-generation counts.
+
+## Behaviour
+
+- Takes no props. It reads the dex with `useRouteLoaderData` (route ids `"pokedex"` and `"pokemon"`), so it needs a data router around it.
+- Both the sidebar and the top bar are in the DOM; CSS shows one of them.
+- The link to the current page keeps the query string; links to other pages do not.
+- Generation links only apply filters on the list page, not on a single pokémon's page.
+- The Teams link is hidden because that route needs the local Express server.
+
+## Examples
+
+### Marks The Current Page
+
+The current page is marked, and its link keeps the filters in the URL.
+
+<Canvas of={Stories.MarksTheCurrentPage} />
+
+### Generations With Counts
+
+One link per generation with the number of pokémon in it, built from the loaded dex.
+
+<Canvas of={Stories.GenerationsWithCounts} />
+
+### On A Pokemon Page
+
+On `/pokedex/:pokemon` the generation counts still show (the pokémon route shares the dex), but no generation is marked as current.
+
+<Canvas of={Stories.OnAPokemonPage} />
+
+### Outside The Pokedex
+
+On pages without the dex list, such as Compare: no generation list, and that page is marked.
+
+<Canvas of={Stories.OutsideThePokedex} />

@@ -1,0 +1,33 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./CryButton.stories";
+
+<Meta of={Stories} />
+
+# CryButton
+
+Plays a pokémon's cry on the detail page.
+
+## Behaviour
+
+- Disabled when `url` is `null`.
+- Highlighted while the cry plays.
+- Changing `url` (a different pokémon) stops any cry that is playing.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Plays The Cry
+
+Pressing the button plays the audio and highlights it.
+
+<Canvas of={Stories.PlaysTheCry} />
+
+### No Cry Available
+
+The button is disabled.
+
+<Canvas of={Stories.NoCryAvailable} />

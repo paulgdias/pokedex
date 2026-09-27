@@ -1,0 +1,21 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./LoadingSpinner.stories";
+
+<Meta of={Stories} />
+
+# LoadingSpinner
+
+A full-height, centred spinning Pokéball. It is the router's `HydrateFallback`, shown while the first route data loads.
+
+## Behaviour
+
+- Takes no props.
+
+## Examples
+
+### Spinning
+
+The animation is applied to the wrapper, not just named in the class list.
+
+<Canvas of={Stories.Spinning} />

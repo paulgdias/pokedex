@@ -53,6 +53,7 @@ export const InfoSection = ({
             <p className="text-sm text-muted">Couldn’t load this section.</p>
         ) : (
             <div
+                role="status"
                 aria-busy="true"
                 aria-label="Loading"
                 className="flex animate-pulse flex-col gap-2.5"

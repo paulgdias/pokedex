@@ -1,0 +1,26 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./ScrollTopButton.stories";
+
+<Meta of={Stories} />
+
+# ScrollTopButton
+
+A round button fixed to the bottom-right corner that scrolls the page back to the top. It is built on the react-aria `Button`, so it responds to click, tap, Enter and Space.
+
+## Behaviour
+
+- Labelled "Go to Top of Page" for assistive tech; the arrow icon is decorative.
+- Only calls `onPress`; the caller decides what to scroll (see `PokemonList`).
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Default
+
+Pressing the button calls `onPress`.
+
+<Canvas of={Stories.Default} />

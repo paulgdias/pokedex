@@ -1,0 +1,30 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import { GitHub } from ".";
+import * as Stories from "./Logos.stories";
+
+<Meta of={Stories} />
+
+# Logos
+
+The author's social links (`GitHub`, `LinkedIn`, `Email`) as inline SVG or icon links. The file also exports `githubUrl` and `linkedinUrl`.
+
+## Behaviour
+
+- All three open in a new tab with `rel="noopener noreferrer"`, so the destination cannot reach `window.opener`.
+- Each link has an `aria-label` ("GitHub", "LinkedIn", "Email") since the content is only an icon.
+- `Email` is a `mailto:` link.
+
+## Props
+
+Each of `GitHub`, `LinkedIn` and `Email` takes the same props (`LogoProps`).
+
+<ArgTypes of={GitHub} />
+
+## Examples
+
+### Social Links
+
+The three links side by side.
+
+<Canvas of={Stories.SocialLinks} />

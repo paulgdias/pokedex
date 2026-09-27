@@ -1,0 +1,33 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./SpriteToggle.stories";
+
+<Meta of={Stories} />
+
+# SpriteToggle
+
+An "Artwork" / "In-Game" segmented control (react-aria `ToggleButtonGroup`) overlaid on the detail page's large card. "In-Game" is the 96px pixel sprite, drawn by `PokemonCard` with `pixelated`.
+
+## Behaviour
+
+- Absolutely positioned over the card's art, so it needs a positioned parent.
+- Exactly one option is always selected (`disallowEmptySelection`).
+- "In-Game" is disabled when the pokémon has no pixel sprite (`isInGameAvailable={false}`).
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Switches View
+
+Choosing an option calls `onChange`.
+
+<Canvas of={Stories.SwitchesView} />
+
+### In Game Unavailable
+
+"In-Game" is disabled.
+
+<Canvas of={Stories.InGameUnavailable} />

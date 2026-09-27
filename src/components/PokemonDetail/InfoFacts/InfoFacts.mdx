@@ -1,0 +1,32 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./InfoFacts.stories";
+
+<Meta of={Stories} />
+
+# InfoFacts
+
+Size, breeding and species facts as a definition list: height, weight, base experience, capture rate, base happiness, gender, egg groups, growth rate, habitat, color and shape.
+
+## Behaviour
+
+- Missing values show an em dash.
+- Gender is a bar of the female / male share, or "Genderless".
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Facts
+
+Every fact for a typical pokémon.
+
+<Canvas of={Stories.Facts} />
+
+### Genderless
+
+A genderless pokémon shows text instead of the bar.
+
+<Canvas of={Stories.Genderless} />

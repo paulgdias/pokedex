@@ -1,0 +1,59 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./EvolutionChain.stories";
+
+<Meta of={Stories} />
+
+# EvolutionChain
+
+The evolution chain on a pokémon's detail page: compact cards in stages joined by arrows, with the trigger (`Lv. 16`, a stone, friendship...) as a pill on each arrow. Data comes from `buildEvolutionLanes` in `@utils/evolution`.
+
+## Behaviour
+
+- The current pokémon has the accent border and `aria-current`; it is not a link. Every other card navigates to that pokémon.
+- Mega and Gigantamax forms sit in a dashed "Other forms" box; each regional variant (Alola, Galar, ...) gets its own lane.
+- Stacks vertically below the `md` breakpoint.
+- Renders nothing for a pokémon with no evolutions and no alternate forms.
+- Navigation passes `previous` in router state so the back button returns to the same list filters.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Three Stage Line
+
+A linear three-stage line. Picking another stage goes to its page and remembers where you were.
+
+<Canvas of={Stories.ThreeStageLine} />
+
+### Other Forms
+
+A pokémon with Mega forms, shown in the dashed box.
+
+<Canvas of={Stories.OtherForms} />
+
+### Branching Evolutions
+
+A stage that branches into several evolutions.
+
+<Canvas of={Stories.BranchingEvolutions} />
+
+### Regional Lanes
+
+The standard lane followed by one lane per regional variant.
+
+<Canvas of={Stories.RegionalLanes} />
+
+### No Evolutions
+
+A pokémon with a single form: the section is not rendered.
+
+<Canvas of={Stories.NoEvolutions} />
+
+### Explicit Previous
+
+`previous` overrides the location that back navigation returns to.
+
+<Canvas of={Stories.ExplicitPrevious} />

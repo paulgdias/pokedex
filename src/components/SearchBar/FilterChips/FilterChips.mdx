@@ -1,0 +1,38 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./FilterChips.stories";
+
+<Meta of={Stories} />
+
+# FilterChips
+
+One removable chip per active filter (generation, types, category), plus "Clear all". Renders nothing when there are no filters.
+
+## Behaviour
+
+- A blank search text does not count as a filter.
+- Removing a chip patches only that filter through `onChange`.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Removes One Filter
+
+A chip's remove button clears its own filter.
+
+<Canvas of={Stories.RemovesOneFilter} />
+
+### Clears All
+
+"Clear all" calls `onClearAll`.
+
+<Canvas of={Stories.ClearsAll} />
+
+### Nothing To Show
+
+No active filters: nothing is rendered.
+
+<Canvas of={Stories.NothingToShow} />
