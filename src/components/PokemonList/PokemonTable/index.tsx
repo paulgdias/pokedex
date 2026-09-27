@@ -18,11 +18,8 @@ import { typeDotClass } from "@styles/Pokedex";
 import "react-virtualized/styles.css";
 
 const ROW_HEIGHT = 56;
-
-// the same columns for the header and every row; the stat columns only fit
-// from `md` up
 const COLUMNS =
-    "grid items-center gap-x-3 px-4 grid-cols-[3.5rem_minmax(0,1fr)_8rem_3.5rem] md:grid-cols-[3.5rem_minmax(0,1fr)_9rem_repeat(6,3.25rem)_3.5rem]";
+    "grid items-center gap-x-3 px-4 grid-cols-[3.5rem_minmax(0,3fr)_minmax(5rem,1fr)_3.5rem] md:grid-cols-[3.5rem_minmax(0,3fr)_minmax(5rem,1fr)_repeat(6,3.25rem)_3.5rem]";
 const STAT_CELL = "hidden text-right md:block";
 
 const SHORT_STAT_LABELS = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
