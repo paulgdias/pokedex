@@ -24,7 +24,8 @@ MONGODB_DB=...
 
 - `npm start`: run the server
 - `npm run dev`: run with nodemon
-- `npm run format`: format `src` with Biome
+
+Linting and formatting come from the root Biome config (`npm run biome:lint` / `biome:format` in the repo root cover `api/src`).
 
 ## Endpoints
 
