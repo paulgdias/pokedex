@@ -10,7 +10,25 @@ const plugins = [
     new TsCheckerRspackPlugin(),
 ];
 
-module.exports = {
+// filenames carry a content hash, so they can be cached for a year; the HTML
+// that references them must be revalidated so a deploy is picked up at once
+const HASHED_ASSET = /\.[0-9a-f]{8,}\.(js|css)$/;
+
+const cacheHeaders = (req: { url?: string }) => {
+    const { pathname } = new URL(req.url ?? "/", "http://localhost");
+    const immutable =
+        HASHED_ASSET.test(pathname) && !pathname.includes("hot-update");
+    return [
+        {
+            key: "Cache-Control",
+            value: immutable
+                ? "public, max-age=31536000, immutable"
+                : "no-cache",
+        },
+    ];
+};
+
+module.exports = (_env: unknown, argv: { mode?: string }) => ({
     entry: "./src/index.tsx",
     output: {
         path: path.resolve(__dirname, "dist"),
@@ -77,6 +95,8 @@ module.exports = {
         },
         liveReload: true,
         compress: true,
+        // dev keeps the default (no headers) so HMR is unaffected
+        ...(argv.mode === "production" && { headers: cacheHeaders }),
     },
     optimization: {
         splitChunks: {
@@ -98,4 +118,4 @@ module.exports = {
         maxEntrypointSize: 600_000,
         maxAssetSize: 420_000,
     },
-};
+});

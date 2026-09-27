@@ -7,7 +7,7 @@ Path-scoped rules (loaded only when working on matching files): [`.claude/rules/
 ## Commands
 
 - `npm run dev`: rspack dev server on port 3000 (also type-checks via `TsCheckerRspackPlugin`).
-- `npm run build`: production build to `dist/` (gitignored). `npm start` serves the production build.
+- `npm run build`: production build to `dist/` (gitignored). `npm start` serves the production build with `Cache-Control: immutable` (1 year) on content-hashed `.js`/`.css` and `no-cache` on everything else (`devServer.headers` in `rspack.config.ts`, production mode only); a real host must do the same or Lighthouse flags "Use efficient cache lifetimes".
 - `npm run type-check`: `tsc --noEmit`
 - `npm run biome:lint` / `npm run biome:lint:fix`: Biome linter over `src`.
 - `npm run biome:format`: Biome formatter over `src`. Style: 4 spaces, double quotes, semicolons, width 80, ES5 trailing commas.
