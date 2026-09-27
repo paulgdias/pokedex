@@ -19,9 +19,10 @@ export const POKEAPI_SOURCE =
         ? "proxy"
         : "upstream";
 
+// graphql-request parses the URL with `new URL`, which rejects a relative one
 const POKEAPI_URL =
     POKEAPI_SOURCE === "proxy"
-        ? "/pokeapi/graphql"
+        ? new URL("/pokeapi/graphql", window.location.origin).href
         : "https://beta.pokeapi.co/graphql/v1beta";
 
 // proxied responses carry same-origin sprite and cry URLs, so the persisted
