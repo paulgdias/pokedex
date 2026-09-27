@@ -196,7 +196,7 @@ export const buildEvolutionLanes = (
                         : (methods[laneIndex] ?? methods[0] ?? null),
                 forms:
                     region === null
-                        ? [...entry.extras].sort((a, b) => a._id - b._id)
+                        ? [...entry.extras].sort((a, b) => a.id - b.id)
                         : [],
             };
             (stages[depth] ??= []).push(step);
@@ -206,7 +206,7 @@ export const buildEvolutionLanes = (
             stages: stages
                 .filter(Boolean)
                 .map((stage) =>
-                    stage.sort((a, b) => a.pokemon._id - b.pokemon._id)
+                    stage.sort((a, b) => a.pokemon.id - b.pokemon.id)
                 ),
         };
     });

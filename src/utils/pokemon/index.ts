@@ -23,7 +23,7 @@ const toStats = (stats: Pokemon["stats"] | undefined) => {
 const toPokemonDetails = (pokemon: Pokemon): PokemonDetails => {
     const stats = toStats(pokemon.stats);
     return {
-        _id: pokemon.id ?? 0,
+        id: pokemon.id ?? 0,
         name: pokemon.name ?? "",
         sprite: pokemon.sprites?.[0]?.default ?? "",
         inGameSprite: pokemon.sprites?.[0]?.pixel ?? null,
@@ -58,7 +58,7 @@ const groupByEvolutionChain = (pokemon: PokemonDetails[]) => {
             chains.set(item.evolutionChainId, [item]);
         }
     }
-    chains.forEach((chain) => chain.sort((a, b) => a._id - b._id));
+    chains.forEach((chain) => chain.sort((a, b) => a.id - b.id));
     return chains;
 };
 

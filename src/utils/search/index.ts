@@ -76,7 +76,7 @@ export const matchesText = (pokemon: PokemonDetails, text: string): boolean => {
         return true;
     }
     if (/^\d+$/.test(search)) {
-        return String(pokemon._id).startsWith(String(parseInt(search, 10)));
+        return String(pokemon.id).startsWith(String(parseInt(search, 10)));
     }
     return pokemon.name.includes(search);
 };

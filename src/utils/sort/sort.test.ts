@@ -24,7 +24,7 @@ import {
 const ids = (
     state: SortState,
     list = [SQUIRTLE, MEWTWO, bulbasaur, MEW, CHARMANDER, PICHU]
-) => sortPokemon(list, state).map((p) => p._id);
+) => sortPokemon(list, state).map((p) => p.id);
 
 describe("sortPokemon", () => {
     it("defaults to Bulbasaur first", () => {
@@ -49,7 +49,7 @@ describe("sortPokemon", () => {
 
     it("sorts by primary type only, ties by id", () => {
         const dual = makePokemon({
-            _id: 20,
+            id: 20,
             name: "z",
             types: ["fire", "water"],
         });
@@ -57,17 +57,17 @@ describe("sortPokemon", () => {
             sortPokemon([SQUIRTLE, dual, CHARMANDER], {
                 key: "type",
                 direction: "asc",
-            }).map((p) => p._id)
+            }).map((p) => p.id)
         ).toEqual([4, 20, 7]);
     });
 
     it("sorts pokémon without a type before typed ones", () => {
-        const typeless = makePokemon({ _id: 30, name: "q", types: [] });
+        const typeless = makePokemon({ id: 30, name: "q", types: [] });
         expect(
             sortPokemon([CHARMANDER, typeless], {
                 key: "type",
                 direction: "asc",
-            })[0]._id
+            })[0].id
         ).toBe(30);
     });
 
@@ -90,17 +90,17 @@ describe("sortPokemon", () => {
     });
 
     it("treats a missing stat as 0", () => {
-        const sparse = makePokemon({ _id: 40, name: "s", stats: [] });
+        const sparse = makePokemon({ id: 40, name: "s", stats: [] });
         expect(
             sortPokemon([bulbasaur, sparse], { key: "hp", direction: "asc" })[0]
-                ._id
+                .id
         ).toBe(40);
     });
 
     it("breaks ties by ascending id whatever the direction", () => {
-        const a = makePokemon({ _id: 2, name: "x", statTotal: 100 });
-        const b = makePokemon({ _id: 1, name: "y", statTotal: 100 });
-        const c = makePokemon({ _id: 3, name: "z", statTotal: 100 });
+        const a = makePokemon({ id: 2, name: "x", statTotal: 100 });
+        const b = makePokemon({ id: 1, name: "y", statTotal: 100 });
+        const c = makePokemon({ id: 3, name: "z", statTotal: 100 });
         expect(ids({ key: "total", direction: "asc" }, [c, a, b])).toEqual([
             1, 2, 3,
         ]);

@@ -130,9 +130,9 @@ describe("matchesText", () => {
     });
 
     it("matches numbers by prefix after stripping leading zeros and #", () => {
-        const seven = makePokemon({ _id: 7, name: "squirtle" });
-        const seventy = makePokemon({ _id: 70, name: "weepinbell" });
-        const seventeen = makePokemon({ _id: 17, name: "pidgeotto" });
+        const seven = makePokemon({ id: 7, name: "squirtle" });
+        const seventy = makePokemon({ id: 70, name: "weepinbell" });
+        const seventeen = makePokemon({ id: 17, name: "pidgeotto" });
         expect(matchesText(seven, "007")).toBe(true);
         expect(matchesText(seven, "#7")).toBe(true);
         expect(matchesText(seventy, "7")).toBe(true);
@@ -141,7 +141,7 @@ describe("matchesText", () => {
     });
 
     it("does not match a number against the name", () => {
-        expect(matchesText(makePokemon({ name: "mon-7", _id: 1 }), "7")).toBe(
+        expect(matchesText(makePokemon({ name: "mon-7", id: 1 }), "7")).toBe(
             false
         );
     });
@@ -292,7 +292,7 @@ describe("getPokemonSuggestions", () => {
 
     it("caps at five by default and honours a custom limit", () => {
         const many = Array.from({ length: 9 }, (_, i) =>
-            makePokemon({ _id: i + 1, name: `mon${i}` })
+            makePokemon({ id: i + 1, name: `mon${i}` })
         );
         expect(getPokemonSuggestions(many, "mon")).toHaveLength(5);
         expect(getPokemonSuggestions(many, "mon", 2)).toHaveLength(2);

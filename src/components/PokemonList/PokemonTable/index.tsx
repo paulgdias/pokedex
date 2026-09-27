@@ -177,7 +177,7 @@ const PokemonTable = ({
                                                 role="cell"
                                                 className="font-mono text-xs text-subtle"
                                             >
-                                                {formatPokedexNumber(item._id)}
+                                                {formatPokedexNumber(item.id)}
                                             </div>
                                             <div
                                                 role="cell"

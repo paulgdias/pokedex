@@ -14,7 +14,7 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...` (each u
 | `pokedexLoader/` | `pokedexLoader(queryClient)`: the loader shared by `/pokedex`, `/pokedex/:pokemon` and `/compare` (dex from the query cache -> `PokemonDetails[]` with evolutions). Kept out of the lazy pages so it starts immediately. |
 | `routes/` | `createAppRouter(queryClient)`. `dataRoute()` takes a page import (`() => import(...)`, used as the route's `lazy`) plus loader, `errorElement`, `HydrateFallback`; Home and Layout are in the entry chunk. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
 | `generations/` | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type. |
-| `pokemon/` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `_id`). |
+| `pokemon/` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `id`). |
 | `evolution/` | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages). |
 | `search/` | Filters: `PokedexFilters`, `EMPTY_FILTERS`, `POKEMON_TYPES`, `CATEGORIES`, `getFiltersFromURLParams`, `withFilters`, `matchesText`, `applyFilters`. Suggestions: `getFilterSuggestions`, `getPokemonSuggestions`. Formatting: `capitalize`, `formatPokedexNumber` (formats to `#0001`). |
 | `sort/` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`, `getSortLabel`. |
@@ -29,7 +29,7 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...` (each u
 **Sort** (`sort.ts`)
 - Each comparator produces the natural `"asc"` order (1->N, A->Z, legendaries first); `"desc"` is its reverse.
 - `DEFAULT_SORT` is `id:asc`, i.e. Bulbasaur first.
-- Ties always fall back to ascending `_id` (`|| a._id - b._id`), regardless of direction.
+- Ties always fall back to ascending `id` (`|| a.id - b.id`), regardless of direction.
 - `type` sort compares only primary type (`types[0]`).
 - `getNextSort` flips direction only when the same key is chosen again while it is `asc`; a new key starts at `asc`.
 - Sort keys are defined in `src/types/SortingTypes.ts` (`SORT_KEYS`; the six stat keys in `STAT_SORT_KEYS` map to indexes of `PokemonDetails.stats`). Stat/total columns in the list view start `desc` on first click; the sort select shows an extra option for sorts it does not list.
@@ -58,7 +58,7 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...` (each u
 - To support a new generation, add it to `GENERATIONS`. `getFiltersFromURLParams` only accepts ids in that table, and `Nav` builds its links and counts from it.
 
 **Two data shapes**
-- GraphQL `Pokemon` uses `id` and `specs.*`; app `PokemonDetails` uses `_id`, `generationId`, etc. The `_id` name is inherited from the old Mongo API. Convert at the loader boundary with `pokemon.ts`; don't leak the GraphQL shape into components.
+- GraphQL `Pokemon` uses `id` and `specs.*`; app `PokemonDetails` uses a flat `id`, `generationId`, etc. Convert at the loader boundary with `pokemon.ts`; don't leak the GraphQL shape into components.
 
 ## Adding a filter or sort key
 

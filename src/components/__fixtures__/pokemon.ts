@@ -18,9 +18,9 @@ export const SPRITE = sprite();
 export const makePokemon = (
     overrides: Partial<PokemonDetails> = {}
 ): PokemonDetails => {
-    const id = overrides._id ?? 1;
+    const id = overrides.id ?? 1;
     return {
-        _id: id,
+        id,
         name: "bulbasaur",
         sprite: SPRITE,
         inGameSprite: sprite(),
@@ -47,7 +47,7 @@ export const chain = (members: PokemonDetails[]) =>
 
 const BULBASAUR = makePokemon({ evolutionChainId: 1 });
 const IVYSAUR = makePokemon({
-    _id: 2,
+    id: 2,
     name: "ivysaur",
     evolutionChainId: 1,
     speciesId: 2,
@@ -57,7 +57,7 @@ const IVYSAUR = makePokemon({
     statTotal: 405,
 });
 const VENUSAUR = makePokemon({
-    _id: 3,
+    id: 3,
     name: "venusaur",
     evolutionChainId: 1,
     speciesId: 3,
@@ -67,7 +67,7 @@ const VENUSAUR = makePokemon({
     statTotal: 525,
 });
 const VENUSAUR_MEGA = makePokemon({
-    _id: 10033,
+    id: 10033,
     name: "venusaur-mega",
     evolutionChainId: 1,
     speciesId: 3,
@@ -78,7 +78,7 @@ const VENUSAUR_MEGA = makePokemon({
     statTotal: 625,
 });
 const VENUSAUR_GMAX = makePokemon({
-    _id: 10195,
+    id: 10195,
     name: "venusaur-gmax",
     evolutionChainId: 1,
     speciesId: 3,
@@ -100,7 +100,7 @@ export const [bulbasaur, ivysaur, venusaur, venusaurMega, venusaurGmax] =
 
 /** A single-stage species: no evolution section. */
 export const DITTO = makePokemon({
-    _id: 132,
+    id: 132,
     name: "ditto",
     types: ["normal"],
     stats: [48, 48, 48, 48, 48, 48],
@@ -110,13 +110,13 @@ export const DITTO = makePokemon({
 const EEVEE_CHAIN = 133;
 export const EEVEE_LINE = chain([
     makePokemon({
-        _id: 133,
+        id: 133,
         name: "eevee",
         types: ["normal"],
         evolutionChainId: EEVEE_CHAIN,
     }),
     makePokemon({
-        _id: 134,
+        id: 134,
         name: "vaporeon",
         types: ["water"],
         evolutionChainId: EEVEE_CHAIN,
@@ -124,7 +124,7 @@ export const EEVEE_LINE = chain([
         evolutionMethods: ["Use Water Stone"],
     }),
     makePokemon({
-        _id: 135,
+        id: 135,
         name: "jolteon",
         types: ["electric"],
         evolutionChainId: EEVEE_CHAIN,
@@ -137,13 +137,13 @@ export const EEVEE_LINE = chain([
 const MEOWTH_CHAIN = 52;
 export const MEOWTH_LINE = chain([
     makePokemon({
-        _id: 52,
+        id: 52,
         name: "meowth",
         types: ["normal"],
         evolutionChainId: MEOWTH_CHAIN,
     }),
     makePokemon({
-        _id: 10107,
+        id: 10107,
         name: "meowth-alola",
         types: ["dark"],
         evolutionChainId: MEOWTH_CHAIN,
@@ -152,7 +152,7 @@ export const MEOWTH_LINE = chain([
         form: "alola",
     }),
     makePokemon({
-        _id: 10161,
+        id: 10161,
         name: "meowth-galar",
         types: ["steel"],
         evolutionChainId: MEOWTH_CHAIN,
@@ -161,7 +161,7 @@ export const MEOWTH_LINE = chain([
         form: "galar",
     }),
     makePokemon({
-        _id: 53,
+        id: 53,
         name: "persian",
         types: ["normal"],
         evolutionChainId: MEOWTH_CHAIN,
@@ -170,7 +170,7 @@ export const MEOWTH_LINE = chain([
         generationId: 1,
     }),
     makePokemon({
-        _id: 10108,
+        id: 10108,
         name: "persian-alola",
         types: ["dark"],
         evolutionChainId: MEOWTH_CHAIN,
@@ -181,7 +181,7 @@ export const MEOWTH_LINE = chain([
         form: "alola",
     }),
     makePokemon({
-        _id: 863,
+        id: 863,
         name: "perrserker",
         types: ["steel"],
         evolutionChainId: MEOWTH_CHAIN,
@@ -192,7 +192,7 @@ export const MEOWTH_LINE = chain([
 ]);
 
 export const MEWTWO = makePokemon({
-    _id: 150,
+    id: 150,
     name: "mewtwo",
     types: ["psychic"],
     isLegendary: true,
@@ -200,7 +200,7 @@ export const MEWTWO = makePokemon({
     statTotal: 680,
 });
 export const MEW = makePokemon({
-    _id: 151,
+    id: 151,
     name: "mew",
     types: ["psychic"],
     isMythical: true,
@@ -208,21 +208,21 @@ export const MEW = makePokemon({
     statTotal: 600,
 });
 export const CHARMANDER = makePokemon({
-    _id: 4,
+    id: 4,
     name: "charmander",
     types: ["fire"],
     stats: [39, 52, 43, 60, 50, 65],
     statTotal: 309,
 });
 export const SQUIRTLE = makePokemon({
-    _id: 7,
+    id: 7,
     name: "squirtle",
     types: ["water"],
     stats: [44, 48, 65, 50, 64, 43],
     statTotal: 314,
 });
 export const PICHU = makePokemon({
-    _id: 172,
+    id: 172,
     name: "pichu",
     types: ["electric"],
     generationId: 2,
@@ -231,7 +231,7 @@ export const PICHU = makePokemon({
 });
 /** A pokémon without artwork or an in-game sprite. */
 export const MISSINGNO = makePokemon({
-    _id: 999,
+    id: 999,
     name: "missingno",
     sprite: "",
     inGameSprite: null,
@@ -257,7 +257,7 @@ export const DEX: PokemonDetails[] = [
 export const makeDex = (count: number): PokemonDetails[] =>
     Array.from({ length: count }, (_, index) =>
         makePokemon({
-            _id: index + 1,
+            id: index + 1,
             name: `mon-${index + 1}`,
             types: index % 2 ? ["water"] : ["fire", "flying"],
             generationId: (index % 9) + 1,

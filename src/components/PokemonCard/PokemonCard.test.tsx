@@ -6,7 +6,7 @@ import PokemonCard from "./index";
 
 const bulbasaur = makePokemon();
 const charmander = makePokemon({
-    _id: 4,
+    id: 4,
     name: "charmander",
     types: ["fire"],
 });
@@ -63,7 +63,7 @@ describe("PokemonCard", () => {
         expect(screen.getByRole("img").query()).toBeNull();
         expect(cardHtml(screen)).toContain('aria-hidden="true"');
         // drawn from the attribute, so it is not text in the document
-        expect(cardHtml(screen)).toContain(`data-number="${bulbasaur._id}"`);
+        expect(cardHtml(screen)).toContain(`data-number="${bulbasaur.id}"`);
     });
 
     it("uses the sprite override when given", async () => {

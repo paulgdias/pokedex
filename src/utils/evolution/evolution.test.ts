@@ -207,9 +207,9 @@ describe("buildEvolutionLanes", () => {
     it("has no method when a species lists none", () => {
         const [lane] = buildEvolutionLanes(
             chain([
-                makePokemon({ _id: 1, name: "a", evolutionChainId: 1 }),
+                makePokemon({ id: 1, name: "a", evolutionChainId: 1 }),
                 makePokemon({
-                    _id: 2,
+                    id: 2,
                     name: "b",
                     speciesId: 2,
                     evolvesFromId: 1,
@@ -222,9 +222,9 @@ describe("buildEvolutionLanes", () => {
 
     it("drops costumes and other alternate forms", () => {
         const lanes = buildEvolutionLanes([
-            makePokemon({ _id: 25, name: "pikachu" }),
+            makePokemon({ id: 25, name: "pikachu" }),
             makePokemon({
-                _id: 10080,
+                id: 10080,
                 name: "pikachu-alola-cap",
                 speciesId: 25,
                 isDefault: false,
@@ -238,9 +238,9 @@ describe("buildEvolutionLanes", () => {
     it("keeps a pre-evolution that only exists in a regional lane in the standard lane's ancestry", () => {
         // a regional-only species is not part of the standard lane
         const lanes = buildEvolutionLanes([
-            makePokemon({ _id: 1, name: "a", evolutionChainId: 1 }),
+            makePokemon({ id: 1, name: "a", evolutionChainId: 1 }),
             makePokemon({
-                _id: 2,
+                id: 2,
                 name: "b-alola",
                 speciesId: 2,
                 evolvesFromId: 1,
@@ -255,8 +255,8 @@ describe("buildEvolutionLanes", () => {
 
     it("does not loop on a chain that points back at itself", () => {
         const lanes = buildEvolutionLanes([
-            makePokemon({ _id: 1, name: "a", speciesId: 1, evolvesFromId: 2 }),
-            makePokemon({ _id: 2, name: "b", speciesId: 2, evolvesFromId: 1 }),
+            makePokemon({ id: 1, name: "a", speciesId: 1, evolvesFromId: 2 }),
+            makePokemon({ id: 2, name: "b", speciesId: 2, evolvesFromId: 1 }),
         ]);
         expect(lanes).toHaveLength(1);
         expect(lanes[0].stages.flat()).toHaveLength(2);
@@ -265,7 +265,7 @@ describe("buildEvolutionLanes", () => {
     it("treats a parent that is missing from the chain as a first stage", () => {
         const [lane] = buildEvolutionLanes([
             makePokemon({
-                _id: 5,
+                id: 5,
                 name: "orphan",
                 speciesId: 5,
                 evolvesFromId: 99,

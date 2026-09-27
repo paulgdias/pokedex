@@ -89,7 +89,7 @@ export type Pokemon = {
 };
 
 export type PokemonDetails = {
-    _id: number;
+    id: number;
     name: string;
     sprite: string;
     /** the 96px in-game sprite; null when the pokémon has none */

@@ -50,7 +50,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
     const Card = (
         <div
             ref={ref}
-            key={pokemon._id}
+            key={pokemon.id}
             style={style}
             tabIndex={navigateCallback ? 0 : -1}
             aria-label={`Pokemon Card for ${pokemon.name}`}
@@ -102,7 +102,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                 ) : (
                     <span
                         aria-hidden="true"
-                        data-number={pokemon._id}
+                        data-number={pokemon.id}
                         className={`${cardNumberWatermarkClass} ${isLarge ? "text-7xl" : ""}`}
                     />
                 )}
@@ -116,7 +116,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                         {pokemon.name}
                     </span>
                     <span className="font-mono text-xs text-subtle">
-                        {formatPokedexNumber(pokemon._id)}
+                        {formatPokedexNumber(pokemon.id)}
                     </span>
                 </div>
                 <div className="flex gap-1.5">

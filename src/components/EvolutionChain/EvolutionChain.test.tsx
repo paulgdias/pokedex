@@ -55,9 +55,9 @@ describe("EvolutionChain visibility", () => {
 
     it("is shown for a lone species that has Mega forms", async () => {
         const lone = [
-            { ...makePokemon({ _id: 6, name: "charizard" }) },
+            { ...makePokemon({ id: 6, name: "charizard" }) },
             makePokemon({
-                _id: 10034,
+                id: 10034,
                 name: "charizard-mega-x",
                 speciesId: 6,
                 isDefault: false,
@@ -145,9 +145,9 @@ describe("EvolutionChain stages", () => {
 
     it("has no connector pill when the method is unknown", async () => {
         const silent = chain([
-            makePokemon({ _id: 1, name: "a", evolutionChainId: 9 }),
+            makePokemon({ id: 1, name: "a", evolutionChainId: 9 }),
             makePokemon({
-                _id: 2,
+                id: 2,
                 name: "b",
                 evolutionChainId: 9,
                 speciesId: 2,
@@ -186,9 +186,9 @@ describe("EvolutionChain other forms", () => {
 
     it("falls back to the whole form name when it does not extend the base name", async () => {
         const odd = chain([
-            makePokemon({ _id: 25, name: "pikachu" }),
+            makePokemon({ id: 25, name: "pikachu" }),
             makePokemon({
-                _id: 10080,
+                id: 10080,
                 name: "gmax-pika",
                 speciesId: 25,
                 isDefault: false,

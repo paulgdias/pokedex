@@ -15,7 +15,7 @@ type Comparator = (a: PokemonDetails, b: PokemonDetails) => number;
 // Each comparator yields the "asc" order (1 → N, A → Z, legendaries first);
 // the "desc" direction is its reverse.
 const comparators: Record<SortKey, Comparator> = {
-    id: (a, b) => a._id - b._id,
+    id: (a, b) => a.id - b.id,
     name: (a, b) => a.name.localeCompare(b.name),
     type: (a, b) => (a.types[0] ?? "").localeCompare(b.types[0] ?? ""),
     isLegendary: (a, b) => Number(b.isLegendary) - Number(a.isLegendary),
@@ -40,7 +40,7 @@ export const sortPokemon = (
     const compare = comparators[key];
     const sign = direction === "desc" ? -1 : 1;
     // ties always fall back to ascending id, regardless of direction
-    return [...pokemon].sort((a, b) => sign * compare(a, b) || a._id - b._id);
+    return [...pokemon].sort((a, b) => sign * compare(a, b) || a.id - b.id);
 };
 
 export const getNextSort = (current: SortState, key: SortKey): SortState => ({

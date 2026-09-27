@@ -38,7 +38,7 @@ describe("convertToPokemonDetailsArray", () => {
     it("converts a full record", () => {
         const [bulbasaur] = convertToPokemonDetailsArray([raw()]);
         expect(bulbasaur).toEqual({
-            _id: 1,
+            id: 1,
             name: "bulbasaur",
             sprite: "art.png",
             inGameSprite: "pixel.png",
@@ -112,7 +112,7 @@ describe("convertToPokemonDetailsArray", () => {
             } as unknown as Pokemon,
         ]);
         expect(mon).toMatchObject({
-            _id: 7,
+            id: 7,
             sprite: "",
             inGameSprite: null,
             isLegendary: false,
@@ -132,7 +132,7 @@ describe("convertToPokemonDetailsArray", () => {
 
     it("falls back when even the id and name are missing", () => {
         const [mon] = convertToPokemonDetailsArray([{} as unknown as Pokemon]);
-        expect(mon._id).toBe(0);
+        expect(mon.id).toBe(0);
         expect(mon.name).toBe("");
         expect(mon.speciesId).toBe(0);
     });

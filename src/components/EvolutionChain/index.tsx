@@ -100,7 +100,7 @@ const Node = ({
                         {pokemon.name}
                     </span>
                     <span className="font-mono text-xs text-subtle">
-                        {formatPokedexNumber(pokemon._id)}
+                        {formatPokedexNumber(pokemon.id)}
                     </span>
                 </span>
                 <span className="flex flex-wrap gap-x-2.5 gap-y-1">
@@ -156,7 +156,7 @@ const OtherForms = ({
             Other forms
         </span>
         {step.forms.map((form) => {
-            const isCurrent = form._id === currentId;
+            const isCurrent = form.id === currentId;
             const content = (
                 <>
                     <Thumbnail pokemon={form} className="size-12 rounded-lg" />
@@ -178,7 +178,7 @@ const OtherForms = ({
             if (isCurrent) {
                 return (
                     <div
-                        key={form._id}
+                        key={form.id}
                         aria-current="page"
                         className={className}
                     >
@@ -189,7 +189,7 @@ const OtherForms = ({
 
             return (
                 <a
-                    key={form._id}
+                    key={form.id}
                     href={`/pokedex/${form.name}`}
                     className={className}
                     onClick={(event) => {
@@ -223,11 +223,11 @@ const Lane = ({
         )}
         <div className="pokedex-scroll flex flex-col md:flex-row md:overflow-x-auto md:pb-1">
             {lane.stages.map((stage, index) => (
-                <Fragment key={stage[0].pokemon._id}>
+                <Fragment key={stage[0].pokemon.id}>
                     <div className="flex flex-col gap-3 md:gap-4">
                         {stage.map((step) => (
                             <div
-                                key={step.pokemon._id}
+                                key={step.pokemon.id}
                                 className="flex flex-col md:flex-row md:items-start"
                             >
                                 {index > 0 && (
@@ -237,7 +237,7 @@ const Lane = ({
                                     <Node
                                         step={step}
                                         isCurrent={
-                                            step.pokemon._id === currentId
+                                            step.pokemon.id === currentId
                                         }
                                         onSelect={onSelect}
                                     />
@@ -298,7 +298,7 @@ const EvolutionChain = ({
                                 : "Standard"
                             : null
                     }
-                    currentId={pokemon._id}
+                    currentId={pokemon.id}
                     onSelect={onSelect}
                 />
             ))}

@@ -89,7 +89,7 @@ describe("PokemonTable structure", () => {
         const { screen } = await setup({
             pokemon: [
                 bulbasaur,
-                makePokemon({ _id: 2, name: "blank", sprite: "" }),
+                makePokemon({ id: 2, name: "blank", sprite: "" }),
             ],
         });
         const rows = screen.getByRole("row").elements().slice(1);

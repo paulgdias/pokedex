@@ -64,7 +64,7 @@ const Picker = ({
     const suggestions = useMemo(
         () =>
             getPokemonSuggestions(pokemon, text, 30)
-                .filter((item) => !excludedIds.includes(item._id))
+                .filter((item) => !excludedIds.includes(item.id))
                 .slice(0, 8),
         [pokemon, text, excludedIds]
     );
@@ -102,7 +102,7 @@ const Picker = ({
                 >
                     {(item: PokemonDetails) => (
                         <ListBoxItem
-                            id={item._id}
+                            id={item.id}
                             textValue={item.name}
                             className="flex cursor-pointer items-center gap-3 rounded-[10px] px-2.5 py-1.5 outline-none data-[focused]:bg-chip"
                         >
@@ -112,7 +112,7 @@ const Picker = ({
                                 className="size-8 object-contain"
                             />
                             <span className="w-11 font-mono text-xs text-subtle">
-                                {formatPokedexNumber(item._id)}
+                                {formatPokedexNumber(item.id)}
                             </span>
                             <span className="font-semibold capitalize">
                                 {item.name}
@@ -141,11 +141,11 @@ const Compare: React.FC = () => {
 
     const ids = parseIds(params).slice(0, MAX_COMPARED);
     const selected = ids
-        .map((id) => allPokemon.find((item) => item._id === id))
+        .map((id) => allPokemon.find((item) => item.id === id))
         .filter((item): item is PokemonDetails => Boolean(item));
 
     const infoQueries = useQueries({
-        queries: selected.map((item) => pokemonInfoQueryOptions(item._id)),
+        queries: selected.map((item) => pokemonInfoQueryOptions(item.id)),
     });
 
     const setIds = (next: number[]) => {
@@ -159,7 +159,7 @@ const Compare: React.FC = () => {
         setParams(updated, { replace: true, preventScrollReset: true, state });
     };
 
-    const selectedIds = selected.map((item) => item._id);
+    const selectedIds = selected.map((item) => item.id);
     const statRows = STAT_LABELS.map((label, index) => ({
         label,
         values: selected.map((item) => item.stats[index] ?? 0),
@@ -219,7 +219,7 @@ const Compare: React.FC = () => {
                             <colgroup>
                                 <col className="w-24" />
                                 {selected.map((item) => (
-                                    <col key={item._id} />
+                                    <col key={item.id} />
                                 ))}
                             </colgroup>
                             <thead>
@@ -227,7 +227,7 @@ const Compare: React.FC = () => {
                                     <td />
                                     {selected.map((item) => (
                                         <th
-                                            key={item._id}
+                                            key={item.id}
                                             scope="col"
                                             className={`${headerCell} text-left font-normal`}
                                         >
@@ -235,7 +235,7 @@ const Compare: React.FC = () => {
                                                 <div className="flex w-full items-start justify-between">
                                                     <span className="font-mono text-xs text-subtle">
                                                         {formatPokedexNumber(
-                                                            item._id
+                                                            item.id
                                                         )}
                                                     </span>
                                                     <Button
@@ -245,7 +245,7 @@ const Compare: React.FC = () => {
                                                                 selectedIds.filter(
                                                                     (id) =>
                                                                         id !==
-                                                                        item._id
+                                                                        item.id
                                                                 )
                                                             )
                                                         }
@@ -286,10 +286,7 @@ const Compare: React.FC = () => {
                                         Types
                                     </th>
                                     {selected.map((item) => (
-                                        <td
-                                            key={item._id}
-                                            className={valueCell}
-                                        >
+                                        <td key={item.id} className={valueCell}>
                                             <div className="flex flex-wrap gap-1.5">
                                                 {item.types.map((type) => (
                                                     <span
@@ -313,10 +310,7 @@ const Compare: React.FC = () => {
                                         Generation
                                     </th>
                                     {selected.map((item) => (
-                                        <td
-                                            key={item._id}
-                                            className={valueCell}
-                                        >
+                                        <td key={item.id} className={valueCell}>
                                             {getGeneration(item.generationId)
                                                 ?.region ?? "—"}
                                         </td>
@@ -334,7 +328,7 @@ const Compare: React.FC = () => {
                                             </th>
                                             {values.map((value, index) => (
                                                 <td
-                                                    key={selected[index]._id}
+                                                    key={selected[index].id}
                                                     className={valueCell}
                                                 >
                                                     <span
@@ -377,7 +371,7 @@ const Compare: React.FC = () => {
                                     </th>
                                     {totalRow.map((value, index) => (
                                         <td
-                                            key={selected[index]._id}
+                                            key={selected[index].id}
                                             className={`${valueCell} font-mono font-bold ${
                                                 bestPositions(totalRow).has(
                                                     index
@@ -395,10 +389,7 @@ const Compare: React.FC = () => {
                                         Height
                                     </th>
                                     {selected.map((item, index) => (
-                                        <td
-                                            key={item._id}
-                                            className={valueCell}
-                                        >
+                                        <td key={item.id} className={valueCell}>
                                             {infoCell(index, (info) =>
                                                 formatHeight(info.height)
                                             )}
@@ -410,10 +401,7 @@ const Compare: React.FC = () => {
                                         Weight
                                     </th>
                                     {selected.map((item, index) => (
-                                        <td
-                                            key={item._id}
-                                            className={valueCell}
-                                        >
+                                        <td key={item.id} className={valueCell}>
                                             {infoCell(index, (info) =>
                                                 formatWeight(info.weight)
                                             )}
@@ -425,10 +413,7 @@ const Compare: React.FC = () => {
                                         Abilities
                                     </th>
                                     {selected.map((item, index) => (
-                                        <td
-                                            key={item._id}
-                                            className={valueCell}
-                                        >
+                                        <td key={item.id} className={valueCell}>
                                             {infoCell(index, (info) => (
                                                 <ul className="flex flex-col gap-1">
                                                     {info.abilities.map(

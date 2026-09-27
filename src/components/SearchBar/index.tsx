@@ -266,7 +266,7 @@ const SearchBar = ({
                                             filterSuggestions.length + i;
                                         return (
                                             <div
-                                                key={item._id}
+                                                key={item.id}
                                                 id={optionId(index)}
                                                 role="option"
                                                 aria-selected={
@@ -294,7 +294,7 @@ const SearchBar = ({
                                                 </span>
                                                 <span className="w-11 font-mono text-xs text-subtle">
                                                     {formatPokedexNumber(
-                                                        item._id
+                                                        item.id
                                                     )}
                                                 </span>
                                                 <span className="grow truncate font-semibold capitalize">

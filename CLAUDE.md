@@ -73,7 +73,7 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 
 ## Gotchas
 
-- **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `_id`. See `.claude/rules/utils.md`.
+- **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `id`. See `.claude/rules/utils.md`.
 - **`Icons` vs `icons` casing**: The directory on disk is `src/components/Icons/`, but git tracks `src/components/icons/`. Imports use `@components/Icons/...`, which resolves on case-insensitive file systems (macOS) but fails on case-sensitive OS/CI environments (Linux).
 - **`api/` server**: a small Express server (its own `package.json`; run `npm install` inside `api/`) that only hosts the optional PokeAPI proxy, no database. `api/` is tracked normally (only `/api/.cache` is gitignored, plus the generic `.env` and `node_modules` rules) and is linted and formatted by the root Biome. The old MongoDB routes and the `/teams` page were removed.
 

@@ -68,14 +68,14 @@ const Pokemon: React.FC = () => {
     // the pokedex loader already attaches each pokemon's evolutions
     const pokedexList = useLoaderData() as PokemonDetails[];
     const pokemon = pokedexList.find((item) => item.name === pokemonName);
-    const id = pokemon?._id ?? 0;
+    const id = pokemon?.id ?? 0;
 
     // neighbours in national dex order (alternate forms share their base
     // form's position)
     const { prev, next } = useMemo(() => {
         const ordered = pokedexList
             .filter((item) => item.isDefault)
-            .sort((a, b) => a._id - b._id);
+            .sort((a, b) => a.id - b.id);
         const index = ordered.findIndex(
             (item) => item.speciesId === pokemon?.speciesId
         );
@@ -216,7 +216,7 @@ const Pokemon: React.FC = () => {
                     />
                     <Button
                         onPress={() =>
-                            navigate(`/compare?ids=${pokemon._id}`, {
+                            navigate(`/compare?ids=${pokemon.id}`, {
                                 state: { previous },
                             })
                         }
