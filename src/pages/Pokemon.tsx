@@ -85,9 +85,12 @@ const Pokemon: React.FC = () => {
         };
     }, [pokedexList, pokemon?.speciesId]);
 
-    const goTo = (target: PokemonDetails | undefined) => {
+    // `replace` keeps a held arrow key from pushing one history entry per
+    // repeat, which would leave browser Back walking through every stop
+    const goTo = (target: PokemonDetails | undefined, replace = false) => {
         if (target) {
             navigate(`/pokedex/${target.name}`, {
+                replace,
                 state: { pokemon: target, previous },
             });
         }
@@ -106,9 +109,9 @@ const Pokemon: React.FC = () => {
                 return;
             }
             if (event.key === "ArrowLeft") {
-                goTo(prev);
+                goTo(prev, event.repeat);
             } else if (event.key === "ArrowRight") {
-                goTo(next);
+                goTo(next, event.repeat);
             }
         };
         window.addEventListener("keydown", onKeyDown);
