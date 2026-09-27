@@ -25,7 +25,7 @@ const SpriteToggle = ({
             const [id] = Array.from(keys);
             onChange(id as SpriteView);
         }}
-        className="absolute top-2.5 right-2.5 z-10 flex gap-0.5 rounded-xl bg-track p-[3px]"
+        className="absolute right-2.5 bottom-2.5 z-10 flex gap-0.5 rounded-xl bg-track p-[3px]"
     >
         {OPTIONS.map(({ id, label }) => (
             <ToggleButton
