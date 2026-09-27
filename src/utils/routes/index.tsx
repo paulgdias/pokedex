@@ -4,9 +4,9 @@ import type { RouteObject } from "react-router";
 
 import LoadingSpinner from "@components/LoadingSpinner";
 
-import Home from "../pages/Home";
-import Layout from "../pages/Layout";
-import { pokedexLoader } from "./pokedexLoader";
+import Home from "../../pages/Home";
+import Layout from "../../pages/Layout";
+import { pokedexLoader } from "../pokedexLoader";
 
 type PageModule = { default: React.ComponentType };
 
@@ -29,12 +29,13 @@ const dataRoute = (
     HydrateFallback: LoadingSpinner,
 });
 
-export const createAppRouter = (queryClient: QueryClient) => {
+/** The app's routes, apart from the router that runs them. */
+export const createAppRoutes = (queryClient: QueryClient): RouteObject[] => {
     const pokedexError =
         "There was an error loading the Pokédex. Please try again.";
     const loader = pokedexLoader(queryClient);
 
-    return createBrowserRouter([
+    return [
         {
             path: "/",
             element: <Layout />,
@@ -48,28 +49,29 @@ export const createAppRouter = (queryClient: QueryClient) => {
                 dataRoute(
                     "pokedex",
                     "/pokedex",
-                    () => import("../pages/Pokedex"),
+                    () => import("../../pages/Pokedex"),
                     loader,
                     pokedexError
                 ),
                 dataRoute(
                     "pokemon",
                     "/pokedex/:pokemon",
-                    () => import("../pages/Pokemon"),
+                    () => import("../../pages/Pokemon"),
                     loader,
                     pokedexError
                 ),
                 dataRoute(
                     "compare",
                     "/compare",
-                    () => import("../pages/Compare"),
+                    () => import("../../pages/Compare"),
                     loader,
                     pokedexError
                 ),
                 {
                     path: "/types",
                     lazy: async () => ({
-                        Component: (await import("../pages/TypeChart")).default,
+                        Component: (await import("../../pages/TypeChart"))
+                            .default,
                     }),
                     HydrateFallback: LoadingSpinner,
                 },
@@ -77,7 +79,7 @@ export const createAppRouter = (queryClient: QueryClient) => {
                     id: "teams",
                     path: "/teams",
                     lazy: async () => {
-                        const page = await import("../pages/Teams");
+                        const page = await import("../../pages/Teams");
                         return {
                             Component: page.default,
                             loader: page.loader(queryClient),
@@ -92,5 +94,8 @@ export const createAppRouter = (queryClient: QueryClient) => {
                 },
             ],
         },
-    ]);
+    ];
 };
+
+export const createAppRouter = (queryClient: QueryClient) =>
+    createBrowserRouter(createAppRoutes(queryClient));

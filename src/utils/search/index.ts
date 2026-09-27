@@ -1,6 +1,6 @@
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
 
-import { GENERATIONS, Generation } from "./generations";
+import { GENERATIONS, Generation } from "../generations";
 
 export type PokemonType = keyof typeof typeColors;
 export type Category = "legendary" | "mythical";

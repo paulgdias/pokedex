@@ -5,7 +5,7 @@ import {
     PokemonInfoResult,
 } from "@customTypes/PokemonTypes";
 
-import { formatEvolutionMethod, getPokemonForm } from "./evolution";
+import { formatEvolutionMethod, getPokemonForm } from "../evolution";
 
 const STAT_COUNT = 6;
 
