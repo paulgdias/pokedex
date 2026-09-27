@@ -5,24 +5,24 @@ paths:
 
 # Utils
 
-Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...`. Everything is a named export. Files are pure functions/constants, except `useNavigateToPokemon.ts` (a hook) and `routes.tsx` (router factory).
+Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...` (each util is a folder, `name/index.ts(x)` with `name/name.test.ts(x)` beside it; import paths are unchanged). Everything is a named export. Files are pure functions/constants, except `useNavigateToPokemon.ts` (a hook) and `routes.tsx` (router factory).
 
 ## Files
 
 | File | Exports |
 |---|---|
-| `pokedexLoader.ts` | `pokedexLoader(queryClient)`: the loader shared by `/pokedex`, `/pokedex/:pokemon` and `/compare` (dex from the query cache -> `PokemonDetails[]` with evolutions). Kept out of the lazy pages so it starts immediately. |
-| `routes.tsx` | `createAppRouter(queryClient)`. `dataRoute()` takes a page import (`() => import(...)`, used as the route's `lazy`) plus loader, `errorElement`, `HydrateFallback`; Home and Layout are in the entry chunk. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
-| `generations.ts` | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type. |
-| `pokemon.ts` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `_id`). |
-| `evolution.ts` | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages). |
-| `search.ts` | Filters: `PokedexFilters`, `EMPTY_FILTERS`, `POKEMON_TYPES`, `CATEGORIES`, `getFiltersFromURLParams`, `withFilters`, `matchesText`, `applyFilters`. Suggestions: `getFilterSuggestions`, `getPokemonSuggestions`. Formatting: `capitalize`, `formatPokedexNumber` (formats to `#0001`). |
-| `sort.ts` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`, `getSortLabel`. |
-| `stats.ts` | `STAT_LABELS`, `MAX_STAT`, `TYPE_ORDER`; formatters (`formatName`, `formatFlavorText`, `formatHeight`, `formatWeight`, `getFemaleShare`); `getTypeMatchups` (a defender's damage taken, dual types multiplied) `getOffense` (what an attacker hits) and `describeMatchup` (one-line "Fire → Grass: 2× (super effective)"), both from the `TypeEfficacy` map. |
-| `view.ts` | `PokedexView` (`cards` / `list`), `getViewFromURLParams`, `withView` (URL param `view`). |
-| `idbStorage.ts` | `idbStorage` (async `getItem` / `setItem` / `removeItem` on IndexedDB, failures swallowed; the React Query persister's storage) and `removeLegacyLocalStorageCache`. |
-| `useTheme.ts` | `useTheme` (preference `light` / `dark` / `system`, resolved theme, setter) and `initTheme` (call once at startup; follows OS changes while on `system`). |
-| `useNavigateToPokemon.ts` | Custom hook returning `(event, pokemon) => void`. Navigates to `/pokedex/:pokemonName` with `{ pokemon, previous }` router state (`PokemonLocationState`) so back navigation preserves previous filters and scroll. |
+| `pokedexLoader/` | `pokedexLoader(queryClient)`: the loader shared by `/pokedex`, `/pokedex/:pokemon` and `/compare` (dex from the query cache -> `PokemonDetails[]` with evolutions). Kept out of the lazy pages so it starts immediately. |
+| `routes/` | `createAppRouter(queryClient)`. `dataRoute()` takes a page import (`() => import(...)`, used as the route's `lazy`) plus loader, `errorElement`, `HydrateFallback`; Home and Layout are in the entry chunk. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
+| `generations/` | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type. |
+| `pokemon/` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `_id`). |
+| `evolution/` | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages). |
+| `search/` | Filters: `PokedexFilters`, `EMPTY_FILTERS`, `POKEMON_TYPES`, `CATEGORIES`, `getFiltersFromURLParams`, `withFilters`, `matchesText`, `applyFilters`. Suggestions: `getFilterSuggestions`, `getPokemonSuggestions`. Formatting: `capitalize`, `formatPokedexNumber` (formats to `#0001`). |
+| `sort/` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`, `getSortLabel`. |
+| `stats/` | `STAT_LABELS`, `MAX_STAT`, `TYPE_ORDER`; formatters (`formatName`, `formatFlavorText`, `formatHeight`, `formatWeight`, `getFemaleShare`); `getTypeMatchups` (a defender's damage taken, dual types multiplied) `getOffense` (what an attacker hits) and `describeMatchup` (one-line "Fire → Grass: 2× (super effective)"), both from the `TypeEfficacy` map. |
+| `view/` | `PokedexView` (`cards` / `list`), `getViewFromURLParams`, `withView` (URL param `view`). |
+| `idbStorage/` | `idbStorage` (async `getItem` / `setItem` / `removeItem` on IndexedDB, failures swallowed; the React Query persister's storage) and `removeLegacyLocalStorageCache`. |
+| `useTheme/` | `useTheme` (preference `light` / `dark` / `system`, resolved theme, setter) and `initTheme` (call once at startup; follows OS changes while on `system`). |
+| `useNavigateToPokemon/` | Custom hook returning `(event, pokemon) => void`. Navigates to `/pokedex/:pokemonName` with `{ pokemon, previous }` router state (`PokemonLocationState`) so back navigation preserves previous filters and scroll. |
 
 ## Semantics that are easy to get wrong
 

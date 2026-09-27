@@ -12,7 +12,8 @@ Path-scoped rules (loaded only when working on matching files): [`.claude/rules/
 - `npm run biome:lint` / `npm run biome:lint:fix`: Biome linter over `src`.
 - `npm run biome:format`: Biome formatter over `src`. Style: 4 spaces, double quotes, semicolons, width 80, ES5 trailing commas.
 - `npm run biome:check:fix`: Biome linter, formatter, and organize-imports with safe auto-fixes over `src`.
-- There are no automated tests. Verify changes with `npm run biome:lint`, `npm run type-check`, and `npm run build`.
+- `npm test`: `vitest run` (all tests plus every story as a test). `npm run test:coverage`: same with v8 coverage over `src/components` and `src/utils`, failing under 90% for statements, branches, functions and lines. `npm run storybook`: Storybook on port 6006, with `@storybook/addon-docs` used only as the MDX engine (no autodocs): each component has a hand-written `Name.mdx` docs page beside it, and the intro page is `.storybook/Introduction.mdx`.
+- Verify changes with `npm run biome:lint`, `npm run type-check`, `npm run build` and `npm run test:coverage`.
 
 ## Stack
 
@@ -22,7 +23,7 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 
 ## Path aliases
 
-`@api`, `@components`, `@styles`, `@customTypes` (-> `src/types`), `@utils`. They are declared in **both** `tsconfig.json` and `rspack.config.ts`; add new ones to both.
+`@api`, `@components`, `@styles`, `@customTypes` (-> `src/types`), `@utils`. They are declared in `tsconfig.json`, `rspack.config.ts` **and** `vitest.config.mts` (Storybook reuses the Vitest config's aliases in `.storybook/main.ts`); add new ones to all of them.
 
 ## Data flow
 
@@ -35,7 +36,7 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 - Sprite preconnections: `Pokedex.tsx` and `Pokemon.tsx` preconnect to `https://beta.pokeapi.co` and `https://raw.githubusercontent.com/`.
 - The dex query also carries base stats (`stats`, six numbers plus `statTotal` on `PokemonDetails`), evolution methods (`specs.evolution_methods`), `is_default` and the species id. `src/utils/evolution.ts` turns the evolution data into the lanes `EvolutionChain` renders. Changing the dex query shape requires bumping the `queryKey` (currently `["pokedex", "v5"]`) so the persisted cache is not reused. The dex JSON is ~960 KB. The React Query cache is persisted to IndexedDB (`src/utils/idbStorage.ts`, database `pokedex-cache`) rather than localStorage, so there is no ~5 MB quota; the old localStorage key is removed at startup. It includes the in-game (pixel) sprite URL (`inGameSprite`), so the detail page needs no extra request for it.
 - Heavier per-pokémon data is fetched lazily on the detail page with `queryOptions` factories in `src/api/pokedex.ts`: `pokemonInfoQueryOptions` (size, abilities, entries, cry, species facts), and `typeEfficacyQueryOptions` (the 18×18 type chart, fetched once and shared by the matchups section and `/types`). The detail page debounces `pokemonInfoQueryOptions` (300 ms, `Pokemon.tsx`) so skimming with ←/→ does not send a request per stop (PokeAPI answers 429 Too Many Requests when hammered). Keep large datasets (moves, encounters) lazy.
-- Theme: `data-theme="light|dark"` on `<html>`, set before first paint by an inline script in `public/index.html` and managed by `src/utils/useTheme.ts` (choice stored in localStorage under `theme`). Dark colours are token overrides in `src/styles/index.css`; the sidebar tokens are the same in both themes. Use tokens (`bg-surface`, `text-ink`, `shadow-hover` ...), not hex values.
+- Theme: `data-theme="light|dark"` on `<html>`, set before first paint by an inline script in `public/index.html` and managed by `src/utils/useTheme.ts` (choice stored in localStorage under `theme`). Dark colors are token overrides in `src/styles/index.css`; the sidebar tokens are the same in both themes. Use tokens (`bg-surface`, `text-ink`, `shadow-hover` ...), not hex values.
 
 ## URL is the source of truth for Pokedex state
 
@@ -58,6 +59,17 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 - Types live in `src/types/` (PascalCase files, imported via `@customTypes/...`).
 - Pages (`src/pages`) default-export the component (they are lazy-loaded, so keep them default exports). Loaders for routes that share the dex live in `src/utils/pokedexLoader.ts`; a page-specific loader (Teams) is exported from the page and returned by its `lazy` function.
 
+## Testing
+
+- Vitest 4 in real Chromium (Playwright, headless): `react-virtualized` and axe color contrast need real layout. `vitest.config.mts` has two projects: `unit` (`*.test.ts(x)`, `vitest-browser-react`) and `storybook` (every `*.stories.tsx`, run through `@storybook/addon-vitest`). Rspack is untouched; Vite is only for tests and Storybook.
+- Layout: every component and util is a folder. `Nav/index.tsx` + `Nav/Nav.test.tsx` + `Nav/Nav.stories.tsx`; `utils/sort/index.ts` + `utils/sort/sort.test.ts`. Import paths do not change (`@components/Nav`, `@utils/sort`). `src/components/__tests__/structure.test.ts` fails if a component or util lacks a test file, a component lacks stories, or a story lacks a `play` function that asserts.
+- Every story runs its `play` function (interaction test) and an axe check (`@storybook/addon-a11y`). `.storybook/vitest.setup.ts` fails a story whose axe score (passes / (passes + violations)) is under 50%; `.storybook/a11yReporter.ts` prints every story's score after the run, labelled by project.
+- Every story runs in both themes: `vitest.config.mts` has `storybook-light` and `storybook-dark` projects that differ only by `VITE_STORYBOOK_THEME`, which `.storybook/preview.tsx` turns into the `theme` global; a global decorator writes it to `data-theme` on `<html>`. In the Storybook UI the toolbar Theme menu switches it.
+- Shared fixtures live in `src/components/__fixtures__/` (`makePokemon`, `DEX`, evolution lines, `TestRouter` memory router with a `LocationProbe` for asserting navigation). Sprites are inline SVG data URIs, so nothing touches the network.
+- Dependencies are pre-bundled in `optimizeDeps.include` (`vitest.config.mts`). A dependency first seen mid-run makes Vite re-optimize and reload, which can duplicate React; add new runtime imports there if you see "Vite unexpectedly reloaded a test".
+- Failure screenshots go to `__screenshots__/` (gitignored).
+- E2E: `npm run e2e` (Playwright Test, Chromium, `e2e/*.spec.ts`; Vitest ignores `e2e/`). `playwright.config.ts` starts `npm run dev` on :3000, or reuses a server already running there. `e2e/mocks.ts` (`mockPokeApi`) answers the three GraphQL operations (`getPokedex`, `getPokemonInfo`, `getTypeEfficacy`) from a 22-pokémon dex and stubs sprites, so PokeAPI is never contacted. Each test has its own browser context, so the IndexedDB cache starts empty. Specs cover browse → detail → back, search/filter/sort, card ↔ list view, compare, the type chart and the detail page. The URL is percent-encoded (`sort=name%3Adesc`), so match `(:|%3A)` in URL regexes. The detail page's ←/→ handler re-registers after each render: wait for the adjacent-Pokémon buttons between key presses.
+
 ## Gotchas
 
 - **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `_id`. See `.claude/rules/utils.md`.
@@ -66,5 +78,5 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 
 ## Working agreements
 
-- Run `npm run biome:lint`, `npm run type-check`, and `npm run build` before calling work done.
+- Run `npm run biome:lint`, `npm run type-check`, `npm run build`, and `npm run test:coverage` before calling work done.
 - Don't push unless asked.
