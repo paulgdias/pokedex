@@ -38,7 +38,7 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 ## Styling
 
 - Tailwind utilities inline; `twMerge` so callers can override via `className`.
-- Shared class strings: `src/styles/Pokedex.ts`, `src/styles/Carousel.ts`.
+- Shared class strings: `src/styles/Pokedex.ts`.
 - Tokens (in `src/styles/index.css` `@theme`): `paper`, `surface`, `sand`, `track`, `chip`, `chip-hover`, `wash`, `ink`, `muted`, `subtle`, `line`, `line-strong`, `accent`, `accent-strong`, `sidebar-*`, and one color per Pokémon type (`bg-fire`, ...). Fonts: `font-display`, `font-sans`, `font-mono`.
 - `typeColors` in `@customTypes/PokemonTypes` maps type name -> `bg-*` class and is also the source of the type list (`POKEMON_TYPES`). Adding a type color requires both the map entry and the `@theme` token in `src/styles/index.css`.
 - Focus: the global `:focus-visible` outline (accent, `src/styles/index.css`) is drawn outside the element, so inside scroll containers (`Nav` generation list, virtualized grid) it is clipped or overlaps neighbours. Nav rows use `focus-visible:-outline-offset-2`; cards draw a 2px `::after` border instead (see `cardClass`).
@@ -48,7 +48,7 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 
 - Route loading: `LoadingSpinner` via `HydrateFallback`. The loader awaits data, so `PlaceholderCard` / `isLoading` in `PokemonList` are currently not hit during initial route hydration on the Pokedex page.
 - Empty results: inline `EmptyState` in `src/pages/Pokedex.tsx`.
-- Errors: `ErrorBoundary` in `Layout` (around the outlet) and around the list in `Pokedex` and `Teams`. Toasts via `sonner`.
+- Errors: `ErrorBoundary` in `Layout` (around the outlet) and around the list in `Pokedex`. Toasts via `sonner`.
 
 ## Adding a component
 

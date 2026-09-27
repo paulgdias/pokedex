@@ -1,24 +1,17 @@
-# Pokedex API (legacy)
+# Pokedex API
 
-A small Express 5 server. It has two jobs: the legacy MongoDB routes behind the hidden `/teams` page (`http://localhost:3001/api/v1/pokemon/teams`), and an optional local caching proxy for PokeAPI (below). The Pokédex reads from PokeAPI directly unless it is started with `npm run dev:proxy`.
+A small Express 5 server that hosts an optional local caching proxy for PokeAPI (below). There is no database. The Pokédex reads from PokeAPI directly unless it is started with `npm run dev:proxy`.
 
 ## Setup
 
-Requires Node.js 18 or higher and access to the MongoDB cluster.
+Requires Node.js 18 or higher.
 
 ```bash
 cd api
 npm install
 ```
 
-Create `api/.env` (gitignored):
-
-```
-PORT=3001            # optional, defaults to 3001
-MONGODB_USERNAME=...
-MONGODB_PASSWORD=...
-MONGODB_DB=...
-```
+Set `PORT` in the environment to change the port (defaults to 3001).
 
 ## Scripts
 
@@ -27,23 +20,9 @@ MONGODB_DB=...
 
 Linting and formatting come from the root Biome config (`npm run biome:lint` / `biome:format` in the repo root cover `api/src`).
 
-## Endpoints
-
-All routes are `GET` and prefixed with `/api/v1/pokemon`:
-
-| Route | Description |
-|---|---|
-| `/all` | all Pokémon |
-| `/search=:search` | search by text |
-| `/id/:id` | by id |
-| `/name/:name` | by name |
-| `/type/:type` | by type |
-| `/gen/:number` | by generation |
-| `/teams` | teams |
-
 ## PokeAPI proxy
 
-Mounted at `/pokeapi` (no MongoDB credentials needed). It avoids PokeAPI's rate limits and gives sprites and cries a long cache lifetime.
+Mounted at `/pokeapi`. It avoids PokeAPI's rate limits and gives sprites and cries a long cache lifetime.
 
 | Route | Description |
 |---|---|

@@ -36,7 +36,7 @@ afterEach(async () => {
 });
 
 describe("Nav links", () => {
-    it("offers Home, Pokédex, Compare and Type chart (not Teams)", async () => {
+    it("offers Home, Pokédex, Compare and Type chart", async () => {
         const screen = await setup("/types");
         const names = screen
             .getByRole("navigation", { name: "Primary" })
@@ -245,8 +245,8 @@ describe("Nav generations", () => {
 
     it("counts pokémon per generation from the loader data", async () => {
         const dex = [
-            makePokemon({ _id: 1, generationId: 4 }),
-            makePokemon({ _id: 2, name: "b", generationId: 4 }),
+            makePokemon({ id: 1, generationId: 4 }),
+            makePokemon({ id: 2, name: "b", generationId: 4 }),
         ];
         const screen = await setup("/pokedex", { dex });
         await expect.element(link(screen, /Sinnoh/)).toHaveTextContent("2");

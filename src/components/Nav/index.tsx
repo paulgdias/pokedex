@@ -6,7 +6,7 @@ import {
     useSearchParams,
 } from "react-router";
 
-import { FolderHeart, Grid3x3, House, LibraryBig, Scale } from "lucide-react";
+import { Grid3x3, House, LibraryBig, Scale } from "lucide-react";
 
 import Pokeball from "@components/Icons/Pokeball";
 import ThemeToggle from "@components/ThemeToggle";
@@ -17,13 +17,11 @@ import { GENERATIONS, countByGeneration } from "@utils/generations";
 import { getFiltersFromURLParams, withFilters } from "@utils/search";
 
 const NAV_ITEMS = [
-    { to: "/", label: "Home", Icon: House, hidden: false },
-    { to: "/pokedex", label: "Pokédex", Icon: LibraryBig, hidden: false },
-    { to: "/compare", label: "Compare", Icon: Scale, hidden: false },
-    { to: "/types", label: "Type chart", Icon: Grid3x3, hidden: false },
-    // hidden since it requires the mongodb API
-    { to: "/teams", label: "Teams", Icon: FolderHeart, hidden: true },
-].filter(({ hidden }) => !hidden);
+    { to: "/", label: "Home", Icon: House },
+    { to: "/pokedex", label: "Pokédex", Icon: LibraryBig },
+    { to: "/compare", label: "Compare", Icon: Scale },
+    { to: "/types", label: "Type chart", Icon: Grid3x3 },
+];
 
 // focus outline is drawn inside: outside it is clipped by the scrolling list
 // and overlaps neighbouring rows

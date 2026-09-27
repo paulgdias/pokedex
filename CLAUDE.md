@@ -58,7 +58,7 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 - React 19: `ref` is a plain prop, no `forwardRef`.
 - Tailwind classes inline, `twMerge` so a `className` prop can override. Shared class strings are in `src/styles/*.ts`.
 - Types live in `src/types/` (PascalCase files, imported via `@customTypes/...`).
-- Pages (`src/pages`) default-export the component (they are lazy-loaded, so keep them default exports). Loaders for routes that share the dex live in `src/utils/pokedexLoader.ts`; a page-specific loader (Teams) is exported from the page and returned by its `lazy` function.
+- Pages (`src/pages`) default-export the component (they are lazy-loaded, so keep them default exports). Loaders for routes that share the dex live in `src/utils/pokedexLoader.ts`.
 
 ## Testing
 
@@ -75,7 +75,7 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 
 - **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `_id`. See `.claude/rules/utils.md`.
 - **`Icons` vs `icons` casing**: The directory on disk is `src/components/Icons/`, but git tracks `src/components/icons/`. Imports use `@components/Icons/...`, which resolves on case-insensitive file systems (macOS) but fails on case-sensitive OS/CI environments (Linux).
-- **`api/` server**: a small Express + MongoDB server (its own `package.json`; run `npm install` inside `api/`) that serves the hidden `/teams` page and hosts the optional PokeAPI proxy. The Mongo routes need `api/.env`; the proxy does not. `api/` is tracked normally (only `/api/.cache` is gitignored, plus the generic `.env` and `node_modules` rules) and is linted and formatted by the root Biome. The `/teams` route exists in `src/utils/routes.tsx` but is hidden in `Nav.tsx` because it requires the server on `http://localhost:3001`.
+- **`api/` server**: a small Express server (its own `package.json`; run `npm install` inside `api/`) that only hosts the optional PokeAPI proxy, no database. `api/` is tracked normally (only `/api/.cache` is gitignored, plus the generic `.env` and `node_modules` rules) and is linted and formatted by the root Biome. The old MongoDB routes and the `/teams` page were removed.
 
 ## Working agreements
 

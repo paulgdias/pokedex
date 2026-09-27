@@ -62,7 +62,6 @@ describe("createAppRouter", () => {
             "/pokedex/:pokemon",
             "/compare",
             "/types",
-            "/teams",
         ]);
     });
 
@@ -80,7 +79,6 @@ describe("createAppRouter", () => {
         expect(child(children, "/pokedex").id).toBe("pokedex");
         expect(child(children, "/pokedex/:pokemon").id).toBe("pokemon");
         expect(child(children, "/compare").id).toBe("compare");
-        expect(child(children, "/teams").id).toBe("teams");
     });
 
     it("shares one loader between the dex routes", () => {
@@ -136,20 +134,5 @@ describe("createAppRouter", () => {
             expect(lazy).toBeTypeOf("function");
             expect((await lazy()).Component).toBeTruthy();
         }
-    });
-
-    it("loads the Teams page and its own loader lazily", async () => {
-        const { router, children } = routes();
-        disposable = router;
-        const teams = child(children, "/teams");
-        const loaded = await (
-            teams.lazy as () => Promise<{
-                Component: unknown;
-                loader: unknown;
-            }>
-        )();
-        expect(loaded.Component).toBeTruthy();
-        expect(loaded.loader).toBeTypeOf("function");
-        expect(teams.errorElement).toBeTruthy();
     });
 });

@@ -44,10 +44,6 @@ export const MarksTheCurrentPage: Story = {
             await expect(link).not.toHaveAttribute("aria-current");
             await expect(link).toHaveAttribute("href", "/compare");
         }
-        // Teams needs the Express server, so it is not offered
-        await expect(
-            canvas.queryByRole("link", { name: "Teams", hidden: true })
-        ).toBeNull();
     },
 };
 

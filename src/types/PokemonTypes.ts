@@ -88,14 +88,6 @@ export type Pokemon = {
     evolutions?: Pokemon[];
 };
 
-export type TeamsResult = Team[];
-export type Team = {
-    _id: string;
-    pokemon: PokemonDetails[];
-    name: string;
-    createdAt: string;
-    updatedAt: string;
-};
 export type PokemonDetails = {
     _id: number;
     name: string;

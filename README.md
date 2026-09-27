@@ -38,15 +38,15 @@ There is no automated test suite yet.
 src/
   api/          PokeAPI GraphQL query (pokedex.ts)
   components/   UI components (Nav, PokemonCard, PokemonList, SearchBar, ...)
-  pages/        Route components: Home, Pokedex, Pokemon, Teams, Layout
+  pages/        Route components: Home, Pokedex, Pokemon, Layout
   styles/       Tailwind theme (index.css) and shared class strings
   types/        TypeScript types
   utils/        Routing, search, filter, sort and data helpers
-api/            Legacy Express + MongoDB server (see api/README.md)
+api/            Optional local PokeAPI caching proxy (see api/README.md)
 ```
 
 Contributor and AI-agent notes live in [`CLAUDE.md`](CLAUDE.md), with more detail in path-scoped rules at `.claude/rules/components.md` and `.claude/rules/utils.md`.
 
 ## The `api/` server
 
-The Pokédex no longer uses it. It only backs the hidden `/teams` page, which expects it running on `http://localhost:3001`.
+An optional Express server that caches PokeAPI responses and sprites. Run it with `npm run api` and use it with `npm run dev:proxy`; see [`api/README.md`](api/README.md).

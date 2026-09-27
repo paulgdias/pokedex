@@ -75,23 +75,6 @@ export const createAppRoutes = (queryClient: QueryClient): RouteObject[] => {
                     }),
                     HydrateFallback: LoadingSpinner,
                 },
-                {
-                    id: "teams",
-                    path: "/teams",
-                    lazy: async () => {
-                        const page = await import("../../pages/Teams");
-                        return {
-                            Component: page.default,
-                            loader: page.loader(queryClient),
-                        };
-                    },
-                    errorElement: (
-                        <div>
-                            There was an error loading teams. Please try again.
-                        </div>
-                    ),
-                    HydrateFallback: LoadingSpinner,
-                },
             ],
         },
     ];
