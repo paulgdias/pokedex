@@ -10,7 +10,23 @@ import {
 
 import { convertToPokemonInfo } from "@utils/pokemon";
 
-const POKEAPI_URL = "https://beta.pokeapi.co/graphql/v1beta";
+// set by DefinePlugin in rspack.config.ts (POKEAPI_PROXY=1); Vitest, Storybook
+// and e2e do not define it and keep talking to (or mocking) PokeAPI itself
+declare const __POKEAPI_PROXY__: boolean | undefined;
+
+export const POKEAPI_SOURCE =
+    typeof __POKEAPI_PROXY__ !== "undefined" && __POKEAPI_PROXY__
+        ? "proxy"
+        : "upstream";
+
+const POKEAPI_URL =
+    POKEAPI_SOURCE === "proxy"
+        ? "/pokeapi/graphql"
+        : "https://beta.pokeapi.co/graphql/v1beta";
+
+// proxied responses carry same-origin sprite and cry URLs, so the persisted
+// cache is keyed per source; upstream keeps its original keys
+const sourceKey = POKEAPI_SOURCE === "proxy" ? ["proxy"] : [];
 
 const pokedexQuery = gql`
     query getPokedex {
@@ -66,7 +82,7 @@ const pokedexQuery = gql`
 `;
 
 export const pokedexQueryOptions = queryOptions({
-    queryKey: ["pokedex", "v5"],
+    queryKey: ["pokedex", "v5", ...sourceKey],
     queryFn: () => request<PokedexResult>(POKEAPI_URL, pokedexQuery),
 });
 
@@ -134,7 +150,7 @@ const infoQuery = gql`
 /** Abilities, size, species facts, entries and the cry of one pokemon. */
 export const pokemonInfoQueryOptions = (id: number) =>
     queryOptions({
-        queryKey: ["pokemon-info", id],
+        queryKey: ["pokemon-info", id, ...sourceKey],
         queryFn: async () => {
             const result = await request<PokemonInfoResult>(
                 POKEAPI_URL,

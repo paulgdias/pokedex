@@ -10,6 +10,8 @@
     "dev": "rspack --mode=development serve",
     "build": "rspack --mode=production build",
     "start": "rspack --mode=production serve",
+    "dev:proxy": "POKEAPI_PROXY=1 rspack --mode=development serve",
+    "api": "npm --prefix api start",
     "biome:lint": "biome lint --verbose src api/src",
     "biome:lint:fix": "biome lint --write --verbose src api/src",
     "biome:format": "biome format --write --verbose src api/src",

@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { DefinePlugin } = require("@rspack/core");
 const { TsCheckerRspackPlugin } = require("ts-checker-rspack-plugin");
 
 const plugins = [
@@ -8,6 +9,10 @@ const plugins = [
         favicon: "./public/favicon.svg",
     }),
     new TsCheckerRspackPlugin(),
+    // POKEAPI_PROXY=1 sends PokeAPI requests through the local api/ server
+    new DefinePlugin({
+        __POKEAPI_PROXY__: JSON.stringify(Boolean(process.env.POKEAPI_PROXY)),
+    }),
 ];
 
 // filenames carry a content hash, so they can be cached for a year; the HTML
@@ -95,6 +100,8 @@ module.exports = (_env: unknown, argv: { mode?: string }) => ({
         },
         liveReload: true,
         compress: true,
+        // api/ (npm run api) caches PokeAPI responses and sprites
+        proxy: [{ context: ["/pokeapi"], target: "http://localhost:3001" }],
         // dev keeps the default (no headers) so HMR is unaffected
         ...(argv.mode === "production" && { headers: cacheHeaders }),
     },

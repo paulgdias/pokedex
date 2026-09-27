@@ -4,6 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const path = require("path");
 const { MongoClient } = require("mongodb");
+const pokeapiProxy = require("./pokeapiProxy");
 
 class PokedexServer {
     constructor() {
@@ -18,6 +19,8 @@ class PokedexServer {
         this.app.use(helmet());
         this.app.use(express.json());
         this.app.use(express.static(path.join(__dirname, "../public")));
+
+        this.app.use("/pokeapi", pokeapiProxy);
 
         this.setupRoutes();
     }

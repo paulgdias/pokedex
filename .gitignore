@@ -1,5 +1,5 @@
 node_modules
-/api
+/api/.cache
 dist
 .DS_Store
 .vscode
