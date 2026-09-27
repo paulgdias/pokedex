@@ -4,3 +4,9 @@ dist
 .DS_Store
 .vscode
 .env
+coverage
+storybook-static
+__screenshots__
+.vitest-attachments
+test-results
+playwright-report

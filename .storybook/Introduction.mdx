@@ -1,0 +1,22 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Pokedex components
+
+Every component under `src/components` is a folder with `index.tsx`, a test
+file, a stories file and a `Name.mdx`. The MDX file is the component's **Docs**
+page: what it is for, how it behaves, its props and its stories. It is written
+by hand; nothing is generated.
+
+- **Stories** are interaction tests: each has a `play` function that asserts,
+  and runs in `npm test` alongside an axe accessibility check.
+- **Accessibility** panel lists every axe violation for the story on screen.
+  A story fails when its score is under 50%.
+- **Styling** uses the Tailwind tokens from `src/styles/index.css`
+  (`bg-surface`, `text-ink`, ...). Dark colors are token overrides under
+  `data-theme="dark"` on `<html>`. The **Theme** menu in the toolbar switches
+  between light and dark, and `npm test` runs every story in both.
+
+Run `npm run storybook` to browse them, `npm run build-storybook` for a static
+copy.

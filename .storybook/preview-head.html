@@ -1,0 +1,9 @@
+<style>
+    /* the app's base styles set `overflow: hidden` on html and body (the app
+       scrolls inside its own containers), which stops MDX docs pages from
+       scrolling; story canvases keep it */
+    html:has(.sbdocs-wrapper),
+    body:has(.sbdocs-wrapper) {
+        overflow: auto;
+    }
+</style>
