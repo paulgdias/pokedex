@@ -10,6 +10,9 @@ const ASSET_PREFIX = "/pokeapi/assets/";
 const CACHE_DIR = path.join(__dirname, "../.cache");
 const FRESH_MS = 24 * 60 * 60 * 1000;
 const MAX_TRIES = 3;
+// files unused for this long are evicted on startup; override with the env var
+const MAX_AGE_MS =
+    Number(process.env.POKEAPI_CACHE_MAX_AGE_DAYS ?? 30) * 24 * 60 * 60 * 1000;
 
 // only the operations the app sends, so this is not an open proxy
 const OPERATIONS = new Set(["getPokedex", "getPokemonInfo", "getTypeEfficacy"]);
@@ -62,6 +65,47 @@ const age = async (file) => {
     return stat ? Date.now() - stat.mtimeMs : Number.POSITIVE_INFINITY;
 };
 
+// assets are immutable and never rewritten, so their mtime alone would only
+// say "first fetched," not "still used"; bump it on every hit so the
+// eviction sweep can tell a stale file from a popular one
+const touch = (file) => {
+    const now = new Date();
+    fs.utimes(file, now, now).catch(() => {});
+};
+
+const listFiles = async (dir) => {
+    const entries = await fs
+        .readdir(dir, { withFileTypes: true })
+        .catch(() => []);
+    const files = [];
+    for (const entry of entries) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            files.push(...(await listFiles(full)));
+        } else {
+            files.push(full);
+        }
+    }
+    return files;
+};
+
+/** deletes cache files unused for MAX_AGE_MS; run once on startup. */
+const sweepCache = async () => {
+    const cutoff = Date.now() - MAX_AGE_MS;
+    const files = await listFiles(CACHE_DIR);
+    let removed = 0;
+    for (const file of files) {
+        const stat = await fs.stat(file).catch(() => null);
+        if (stat && stat.mtimeMs < cutoff) {
+            await fs.unlink(file).catch(() => {});
+            removed++;
+        }
+    }
+    if (removed) {
+        console.log(`Evicted ${removed} stale cache file(s) from api/.cache`);
+    }
+};
+
 const graphqlCacheFile = (query, variables) => {
     const hash = crypto
         .createHash("sha256")
@@ -109,7 +153,10 @@ router.post("/graphql", async (req, res) => {
                     throw error;
                 }
                 console.warn(`Serving stale ${operation}: ${error.message}`);
+                touch(file);
             }
+        } else {
+            touch(file);
         }
         res.type("json").send(text);
     } catch (error) {
@@ -141,6 +188,8 @@ router.get("/assets/*path", async (req, res) => {
                 return res.status(result.status).send("Asset not found");
             }
             data = result.bytes;
+        } else {
+            touch(file);
         }
         res.set({
             "Cache-Control": "public, max-age=31536000, immutable",
@@ -157,4 +206,4 @@ router.get("/assets/*path", async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = { router, sweepCache };

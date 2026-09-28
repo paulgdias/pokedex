@@ -31,6 +31,8 @@ Mounted at `/pokeapi`. It avoids PokeAPI's rate limits and gives sprites and cri
 
 The GraphQL responses have their `raw.githubusercontent.com/PokeAPI/` URLs rewritten to `/pokeapi/assets/`, so the browser loads them same-origin. Cached files live in `api/.cache/` (gitignored); delete it to refetch everything.
 
+On startup the server evicts cache files unused for 30 days (each cache hit refreshes its "last used" time, so anything still being read never gets swept). Override the retention with `POKEAPI_CACHE_MAX_AGE_DAYS`.
+
 Use it from the frontend (repo root), in two terminals:
 
 ```bash
