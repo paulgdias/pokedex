@@ -23,7 +23,7 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 
 ## Path aliases
 
-`@api`, `@components`, `@styles`, `@customTypes` (-> `src/types`), `@utils`. They are declared in `tsconfig.json`, `rspack.config.ts` **and** `vitest.config.mts` (Storybook reuses the Vitest config's aliases in `.storybook/main.ts`); add new ones to all of them.
+`@api`, `@components`, `@styles`, `@customTypes` (-> `src/types`), `@utils`. They are declared once, in `paths` in `tsconfig.json`. Rspack reads that file (`resolve.tsConfig`), and Vitest and Storybook get theirs through `tsconfigAliases.cjs`, so adding an alias needs only a `tsconfig.json` edit.
 
 ## Data flow
 

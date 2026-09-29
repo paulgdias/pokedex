@@ -1,10 +1,10 @@
-import path from "node:path";
-
+import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
+
+import tsconfigAliases from "./tsconfigAliases.cjs";
 
 // real Chromium: react-virtualized measures its container, and axe needs
 // real styles to judge color contrast
@@ -15,20 +15,10 @@ const browser = (name: string) => ({
     instances: [{ browser: "chromium" as const, name: `${name}-chromium` }],
 });
 
-const dirname = import.meta.dirname;
-
 export default defineConfig({
     plugins: [react(), tailwindcss()],
-    // keep in sync with tsconfig.json and rspack.config.ts
-    resolve: {
-        alias: {
-            "@api": path.resolve(dirname, "src/api"),
-            "@components": path.resolve(dirname, "src/components"),
-            "@styles": path.resolve(dirname, "src/styles"),
-            "@customTypes": path.resolve(dirname, "src/types"),
-            "@utils": path.resolve(dirname, "src/utils"),
-        },
-    },
+    // aliases come from `paths` in tsconfig.json
+    resolve: { alias: tsconfigAliases() },
     // pre-bundled up front: a dependency found mid-run makes Vite re-optimize and
     // reload, which leaves two copies of React in the page
     optimizeDeps: {

@@ -80,13 +80,8 @@ module.exports = (_env: unknown, argv: { mode?: string }) => ({
     },
     resolve: {
         extensions: [".tsx", ".ts", ".jsx", ".js"],
-        alias: {
-            "@api": path.resolve(__dirname, "src/api"),
-            "@components": path.resolve(__dirname, "src/components"),
-            "@styles": path.resolve(__dirname, "src/styles"),
-            "@customTypes": path.resolve(__dirname, "src/types"),
-            "@utils": path.resolve(__dirname, "src/utils"),
-        },
+        // path aliases come from `paths` in tsconfig.json
+        tsConfig: path.resolve(__dirname, "tsconfig.json"),
     },
     devServer: {
         static: {

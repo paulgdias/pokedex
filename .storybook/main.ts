@@ -18,19 +18,14 @@ const config: StorybookConfig = {
     // for its plugins and aliases
     async viteFinal(config) {
         const { default: tailwindcss } = await import("@tailwindcss/vite");
-        const path = await import("node:path");
-        const root = path.resolve(import.meta.dirname, "..");
+        const { default: tsconfigAliases } = await import(
+            "../tsconfigAliases.cjs"
+        );
         config.plugins = [...(config.plugins ?? []), tailwindcss()];
         config.resolve = {
             ...config.resolve,
-            alias: {
-                ...config.resolve?.alias,
-                "@api": path.resolve(root, "src/api"),
-                "@components": path.resolve(root, "src/components"),
-                "@styles": path.resolve(root, "src/styles"),
-                "@customTypes": path.resolve(root, "src/types"),
-                "@utils": path.resolve(root, "src/utils"),
-            },
+            // aliases come from `paths` in tsconfig.json
+            alias: { ...config.resolve?.alias, ...tsconfigAliases() },
         };
         config.optimizeDeps = {
             ...config.optimizeDeps,
