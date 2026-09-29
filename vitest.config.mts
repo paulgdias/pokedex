@@ -57,7 +57,11 @@ export default defineConfig({
         reporters: ["default", "./.storybook/a11yReporter.ts"],
         coverage: {
             provider: "v8",
-            include: ["src/components/**", "src/utils/**"],
+            include: [
+                "src/components/**",
+                "src/utils/**",
+                "api/src/pokeapiProxy.js",
+            ],
             exclude: [
                 "**/*.stories.*",
                 "**/*.test.*",
@@ -79,6 +83,15 @@ export default defineConfig({
                     include: ["src/**/*.test.{ts,tsx}"],
                     setupFiles: ["./vitest.setup.ts"],
                     browser: browser("unit"),
+                },
+            },
+            // the Express PokeAPI proxy: plain Node, no browser
+            {
+                extends: false,
+                test: {
+                    name: "api",
+                    environment: "node",
+                    include: ["api/src/**/*.test.js"],
                 },
             },
             // every story runs in both themes; `.storybook/preview.tsx` reads

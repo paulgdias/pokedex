@@ -26,12 +26,12 @@ Mounted at `/pokeapi`. It avoids PokeAPI's rate limits and gives sprites and cri
 
 | Route | Description |
 |---|---|
-| `POST /pokeapi/graphql` | Forwards the app's `getPokedex`, `getPokemonInfo` and `getTypeEfficacy` queries to `https://beta.pokeapi.co/graphql/v1beta` (other operations get a 400). Responses are cached on disk for 24 h, served stale if PokeAPI is down, and identical concurrent requests share one upstream call. 429s are retried honouring `Retry-After`. |
+| `POST /pokeapi/graphql` | Forwards the app's `getPokedex`, `getPokemonInfo` and `getTypeEfficacy` queries to `https://beta.pokeapi.co/graphql/v1beta` (other operations, and documents with more than one operation, get a 400). Responses are cached on disk for 24 h (GraphQL errors and non-JSON bodies are never cached), written atomically, served stale if PokeAPI is down, and identical concurrent requests share one upstream call. 429s are retried honouring `Retry-After`. |
 | `GET /pokeapi/assets/*` | Sprites and cries from `raw.githubusercontent.com/PokeAPI/`, cached on disk and served with `Cache-Control: public, max-age=31536000, immutable`. |
 
 The GraphQL responses have their `raw.githubusercontent.com/PokeAPI/` URLs rewritten to `/pokeapi/assets/`, so the browser loads them same-origin. Cached files live in `api/.cache/` (gitignored); delete it to refetch everything.
 
-On startup the server evicts cache files unused for 30 days (each cache hit refreshes its "last used" time, so anything still being read never gets swept). Override the retention with `POKEAPI_CACHE_MAX_AGE_DAYS`.
+On startup the server evicts cache files unused for 30 days (each asset hit refreshes its "last used" time, so sprites still being read never get swept; GraphQL files keep their fetch time, which is their 24 h freshness clock). Override the retention with `POKEAPI_CACHE_MAX_AGE_DAYS`.
 
 Use it from the frontend (repo root), in two terminals:
 

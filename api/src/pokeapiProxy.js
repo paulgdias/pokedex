@@ -7,7 +7,9 @@ const GRAPHQL_URL = "https://beta.pokeapi.co/graphql/v1beta";
 const ASSET_HOST = "https://raw.githubusercontent.com/PokeAPI/";
 const ASSET_PREFIX = "/pokeapi/assets/";
 
-const CACHE_DIR = path.join(__dirname, "../.cache");
+// overridable so the tests can use a temp dir
+const CACHE_DIR =
+    process.env.POKEAPI_CACHE_DIR || path.join(__dirname, "../.cache");
 const FRESH_MS = 24 * 60 * 60 * 1000;
 const MAX_TRIES = 3;
 // files unused for this long are evicted on startup; override with the env var
@@ -17,7 +19,9 @@ const MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
 
 // only the operations the app sends, so this is not an open proxy
 const OPERATIONS = new Set(["getPokedex", "getPokemonInfo", "getTypeEfficacy"]);
-const ASSET_PATH = /^(sprites|cries)\/[\w./-]+\.(png|gif|svg|webp|ogg)$/;
+const OPERATION_KEYWORDS = new Set(["query", "mutation", "subscription"]);
+// no empty, hidden or ".." segments
+const ASSET_PATH = /^(sprites|cries)(\/[\w-][\w.-]*)+\.(png|gif|svg|webp|ogg)$/;
 
 const CONTENT_TYPES = {
     ".png": "image/png",
@@ -56,9 +60,75 @@ const fetchUpstream = async (url, init) => {
 
 const readFile = (file) => fs.readFile(file).catch(() => null);
 
+// writes beside the target and renames, so a crash, a full disk or a request
+// arriving mid-write never leaves or reads a partial cache file
 const writeFile = async (file, data) => {
     await fs.mkdir(path.dirname(file), { recursive: true });
-    await fs.writeFile(file, data);
+    const temp = `${file}.${crypto.randomUUID()}.tmp`;
+    try {
+        await fs.writeFile(temp, data);
+        await fs.rename(temp, file);
+    } catch (error) {
+        await fs.unlink(temp).catch(() => {});
+        throw error;
+    }
+};
+
+/** a usable GraphQL response is a JSON object without `errors`. */
+const isUsable = (text) => {
+    try {
+        const body = JSON.parse(text);
+        return (
+            body !== null &&
+            typeof body === "object" &&
+            !Array.isArray(body) &&
+            body.errors === undefined
+        );
+    } catch {
+        return false;
+    }
+};
+
+const readUsable = async (file) => {
+    const text = await readFile(file);
+    return text !== null && isUsable(text) ? text : null;
+};
+
+/**
+ * counts the operations in a GraphQL document (fragments do not), so a second
+ * operation cannot ride along behind an allowed name. Only top-level tokens
+ * matter: braces and parentheses nest, and strings and comments are dropped.
+ */
+const countOperations = (query) => {
+    const source = query.replace(
+        /"""[\s\S]*?"""|"(?:\\.|[^"\\])*"|#[^\n]*/g,
+        " "
+    );
+    let depth = 0;
+    let count = 0;
+    // what the next top-level "{" opens
+    let next = "shorthand";
+    for (const [token] of source.matchAll(/[{}()[\]]|\w+/g)) {
+        if ("{([".includes(token)) {
+            if (depth === 0 && token === "{") {
+                if (next === "shorthand") {
+                    count++;
+                }
+                next = "shorthand";
+            }
+            depth++;
+        } else if ("})]".includes(token)) {
+            depth--;
+        } else if (depth === 0) {
+            if (token === "fragment") {
+                next = "fragment";
+            } else if (OPERATION_KEYWORDS.has(token) && next !== "fragment") {
+                count++;
+                next = "operation";
+            }
+        }
+    }
+    return count;
 };
 
 const age = async (file) => {
@@ -98,8 +168,14 @@ const sweepCache = async () => {
     for (const file of files) {
         const stat = await fs.stat(file).catch(() => null);
         if (stat && stat.mtimeMs < cutoff) {
-            await fs.unlink(file).catch(() => {});
-            removed++;
+            if (
+                await fs.unlink(file).then(
+                    () => true,
+                    () => false
+                )
+            ) {
+                removed++;
+            }
         }
     }
     if (removed) {
@@ -126,6 +202,10 @@ const loadGraphql = async (file, body) => {
     }
     // sprite and cry URLs come back same-origin, served by /assets below
     const text = (await response.text()).replaceAll(ASSET_HOST, ASSET_PREFIX);
+    // a 200 can still carry GraphQL errors or an error page; don't cache those
+    if (!isUsable(text)) {
+        throw new Error("upstream returned an unusable response");
+    }
     await writeFile(file, text);
     return text;
 };
@@ -136,20 +216,24 @@ router.post("/graphql", async (req, res) => {
     const { query, variables } = req.body ?? {};
     const operation =
         typeof query === "string" && /^\s*query\s+(\w+)/.exec(query)?.[1];
-    if (!operation || !OPERATIONS.has(operation)) {
+    if (
+        !operation ||
+        !OPERATIONS.has(operation) ||
+        countOperations(query) !== 1
+    ) {
         return res.status(400).json({ error: "Operation not allowed" });
     }
 
     const file = graphqlCacheFile(query, variables);
     try {
-        let text = (await age(file)) < FRESH_MS ? await readFile(file) : null;
+        let text = (await age(file)) < FRESH_MS ? await readUsable(file) : null;
         if (text === null) {
             const body = JSON.stringify({ query, variables });
             try {
                 text = await shared(file, () => loadGraphql(file, body));
             } catch (error) {
                 // serve stale rather than fail when upstream is down
-                text = await readFile(file);
+                text = await readUsable(file);
                 if (text === null) {
                     throw error;
                 }
