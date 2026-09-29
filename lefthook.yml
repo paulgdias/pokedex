@@ -1,0 +1,17 @@
+# Local git hooks (installed by `npm install` via the `prepare` script).
+# Skip once with `LEFTHOOK=0 git commit ...` or `git commit --no-verify`.
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "*.{js,jsx,mjs,cjs,ts,tsx,mts,json,css}"
+      run: npx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    type-check:
+      glob: "*.{ts,tsx,mts}"
+      run: npm run type-check
+
+pre-push:
+  commands:
+    verify:
+      run: npm run verify

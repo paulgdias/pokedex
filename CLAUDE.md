@@ -13,7 +13,7 @@ Path-scoped rules (loaded only when working on matching files): [`.claude/rules/
 - `npm run biome:format`: Biome formatter over the whole repo (one Biome config). Style: 4 spaces for code, 2 for JSON (`.editorconfig`), double quotes, semicolons, width 80, ES5 trailing commas.
 - `npm run biome:check:fix`: Biome linter, formatter, and organize-imports with safe auto-fixes over the whole repo. The Biome `a11y` rules are enabled; where a rule cannot apply (roving/`aria-activedescendant` options, virtualized rows), suppress it inline with `biome-ignore` and a reason.
 - `npm test`: `vitest run` (all tests plus every story as a test). `npm run test:coverage`: same with v8 coverage over `src/components` and `src/utils`, failing under 90% for statements, branches, functions and lines. `npm run storybook`: Storybook on port 6006, with `@storybook/addon-docs` used only as the MDX engine (no autodocs): each component has a hand-written `Name.mdx` docs page beside it, and the intro page is `.storybook/Introduction.mdx`.
-- Verify changes with `npm run biome:lint`, `npm run type-check`, `npm run build` and `npm run test:coverage`.
+- `npm run verify`: `biome ci` (`npm run biome:check`), type-check, production build and `test:coverage`, in that order. `npm run verify:full` adds the Playwright e2e tests.
 
 ## Stack
 
@@ -79,5 +79,5 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 
 ## Working agreements
 
-- Run `npm run biome:lint`, `npm run type-check`, `npm run build`, and `npm run test:coverage` before calling work done.
+- Run `npm run verify` before calling work done (also available as `/verify`). Lefthook hooks (`lefthook.yml`) run Biome and type-check on commit and `verify` on push; never bypass them with `--no-verify` unless asked. A PostToolUse hook (`.claude/hooks/biome-after-edit.sh`) runs Biome on edited TypeScript, JavaScript, JSON and CSS files.
 - Don't push unless asked.

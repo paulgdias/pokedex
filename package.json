@@ -25,8 +25,11 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
+    "verify": "npm run biome:check && npm run type-check && npm run build && npm run test:coverage",
+    "verify:full": "npm run verify && npm run e2e",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@tanstack/query-async-storage-persister": "^5.103.1",
@@ -67,6 +70,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "esbuild": "^0.28.2",
     "html-webpack-plugin": "^5.6.3",
+    "lefthook": "^2.1.14",
     "playwright": "^1.63.0",
     "postcss": "^8.5.3",
     "postcss-loader": "^8.1.1",
