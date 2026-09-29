@@ -11,8 +11,9 @@ const CACHE_DIR = path.join(__dirname, "../.cache");
 const FRESH_MS = 24 * 60 * 60 * 1000;
 const MAX_TRIES = 3;
 // files unused for this long are evicted on startup; override with the env var
-const MAX_AGE_MS =
-    Number(process.env.POKEAPI_CACHE_MAX_AGE_DAYS ?? 30) * 24 * 60 * 60 * 1000;
+const envDays = Number(process.env.POKEAPI_CACHE_MAX_AGE_DAYS);
+const MAX_AGE_DAYS = Number.isFinite(envDays) && envDays > 0 ? envDays : 30;
+const MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
 
 // only the operations the app sends, so this is not an open proxy
 const OPERATIONS = new Set(["getPokedex", "getPokemonInfo", "getTypeEfficacy"]);
@@ -65,9 +66,9 @@ const age = async (file) => {
     return stat ? Date.now() - stat.mtimeMs : Number.POSITIVE_INFINITY;
 };
 
-// assets are immutable and never rewritten, so their mtime alone would only
-// say "first fetched," not "still used"; bump it on every hit so the
-// eviction sweep can tell a stale file from a popular one
+// Resets a file's mtime to "last used". Only for assets, so sweepCache keeps
+// the ones still being read. Never for GraphQL files: their mtime is the fetch
+// time that age() checks for freshness.
 const touch = (file) => {
     const now = new Date();
     fs.utimes(file, now, now).catch(() => {});
@@ -153,10 +154,7 @@ router.post("/graphql", async (req, res) => {
                     throw error;
                 }
                 console.warn(`Serving stale ${operation}: ${error.message}`);
-                touch(file);
             }
-        } else {
-            touch(file);
         }
         res.type("json").send(text);
     } catch (error) {
