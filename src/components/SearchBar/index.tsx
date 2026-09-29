@@ -220,6 +220,7 @@ const SearchBar = ({
                                     <div className="flex flex-wrap gap-2 px-2 pb-2">
                                         {filterSuggestions.map(
                                             (suggestion, index) => (
+                                                // biome-ignore lint/a11y/useFocusableInteractive: options are reached with aria-activedescendant, focus stays in the input
                                                 <div
                                                     key={suggestion.key}
                                                     id={optionId(index)}
@@ -265,6 +266,7 @@ const SearchBar = ({
                                         const index =
                                             filterSuggestions.length + i;
                                         return (
+                                            // biome-ignore lint/a11y/useFocusableInteractive: options are reached with aria-activedescendant, focus stays in the input
                                             <div
                                                 key={item.id}
                                                 id={optionId(index)}

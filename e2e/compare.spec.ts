@@ -11,7 +11,9 @@ test("three pokémon can be picked and compared side by side", async ({
 }) => {
     await page.goto("/compare");
     await expect(
-        page.getByText("Add two or three Pokémon to compare their stats side by side.")
+        page.getByText(
+            "Add two or three Pokémon to compare their stats side by side."
+        )
     ).toBeVisible();
 
     const picker = page.getByRole("combobox", {
@@ -47,9 +49,7 @@ test("a deep link is deduplicated and unknown ids are dropped", async ({
     const table = page.getByRole("table", { name: /Stats compared for/ });
     await expect(table).toContainText("bulbasaur");
     await expect(table).toContainText("charmander");
-    await expect(
-        table.getByRole("link", { name: "bulbasaur" })
-    ).toHaveCount(1);
+    await expect(table.getByRole("link", { name: "bulbasaur" })).toHaveCount(1);
 });
 
 test("one pokémon is not enough to compare", async ({ page }) => {
@@ -64,7 +64,10 @@ test("the Compare button on a detail page seeds the comparison", async ({
 }) => {
     await page.goto("/pokedex/pikachu");
     // the page's own button, not the sidebar link
-    await page.getByRole("main").getByRole("button", { name: "Compare" }).click();
+    await page
+        .getByRole("main")
+        .getByRole("button", { name: "Compare" })
+        .click();
     await expect(page).toHaveURL(/\/compare\?ids=25/);
     await expect(
         page.getByText("Add at least one more Pokémon to compare.")

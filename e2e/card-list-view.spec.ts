@@ -19,9 +19,7 @@ test("switching to list view keeps the filters and shows every match", async ({
     // one header row plus a row per match
     const table = page.getByRole("table", { name: "Pokémon" });
     await expect(table).toHaveAttribute("aria-rowcount", "5");
-    await expect(
-        table.getByRole("link", { name: "charmander" })
-    ).toBeVisible();
+    await expect(table.getByRole("link", { name: "charmander" })).toBeVisible();
 
     await page.getByRole("radio", { name: "Card view" }).click();
     await expect(page).not.toHaveURL(/view=/);

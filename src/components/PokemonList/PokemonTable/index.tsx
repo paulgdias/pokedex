@@ -103,6 +103,7 @@ const PokemonTable = ({
                 aria-rowcount={pokemon.length + 1}
                 className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-surface"
             >
+                {/* biome-ignore lint/a11y/useFocusableInteractive: the sortable header buttons are the tab stops */}
                 <div
                     role="row"
                     className={`${COLUMNS} border-b border-line bg-wash`}
@@ -166,6 +167,7 @@ const PokemonTable = ({
                                     const item = pokemon[index];
 
                                     return (
+                                        // biome-ignore lint/a11y/useFocusableInteractive: the name link stretched over the row is the tab stop
                                         <div
                                             key={key}
                                             role="row"

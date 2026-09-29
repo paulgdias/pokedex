@@ -52,7 +52,14 @@ export const DEX: Mon[] = [
     mon(94, "gengar", ["ghost", "poison"], 1, [60, 65, 60, 130, 75, 110], 20),
     mon(132, "ditto", ["normal"], 1, [48, 48, 48, 48, 48, 48], 30),
     mon(143, "snorlax", ["normal"], 1, [160, 110, 65, 65, 110, 30], 40),
-    mon(149, "dragonite", ["dragon", "flying"], 1, [91, 134, 95, 100, 100, 80], 50),
+    mon(
+        149,
+        "dragonite",
+        ["dragon", "flying"],
+        1,
+        [91, 134, 95, 100, 100, 80],
+        50
+    ),
     mon(150, "mewtwo", ["psychic"], 1, [106, 110, 90, 154, 90, 130], 60, {
         legendary: true,
     }),
@@ -62,11 +69,26 @@ export const DEX: Mon[] = [
     mon(152, "chikorita", ["grass"], 2, [45, 49, 65, 49, 65, 45], 80),
     mon(155, "cyndaquil", ["fire"], 2, [39, 52, 43, 60, 50, 65], 81),
     mon(158, "totodile", ["water"], 2, [50, 65, 64, 44, 48, 43], 82),
-    mon(248, "tyranitar", ["rock", "dark"], 2, [100, 134, 110, 95, 100, 61], 83),
+    mon(
+        248,
+        "tyranitar",
+        ["rock", "dark"],
+        2,
+        [100, 134, 110, 95, 100, 61],
+        83
+    ),
     mon(252, "treecko", ["grass"], 3, [40, 45, 35, 65, 55, 70], 84),
-    mon(384, "rayquaza", ["dragon", "flying"], 3, [105, 150, 90, 150, 90, 95], 85, {
-        legendary: true,
-    }),
+    mon(
+        384,
+        "rayquaza",
+        ["dragon", "flying"],
+        3,
+        [105, 150, 90, 150, 90, 95],
+        85,
+        {
+            legendary: true,
+        }
+    ),
 ];
 
 export const SPRITE_HOST = "https://raw.githubusercontent.com/";

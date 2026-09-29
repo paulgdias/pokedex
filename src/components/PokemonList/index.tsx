@@ -80,7 +80,9 @@ const PokemonList = ({
                                 // Grid's inner container is presentational, so
                                 // each cell supplies its own row/gridcell pair
                                 const renderCell = (card: ReactNode) => (
+                                    // biome-ignore lint/a11y/useFocusableInteractive: grid rows are not tab stops; the card link inside each cell is
                                     <div key={key} role="row" style={style}>
+                                        {/* biome-ignore lint/a11y/useFocusableInteractive: see above */}
                                         <div role="gridcell">{card}</div>
                                     </div>
                                 );

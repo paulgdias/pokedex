@@ -17,9 +17,7 @@ test("search filters immediately and writes q to the URL after the debounce", as
     await page.goto("/pokedex");
     await expect(shown(page)).toContainText("22 shown");
 
-    await page
-        .getByRole("combobox", { name: "Search Pokémon" })
-        .fill("pika");
+    await page.getByRole("combobox", { name: "Search Pokémon" }).fill("pika");
     await expect(shown(page)).toContainText("1 shown");
     await expect(page).toHaveURL(/q=pika/);
 
@@ -69,14 +67,10 @@ test("sorting reorders the list and writes sort to the URL", async ({
     page,
 }) => {
     await page.goto("/pokedex");
-    await expect(firstCard(page)).toHaveAccessibleName(
-        "Navigate to bulbasaur"
-    );
+    await expect(firstCard(page)).toHaveAccessibleName("Navigate to bulbasaur");
 
     await page.getByLabel("Sort").selectOption({ label: "Name Z–A" });
-    await expect(firstCard(page)).toHaveAccessibleName(
-        "Navigate to wartortle"
-    );
+    await expect(firstCard(page)).toHaveAccessibleName("Navigate to wartortle");
     await expect(page).toHaveURL(/sort=name(:|%3A)desc/);
 
     await page.getByLabel("Sort").selectOption({ label: "Number Desc" });
@@ -87,9 +81,7 @@ test("filter chips can be removed one by one or all at once", async ({
     page,
 }) => {
     await page.goto("/pokedex?type=fire&only=legendary&q=zzz");
-    await expect(
-        page.getByText("Nothing matches these filters")
-    ).toBeVisible();
+    await expect(page.getByText("Nothing matches these filters")).toBeVisible();
 
     await page.getByRole("button", { name: /Remove filter .*zzz/i }).click();
     await expect(page).not.toHaveURL(/q=/);
