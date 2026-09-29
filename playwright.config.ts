@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const PORT = 3100;
+
 export default defineConfig({
     testDir: "./e2e",
     // one shared dev server; every test gets its own context (and so its own
@@ -9,7 +11,7 @@ export default defineConfig({
     retries: process.env.CI ? 2 : 0,
     reporter: [["list"], ["html", { open: "never" }]],
     use: {
-        baseURL: "http://localhost:3000",
+        baseURL: `http://localhost:${PORT}`,
         trace: "on-first-retry",
         // AutoSizer renders nothing at 0 height; 1280 is above the `lg`
         // breakpoint, so the generation sidebar exists
@@ -17,8 +19,10 @@ export default defineConfig({
     },
     projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
     webServer: {
-        command: "npm run dev",
-        url: "http://localhost:3000",
+        // a dedicated port, so a `npm run dev` / `dev:proxy` server on :3000
+        // (which would bypass the PokeAPI mocks) is never picked up
+        command: `npm run dev -- --port ${PORT}`,
+        url: `http://localhost:${PORT}`,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
     },
