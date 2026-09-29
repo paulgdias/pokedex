@@ -14,7 +14,7 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 | `Nav/` | Sidebar (desktop) / top bar (mobile): logo, nav items (Home, Pokédex, Compare, Type chart), theme toggle, generation links with per-generation counts. Reads loader data via `useRouteLoaderData` (route ids `"pokedex"`, `"pokemon"`). |
 | `LoadingSpinner/` | Spinning Pokeball animation; used as the router `HydrateFallback`. |
 | `Buttons/ScrollTopButton/` | Fixed "scroll to top" button (`onPress`). |
-| `Icons/Pokeball/`, `Icons/Logos/` | SVG icons; `Logos` also exports `githubUrl` / `linkedinUrl`. *(Note: directory is `Icons/` on disk but tracked as `icons/` in git).* |
+| `Icons/Pokeball/`, `Icons/Logos/` | SVG icons; `Logos` also exports `githubUrl` / `linkedinUrl`. |
 | `PokemonCard/` | Card: official art (with `preload` hint), dex number watermark, type pills, legendary/mythical badge. Supports `size="large" \| "default"`. Optional `sprite` prop overrides the image and `children` render as an overlay in the art area (used by the detail page for `SpriteToggle`). When `navigateCallback` is passed, wraps in an `<a>` tag for accessibility/links while triggering the callback. Prop types in `@customTypes/PokemonCardTypes`. |
 | `PokemonCard/PlaceholderCard/` | Skeleton card reusing the card classes; optional `animated`. |
 | `PokemonList/` | Virtualized grid (`react-virtualized` `Grid` + `AutoSizer`). Pulls `-mr-4` to absorb trailing grid gap. Scrolls to top when the list changes. `isLoading` renders placeholder cards. |
@@ -55,4 +55,4 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 1. Create `Name/index.tsx`, default export, Tailwind + `twMerge`, plus `Name/Name.test.tsx` (behavior, callbacks, edge cases), `Name/Name.stories.tsx` (at least one story with a `play` function that asserts; it also gets the axe check) and `Name/Name.mdx` (`<Meta of={Stories} />`, a short description, behaviour, props via `<ArgTypes of={Stories} />`, and a `<Canvas>` per story; point `<ArgTypes of={Component} />` at the real component when the story's `component` is a wrapper, and hand-write the props as an HTML `<table>` when the props type lives in `src/types`, as for `PokemonCard`; Storybook's MDX has no GFM, so `| pipe |` tables render as plain text). `__tests__/structure.test.ts` enforces this.
 2. Use react-aria primitives for anything interactive to preserve accessibility and keyboard behavior.
 3. Put filtering/sorting/URL logic in `src/utils`, not inside the component.
-4. Run `npm run biome:lint`, `npm run type-check`, `npm run build`, and `npm run test:coverage`.
+4. Run `npm run verify`.
