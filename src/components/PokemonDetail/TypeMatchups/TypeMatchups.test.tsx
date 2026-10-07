@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
 
-import TypeMatchups from ".";
 import { EFFICACY } from "../../__fixtures__/pokemon";
+import TypeMatchups from ".";
 
 const groups = (screen: Awaited<ReturnType<typeof render>>) =>
     Object.fromEntries(

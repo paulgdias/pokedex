@@ -8,10 +8,8 @@ import {
 } from "react-aria-components";
 
 import { typeColors } from "@customTypes/PokemonTypes";
-
-import { POKEMON_TYPES, PokemonType, capitalize } from "@utils/search";
-
 import { typeDotClass } from "@styles/Pokedex";
+import { capitalize, POKEMON_TYPES, PokemonType } from "@utils/search";
 
 const TypeFilter = ({
     types,

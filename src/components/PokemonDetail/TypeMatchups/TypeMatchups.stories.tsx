@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
-import TypeMatchups from ".";
 import { EFFICACY } from "../../__fixtures__/pokemon";
+import TypeMatchups from ".";
 
 const meta = {
     title: "PokemonDetail/TypeMatchups",

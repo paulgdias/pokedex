@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import {
     ArrowDown01,
     ArrowDown10,
@@ -12,23 +10,22 @@ import {
     Search,
     X,
 } from "lucide-react";
+import { useState } from "react";
 import { ToggleButton, ToggleButtonGroup } from "react-aria-components";
 
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
 import { SortState } from "@customTypes/SortingTypes";
-
+import { typeDotClass } from "@styles/Pokedex";
 import { GENERATIONS } from "@utils/generations";
 import {
     Category,
-    PokedexFilters,
     formatPokedexNumber,
     getFilterSuggestions,
     getPokemonSuggestions,
+    PokedexFilters,
 } from "@utils/search";
 import { getSortLabel } from "@utils/sort";
 import { PokedexView } from "@utils/view";
-
-import { typeDotClass } from "@styles/Pokedex";
 
 import FilterChips from "./FilterChips";
 import TypeFilter from "./TypeFilter";

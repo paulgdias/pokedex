@@ -1,19 +1,16 @@
-import { useEffect, useRef } from "react";
-
 import { ArrowDown, ArrowUp } from "lucide-react";
+import { useEffect, useRef } from "react";
 import AutoSizer from "react-virtualized/dist/es/AutoSizer";
 import List from "react-virtualized/dist/es/List";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
-import { STAT_SORT_KEYS, SortKey, SortState } from "@customTypes/SortingTypes";
-
+import { SortKey, SortState, STAT_SORT_KEYS } from "@customTypes/SortingTypes";
+import { typeDotClass } from "@styles/Pokedex";
 import { formatPokedexNumber } from "@utils/search";
 import { getNextSort } from "@utils/sort";
 import { STAT_LABELS } from "@utils/stats";
 import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
-
-import { typeDotClass } from "@styles/Pokedex";
 
 import "react-virtualized/styles.css";
 
@@ -46,6 +43,7 @@ const HeaderCell = ({
     const Arrow = sort.direction === "asc" ? ArrowUp : ArrowDown;
 
     return (
+        // biome-ignore lint/a11y/useFocusableInteractive: the header cell is not a tab stop; the sort button inside it is
         <div
             role="columnheader"
             aria-sort={

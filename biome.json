@@ -1,7 +1,14 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-  "files": { "ignoreUnknown": true, "ignore": [] },
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!public"]
+  },
   "formatter": {
     "enabled": true,
     "useEditorconfig": true,
@@ -13,16 +20,47 @@
     "attributePosition": "auto",
     "bracketSpacing": true
   },
-  "organizeImports": { "enabled": true },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              ":NODE:",
+              ":BLANK_LINE:",
+              [
+                ":PACKAGE:",
+                "!@api/**",
+                "!@components/**",
+                "!@styles/**",
+                "!@customTypes/**",
+                "!@utils/**"
+              ],
+              ":BLANK_LINE:",
+              [
+                "@api/**",
+                "@components/**",
+                "@styles/**",
+                "@customTypes/**",
+                "@utils/**"
+              ],
+              ":BLANK_LINE:",
+              ":PATH:"
+            ]
+          }
+        }
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "preset": "none",
       "a11y": {
         "noAccessKey": "error",
         "noAriaHiddenOnFocusable": "error",
         "noAutofocus": "error",
-        "noBlankTarget": "error",
         "noDistractingElements": "error",
         "noHeaderScope": "error",
         "noInteractiveElementToNoninteractiveRole": "error",
@@ -48,20 +86,30 @@
         "useValidAriaProps": "error",
         "useValidAriaRole": {
           "level": "error",
-          "options": { "ignoreNonDom": true }
+          "options": {
+            "ignoreNonDom": true
+          }
         },
         "useValidAriaValues": "error",
         "useValidLang": "error"
       },
-      "complexity": { "noUselessTypeConstraint": "error" },
+      "complexity": {
+        "noUselessTypeConstraint": "error"
+      },
       "correctness": {
         "noChildrenProp": "error",
         "noUnusedVariables": "error",
-        "useArrayLiterals": "off",
         "useJsxKeyInIterable": "error"
       },
-      "security": { "noDangerouslySetInnerHtmlWithChildren": "error" },
-      "style": { "noNamespace": "error", "useAsConstAssertion": "error" },
+      "security": {
+        "noDangerouslySetInnerHtmlWithChildren": "error",
+        "noBlankTarget": "error"
+      },
+      "style": {
+        "noNamespace": "error",
+        "useAsConstAssertion": "error",
+        "useArrayLiterals": "off"
+      },
       "suspicious": {
         "noCommentText": "error",
         "noDuplicateJsxProps": "error",
@@ -71,6 +119,11 @@
         "noUnsafeDeclarationMerging": "error",
         "useNamespaceKeyword": "error"
       }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "javascript": {
@@ -89,14 +142,13 @@
   },
   "overrides": [
     {
-      "include": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+      "includes": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
       "linter": {
         "rules": {
           "complexity": {
             "noExtraBooleanCast": "error",
-            "noMultipleSpacesInRegularExpressionLiterals": "error",
             "noUselessCatch": "error",
-            "noWith": "error"
+            "noAdjacentSpacesInRegex": "error"
           },
           "correctness": {
             "noConstAssign": "error",
@@ -121,7 +173,8 @@
             "noUnusedVariables": "error",
             "useIsNan": "error",
             "useValidForDirection": "error",
-            "useYield": "error"
+            "useYield": "error",
+            "useValidTypeof": "error"
           },
           "suspicious": {
             "noAsyncPromiseExecutor": "error",
@@ -146,14 +199,16 @@
             "noSparseArray": "error",
             "noUnsafeNegation": "error",
             "useGetterReturn": "error",
-            "useValidTypeof": "error"
+            "noWith": "error"
           }
         }
       }
     },
-    { "include": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
     {
-      "include": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+      "includes": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"]
+    },
+    {
+      "includes": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
       "javascript": {
         "globals": [
           "onscrollend",
@@ -285,24 +340,23 @@
       }
     },
     {
-      "include": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "linter": {
         "rules": {
-          "complexity": { "noWith": "off" },
+          "complexity": {
+            "noArguments": "error"
+          },
           "correctness": {
             "noConstAssign": "off",
             "noGlobalObjectCalls": "off",
             "noInvalidBuiltinInstantiation": "off",
             "noInvalidConstructorSuper": "off",
-            "noNewSymbol": "off",
             "noSetterReturn": "off",
             "noUndeclaredVariables": "off",
             "noUnreachable": "off",
             "noUnreachableSuper": "off"
           },
           "style": {
-            "noArguments": "error",
-            "noVar": "error",
             "useConst": "error"
           },
           "suspicious": {
@@ -314,7 +368,9 @@
             "noImportAssign": "off",
             "noRedeclare": "off",
             "noUnsafeNegation": "off",
-            "useGetterReturn": "off"
+            "useGetterReturn": "off",
+            "noWith": "off",
+            "noVar": "error"
           }
         }
       }

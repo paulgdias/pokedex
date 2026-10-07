@@ -1,15 +1,12 @@
 import { ReactNode, useEffect, useRef } from "react";
-
 import AutoSizer from "react-virtualized/dist/es/AutoSizer";
 import Grid from "react-virtualized/dist/es/Grid";
+import { twMerge } from "tailwind-merge";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import PokemonCard from "@components/PokemonCard";
 import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 import { PokemonDetails } from "@customTypes/PokemonTypes";
-
-import { twMerge } from "tailwind-merge";
-
 import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
 
 import { getPokemonGridProps } from "./utils";

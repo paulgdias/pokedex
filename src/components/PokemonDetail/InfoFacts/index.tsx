@@ -1,5 +1,4 @@
 import { PokemonInfo } from "@customTypes/PokemonTypes";
-
 import {
     formatHeight,
     formatName,

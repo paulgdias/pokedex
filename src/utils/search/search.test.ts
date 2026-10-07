@@ -1,24 +1,24 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    bulbasaur,
     DEX,
     MEW,
     MEWTWO,
-    bulbasaur,
     makePokemon,
 } from "@components/__fixtures__/pokemon";
 
 import {
-    CATEGORIES,
-    EMPTY_FILTERS,
-    POKEMON_TYPES,
     applyFilters,
+    CATEGORIES,
     capitalize,
+    EMPTY_FILTERS,
     formatPokedexNumber,
     getFilterSuggestions,
     getFiltersFromURLParams,
     getPokemonSuggestions,
     matchesText,
+    POKEMON_TYPES,
     withFilters,
 } from ".";
 

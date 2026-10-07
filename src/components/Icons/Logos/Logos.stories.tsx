@@ -1,8 +1,7 @@
-import type { Meta } from "@storybook/react-vite";
-import type { StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
-import { Email, GitHub, LinkedIn, githubUrl, linkedinUrl } from ".";
+import { Email, GitHub, githubUrl, LinkedIn, linkedinUrl } from ".";
 
 const Links = () => (
     <div className="flex gap-4">

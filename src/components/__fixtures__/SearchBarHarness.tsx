@@ -2,8 +2,7 @@ import { useState } from "react";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { SortState } from "@customTypes/SortingTypes";
-
-import { EMPTY_FILTERS, PokedexFilters, applyFilters } from "@utils/search";
+import { applyFilters, EMPTY_FILTERS, PokedexFilters } from "@utils/search";
 import { DEFAULT_SORT } from "@utils/sort";
 import { PokedexView } from "@utils/view";
 

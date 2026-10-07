@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { render } from "vitest-browser-react";
 import { page } from "vitest/browser";
+import { render } from "vitest-browser-react";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
-import Nav from ".";
 import { DEX, makePokemon } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
+import Nav from ".";
 
 type Screen = Awaited<ReturnType<typeof render>>;
 

@@ -1,10 +1,11 @@
 import { PokemonInfo } from "@customTypes/PokemonTypes";
-
 import { formatName } from "@utils/stats";
 
 const AbilityList = ({
     abilities,
-}: { abilities: PokemonInfo["abilities"] }) => (
+}: {
+    abilities: PokemonInfo["abilities"];
+}) => (
     <ul className="flex flex-col gap-3">
         {abilities.map(({ name, isHidden, effect }) => (
             <li key={name} className="flex flex-col gap-0.5">

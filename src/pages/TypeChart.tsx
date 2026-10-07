@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { preconnect } from "react-dom";
-
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import {
     Button,
     Dialog,
@@ -10,20 +8,18 @@ import {
     Tooltip,
     TooltipTrigger,
 } from "react-aria-components";
-
-import { TypeEfficacy, typeColors } from "@customTypes/PokemonTypes";
+import { preconnect } from "react-dom";
 
 import { typeEfficacyQueryOptions } from "@api/pokedex";
-
+import { TypeEfficacy, typeColors } from "@customTypes/PokemonTypes";
+import { typeDotClass, typePillClass } from "@styles/Pokedex";
 import {
-    TYPE_ORDER,
     describeMatchup,
     formatName,
     getOffense,
     getTypeMatchups,
+    TYPE_ORDER,
 } from "@utils/stats";
-
-import { typeDotClass, typePillClass } from "@styles/Pokedex";
 
 type PokemonType = (typeof TYPE_ORDER)[number];
 

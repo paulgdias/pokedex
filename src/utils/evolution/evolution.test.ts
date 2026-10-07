@@ -1,15 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { EvolutionMethod, PokemonDetails } from "@customTypes/PokemonTypes";
-
 import {
     BULBASAUR_LINE,
+    chain,
     DITTO,
     EEVEE_LINE,
     MEOWTH_LINE,
-    chain,
     makePokemon,
 } from "@components/__fixtures__/pokemon";
+import { EvolutionMethod, PokemonDetails } from "@customTypes/PokemonTypes";
 
 import { buildEvolutionLanes, formatEvolutionMethod, getPokemonForm } from ".";
 

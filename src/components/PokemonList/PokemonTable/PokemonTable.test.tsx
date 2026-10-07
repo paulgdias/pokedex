@@ -1,18 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { render } from "vitest-browser-react";
 import { page } from "vitest/browser";
+import { render } from "vitest-browser-react";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { SortState } from "@customTypes/SortingTypes";
 
-import PokemonTable from ".";
 import {
-    DEX,
     bulbasaur,
+    DEX,
     makeDex,
     makePokemon,
 } from "../../__fixtures__/pokemon";
 import TestRouter from "../../__fixtures__/router";
+import PokemonTable from ".";
 
 type Screen = Awaited<ReturnType<typeof render>>;
 

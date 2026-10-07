@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
 
-import InfoFacts from ".";
 import { makeInfo } from "../../__fixtures__/pokemon";
+import InfoFacts from ".";
 
 const rows = (screen: Awaited<ReturnType<typeof render>>) =>
     Object.fromEntries(

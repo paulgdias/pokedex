@@ -7,7 +7,6 @@ import {
     TypeEfficacy,
     TypeEfficacyResult,
 } from "@customTypes/PokemonTypes";
-
 import { convertToPokemonInfo } from "@utils/pokemon";
 
 // set by DefinePlugin in rspack.config.ts (POKEAPI_PROXY=1); Vitest, Storybook

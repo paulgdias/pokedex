@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 
-import PokedexEntry from ".";
 import { makeInfo } from "../../__fixtures__/pokemon";
+import PokedexEntry from ".";
 
 const meta = {
     title: "PokemonDetail/PokedexEntry",

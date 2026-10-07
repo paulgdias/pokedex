@@ -1,7 +1,7 @@
-import { Suspense, lazy } from "react";
+import { lazy, Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { Outlet } from "react-router";
 
-import { ErrorBoundary } from "react-error-boundary";
 import Nav from "../components/Nav";
 
 const Toaster = lazy(() =>

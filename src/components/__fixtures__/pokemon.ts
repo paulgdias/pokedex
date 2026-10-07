@@ -3,8 +3,9 @@ import {
     PokemonInfo,
     TypeEfficacy,
 } from "@customTypes/PokemonTypes";
-import pikachuPixelated from "./pikachu-pixelated.png?inline";
+
 import pikachu from "./pikachu.png?inline";
+import pikachuPixelated from "./pikachu-pixelated.png?inline";
 
 /** Pikachu's artwork inlined as a data URI, so no test or story requests the network. */
 export const sprite = () => pikachu;

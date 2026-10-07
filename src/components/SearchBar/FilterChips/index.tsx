@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 
 import { getGeneration } from "@utils/generations";
-import { PokedexFilters, capitalize } from "@utils/search";
+import { capitalize, PokedexFilters } from "@utils/search";
 
 interface Chip {
     key: string;

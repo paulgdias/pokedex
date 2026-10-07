@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { PokemonInfo } from "@customTypes/PokemonTypes";
-
 import { formatFlavorText, formatName } from "@utils/stats";
 
 const PokedexEntry = ({ info }: { info: PokemonInfo }) => {

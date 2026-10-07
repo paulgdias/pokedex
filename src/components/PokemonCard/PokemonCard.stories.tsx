@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import PokemonCard from ".";
 import {
+    bulbasaur,
     MEW,
     MEWTWO,
     MISSINGNO,
     PIXELATED_SPRITE,
-    bulbasaur,
 } from "../__fixtures__/pokemon";
+import PokemonCard from ".";
 
 const meta = {
     title: "Pokedex/PokemonCard",

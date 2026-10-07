@@ -1,8 +1,6 @@
 import { TypeEfficacy, typeColors } from "@customTypes/PokemonTypes";
-
-import { getTypeMatchups } from "@utils/stats";
-
 import { typeDotClass, typePillClass } from "@styles/Pokedex";
+import { getTypeMatchups } from "@utils/stats";
 
 const TypeMatchups = ({
     types,

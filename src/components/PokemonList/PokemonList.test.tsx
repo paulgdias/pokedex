@@ -3,9 +3,9 @@ import { render } from "vitest-browser-react";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
-import PokemonList from ".";
 import { makeDex } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
+import PokemonList from ".";
 
 type Props = Parameters<typeof PokemonList>[0];
 

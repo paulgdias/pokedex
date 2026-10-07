@@ -3,20 +3,20 @@ import { render } from "vitest-browser-react";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
-import EvolutionChain from ".";
 import {
-    DITTO,
-    EEVEE_LINE,
-    MEOWTH_LINE,
     bulbasaur,
     chain,
+    DITTO,
+    EEVEE_LINE,
     ivysaur,
+    MEOWTH_LINE,
     makePokemon,
     venusaur,
     venusaurGmax,
     venusaurMega,
 } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
+import EvolutionChain from ".";
 
 const setup = async (
     pokemon: PokemonDetails,

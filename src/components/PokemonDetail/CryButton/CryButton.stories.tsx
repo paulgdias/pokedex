@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 
-import CryButton from ".";
 import { makeInfo } from "../../__fixtures__/pokemon";
+import CryButton from ".";
 
 const meta = {
     title: "PokemonDetail/CryButton",
@@ -13,8 +13,12 @@ const meta = {
         const RealAudio = window.Audio;
         window.Audio = class {
             currentTime = 0;
-            addEventListener() {}
-            pause() {}
+            addEventListener() {
+                /* unused */
+            }
+            pause() {
+                /* unused */
+            }
             play() {
                 return Promise.resolve();
             }

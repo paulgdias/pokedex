@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import Nav from ".";
 import { DEX } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
+import Nav from ".";
 
 const meta = {
     title: "Layout/Nav",

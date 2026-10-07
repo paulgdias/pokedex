@@ -74,4 +74,4 @@ const Email = ({ width = 32, height = 32 }: LogoProps) => {
     );
 };
 
-export { GitHub, LinkedIn, Email };
+export { Email, GitHub, LinkedIn };

@@ -1,31 +1,25 @@
+import { useDebounce } from "@uidotdev/usehooks";
+import { SearchX } from "lucide-react";
 import { memo, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { preconnect } from "react-dom";
-
+import { ErrorBoundary } from "react-error-boundary";
 import {
     useLoaderData,
     useNavigationType,
     useSearchParams,
 } from "react-router";
 
-import { useDebounce } from "@uidotdev/usehooks";
-
-import { SearchX } from "lucide-react";
-
 import PokemonList from "@components/PokemonList";
 import PokemonTable from "@components/PokemonList/PokemonTable";
 import SearchBar from "@components/SearchBar";
-
-import { ErrorBoundary } from "react-error-boundary";
-
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { SortState } from "@customTypes/SortingTypes";
-
 import { getGeneration } from "@utils/generations";
 import {
-    EMPTY_FILTERS,
-    PokedexFilters,
     applyFilters,
+    EMPTY_FILTERS,
     getFiltersFromURLParams,
+    PokedexFilters,
     withFilters,
 } from "@utils/search";
 import {
@@ -34,7 +28,7 @@ import {
     sortPokemon,
     withSort,
 } from "@utils/sort";
-import { PokedexView, getViewFromURLParams, withView } from "@utils/view";
+import { getViewFromURLParams, PokedexView, withView } from "@utils/view";
 
 const TEXT_DEBOUNCE_MS = 250;
 

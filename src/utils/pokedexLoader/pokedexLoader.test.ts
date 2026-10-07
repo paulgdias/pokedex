@@ -2,7 +2,6 @@ import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it } from "vitest";
 
 import { pokedexQueryOptions } from "@api/pokedex";
-
 import { Pokemon } from "@customTypes/PokemonTypes";
 
 import { pokedexLoader } from ".";

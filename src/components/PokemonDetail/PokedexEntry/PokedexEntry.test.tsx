@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
+import { render } from "vitest-browser-react";
 
-import PokedexEntry from ".";
 import { makeInfo } from "../../__fixtures__/pokemon";
+import PokedexEntry from ".";
 
 describe("PokedexEntry", () => {
     it("shows the genus and the newest entry with wraps collapsed", async () => {
