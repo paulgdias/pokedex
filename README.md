@@ -10,7 +10,7 @@ React 19, React Router 7, TanStack Query (cache persisted to IndexedDB), Tailwin
 
 ## Getting started
 
-Requires Node.js 22 or higher (`.nvmrc` is provided).
+Requires Node.js 22.18 or higher (or 24.11+) (`.nvmrc` is provided).
 
 ```bash
 npm install
