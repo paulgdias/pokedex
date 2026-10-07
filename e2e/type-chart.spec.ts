@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { type Requests, mockPokeApi } from "./mocks";
+import { mockPokeApi, type Requests } from "./mocks";
 
 let requests: Requests;
 

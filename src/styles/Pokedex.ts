@@ -30,14 +30,14 @@ const categoryBadgeClass = `
 `;
 
 export {
-    cardClass,
     cardArtClass,
-    cardNumberWatermarkClass,
     cardBodyClass,
-    pixelArtClass,
-    typePillClass,
-    typeDotClass,
+    cardClass,
+    cardNumberWatermarkClass,
+    categoryBadgeClass,
     legendaryPokemonClass,
     mythicalPokemonClass,
-    categoryBadgeClass,
+    pixelArtClass,
+    typeDotClass,
+    typePillClass,
 };

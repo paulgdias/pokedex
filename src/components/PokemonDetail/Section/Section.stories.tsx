@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
-import Section, { InfoSection } from ".";
 import { makeInfo } from "../../__fixtures__/pokemon";
+import Section, { InfoSection } from ".";
 
 const meta = {
     title: "PokemonDetail/Section",

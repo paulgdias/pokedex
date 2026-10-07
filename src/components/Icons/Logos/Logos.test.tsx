@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
 
-import { Email, GitHub, LinkedIn, githubUrl, linkedinUrl } from ".";
+import { Email, GitHub, githubUrl, LinkedIn, linkedinUrl } from ".";
 
 describe("Logos", () => {
     it("exports the profile URLs", () => {

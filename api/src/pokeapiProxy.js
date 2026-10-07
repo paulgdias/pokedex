@@ -69,7 +69,9 @@ const writeFile = async (file, data) => {
         await fs.writeFile(temp, data);
         await fs.rename(temp, file);
     } catch (error) {
-        await fs.unlink(temp).catch(() => {});
+        await fs.unlink(temp).catch(() => {
+            /* best effort */
+        });
         throw error;
     }
 };
@@ -141,7 +143,9 @@ const age = async (file) => {
 // time that age() checks for freshness.
 const touch = (file) => {
     const now = new Date();
-    fs.utimes(file, now, now).catch(() => {});
+    fs.utimes(file, now, now).catch(() => {
+        /* best effort */
+    });
 };
 
 const listFiles = async (dir) => {

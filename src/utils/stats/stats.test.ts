@@ -3,9 +3,6 @@ import { describe, expect, it } from "vitest";
 import { EFFICACY } from "@components/__fixtures__/pokemon";
 
 import {
-    MAX_STAT,
-    STAT_LABELS,
-    TYPE_ORDER,
     describeMatchup,
     formatFlavorText,
     formatHeight,
@@ -14,6 +11,9 @@ import {
     getFemaleShare,
     getOffense,
     getTypeMatchups,
+    MAX_STAT,
+    STAT_LABELS,
+    TYPE_ORDER,
 } from ".";
 
 describe("formatting", () => {

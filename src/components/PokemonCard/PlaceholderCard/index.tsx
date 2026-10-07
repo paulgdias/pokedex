@@ -1,5 +1,4 @@
 import { CSSProperties } from "react";
-
 import { twMerge } from "tailwind-merge";
 
 import { cardArtClass, cardBodyClass, cardClass } from "@styles/Pokedex";

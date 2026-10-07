@@ -1,6 +1,6 @@
-import { Fragment } from "react";
-
 import { ArrowDown, ArrowRight } from "lucide-react";
+import { Fragment } from "react";
+import { twMerge } from "tailwind-merge";
 
 import {
     EvolutionLane,
@@ -8,14 +8,10 @@ import {
     PokemonDetails,
     typeColors,
 } from "@customTypes/PokemonTypes";
-
-import { twMerge } from "tailwind-merge";
-
+import { typeDotClass } from "@styles/Pokedex";
 import { buildEvolutionLanes } from "@utils/evolution";
 import { formatPokedexNumber } from "@utils/search";
 import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
-
-import { typeDotClass } from "@styles/Pokedex";
 
 const FORM_LABELS: Record<string, string> = {
     mega: "Mega Evolution",

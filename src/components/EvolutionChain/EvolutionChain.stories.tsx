@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import EvolutionChain from ".";
 import {
     DITTO,
     EEVEE_LINE,
-    MEOWTH_LINE,
     ivysaur,
+    MEOWTH_LINE,
     venusaur,
     venusaurMega,
 } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
+import EvolutionChain from ".";
 
 const meta = {
     title: "PokemonDetail/EvolutionChain",

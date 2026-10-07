@@ -1,4 +1,5 @@
 import { CSSProperties, ReactNode, Ref } from "react";
+
 import { PokemonDetails } from "./PokemonTypes";
 
 export interface PokemonCardType {

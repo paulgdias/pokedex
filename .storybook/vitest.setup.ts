@@ -1,6 +1,6 @@
 import { afterEach, expect } from "vitest";
 
-import { MIN_A11Y_SCORE, getA11yScore } from "./a11yScore";
+import { getA11yScore, MIN_A11Y_SCORE } from "./a11yScore";
 
 type A11yReport = {
     type: string;

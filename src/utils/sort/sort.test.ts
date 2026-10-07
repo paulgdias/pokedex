@@ -1,16 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { SORT_KEYS, SortKey, SortState } from "@customTypes/SortingTypes";
-
 import {
+    bulbasaur,
     CHARMANDER,
     MEW,
     MEWTWO,
+    makePokemon,
     PICHU,
     SQUIRTLE,
-    bulbasaur,
-    makePokemon,
 } from "@components/__fixtures__/pokemon";
+import { SORT_KEYS, SortKey, SortState } from "@customTypes/SortingTypes";
 
 import {
     DEFAULT_SORT,

@@ -1,11 +1,9 @@
-import { createRoot } from "react-dom/client";
-import { RouterProvider } from "react-router";
-
-import { I18nProvider } from "react-aria";
-
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { I18nProvider } from "react-aria";
+import { createRoot } from "react-dom/client";
+import { RouterProvider } from "react-router";
 
 import { idbStorage, removeLegacyLocalStorageCache } from "./utils/idbStorage";
 import { createAppRouter } from "./utils/routes";

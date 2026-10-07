@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
 
-import Section, { InfoSection } from ".";
 import { makeInfo } from "../../__fixtures__/pokemon";
+import Section, { InfoSection } from ".";
 
 describe("Section", () => {
     it("labels the region with its heading", async () => {

@@ -1,12 +1,9 @@
-import { preload } from "react-dom";
-
 import { Sparkles } from "lucide-react";
+import { preload } from "react-dom";
+import { twMerge } from "tailwind-merge";
 
 import { PokemonCardType } from "@customTypes/PokemonCardTypes";
 import { typeColors } from "@customTypes/PokemonTypes";
-
-import { formatPokedexNumber } from "@utils/search";
-
 import {
     cardArtClass,
     cardBodyClass,
@@ -19,7 +16,7 @@ import {
     typeDotClass,
     typePillClass,
 } from "@styles/Pokedex";
-import { twMerge } from "tailwind-merge";
+import { formatPokedexNumber } from "@utils/search";
 
 const PokemonCard: React.FC<PokemonCardType> = ({
     ref,

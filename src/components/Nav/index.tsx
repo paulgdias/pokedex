@@ -1,3 +1,4 @@
+import { Grid3x3, House, LibraryBig, Scale } from "lucide-react";
 import {
     Link,
     NavLink,
@@ -6,14 +7,10 @@ import {
     useSearchParams,
 } from "react-router";
 
-import { Grid3x3, House, LibraryBig, Scale } from "lucide-react";
-
 import Pokeball from "@components/Icons/Pokeball";
 import ThemeToggle from "@components/ThemeToggle";
-
 import { PokemonDetails } from "@customTypes/PokemonTypes";
-
-import { GENERATIONS, countByGeneration } from "@utils/generations";
+import { countByGeneration, GENERATIONS } from "@utils/generations";
 import { getFiltersFromURLParams, withFilters } from "@utils/search";
 
 const NAV_ITEMS = [

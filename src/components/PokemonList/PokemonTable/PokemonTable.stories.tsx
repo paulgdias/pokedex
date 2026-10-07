@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
-import PokemonTable from ".";
 import { DEX, makeDex } from "../../__fixtures__/pokemon";
 import TestRouter from "../../__fixtures__/router";
+import PokemonTable from ".";
 
 const meta = {
     title: "Pokedex/PokemonList/PokemonTable",

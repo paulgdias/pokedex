@@ -1,5 +1,4 @@
 import { ReactNode, useId } from "react";
-
 import { twMerge } from "tailwind-merge";
 
 import { PokemonInfo } from "@customTypes/PokemonTypes";

@@ -1,9 +1,9 @@
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 import {
     SORT_KEYS,
-    STAT_SORT_KEYS,
     SortKey,
     SortState,
+    STAT_SORT_KEYS,
 } from "@customTypes/SortingTypes";
 
 const SORT_PARAM = "sort";

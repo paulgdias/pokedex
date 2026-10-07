@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { createBrowserRouter } from "react-router";
 import type { RouteObject } from "react-router";
+import { createBrowserRouter } from "react-router";
 
 import LoadingSpinner from "@components/LoadingSpinner";
 

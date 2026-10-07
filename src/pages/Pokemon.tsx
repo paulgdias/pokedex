@@ -1,4 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@uidotdev/usehooks";
+import { ArrowLeft, ChevronLeft, ChevronRight, Scale } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "react-aria-components";
 import { preconnect, preload } from "react-dom";
 import {
     useLoaderData,
@@ -7,12 +11,10 @@ import {
     useParams,
 } from "react-router";
 
-import { useQuery } from "@tanstack/react-query";
-import { useDebounce } from "@uidotdev/usehooks";
-import { Button } from "react-aria-components";
-
-import { ArrowLeft, ChevronLeft, ChevronRight, Scale } from "lucide-react";
-
+import {
+    pokemonInfoQueryOptions,
+    typeEfficacyQueryOptions,
+} from "@api/pokedex";
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import EvolutionChain from "@components/EvolutionChain";
 import PokemonCard from "@components/PokemonCard";
@@ -24,16 +26,9 @@ import Section, { InfoSection } from "@components/PokemonDetail/Section";
 import StatBars from "@components/PokemonDetail/StatBars";
 import TypeMatchups from "@components/PokemonDetail/TypeMatchups";
 import SpriteToggle, { SpriteView } from "@components/SpriteToggle";
-
-import {
-    pokemonInfoQueryOptions,
-    typeEfficacyQueryOptions,
-} from "@api/pokedex";
-
+import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { getGeneration } from "@utils/generations";
 import { PokemonLocationState } from "@utils/useNavigateToPokemon";
-
-import { PokemonDetails } from "@customTypes/PokemonTypes";
 
 /** Tints derived from the pokémon's types; they follow the light/dark theme. */
 const getTypeTheme = (types: string[]) => {

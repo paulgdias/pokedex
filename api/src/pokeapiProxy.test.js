@@ -4,6 +4,7 @@ import http from "node:http";
 import { createRequire } from "node:module";
 import os from "node:os";
 import path from "node:path";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // The proxy is CommonJS and reads its config at load time, so it is loaded
@@ -152,9 +153,15 @@ beforeEach(async () => {
     cacheDir = await fs.mkdtemp(path.join(os.tmpdir(), "pokeapi-proxy-"));
     fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "warn").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {
+        /* silence */
+    });
+    vi.spyOn(console, "warn").mockImplementation(() => {
+        /* silence */
+    });
+    vi.spyOn(console, "error").mockImplementation(() => {
+        /* silence */
+    });
     proxy = loadProxy({ POKEAPI_CACHE_MAX_AGE_DAYS: undefined });
     await listen();
 });

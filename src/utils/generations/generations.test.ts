@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { GENERATIONS, countByGeneration, getGeneration } from ".";
+import { countByGeneration, GENERATIONS, getGeneration } from ".";
 
 describe("generations", () => {
     it("lists generations 1-9 in order with roman numerals and regions", () => {

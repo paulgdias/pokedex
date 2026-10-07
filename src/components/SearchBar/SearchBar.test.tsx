@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import { render } from "vitest-browser-react";
 import { page, userEvent } from "vitest/browser";
+import { render } from "vitest-browser-react";
 
 import { EMPTY_FILTERS, PokedexFilters } from "@utils/search";
 import { DEFAULT_SORT } from "@utils/sort";
 
-import SearchBarHarness from "../__fixtures__/SearchBarHarness";
 import { DEX, makeDex } from "../__fixtures__/pokemon";
+import SearchBarHarness from "../__fixtures__/SearchBarHarness";
 
 type Props = Parameters<typeof SearchBarHarness>[0];
 

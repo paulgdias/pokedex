@@ -1,10 +1,6 @@
-import { useMemo, useState } from "react";
-import { preconnect } from "react-dom";
-import { useLoaderData, useLocation, useSearchParams } from "react-router";
-
 import { useQueries } from "@tanstack/react-query";
-
 import { X } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
     Button,
     ComboBox,
@@ -13,23 +9,22 @@ import {
     ListBoxItem,
     Popover,
 } from "react-aria-components";
-
-import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
+import { preconnect } from "react-dom";
+import { useLoaderData, useLocation, useSearchParams } from "react-router";
 
 import { pokemonInfoQueryOptions } from "@api/pokedex";
-
+import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
+import { typeDotClass, typePillClass } from "@styles/Pokedex";
 import { getGeneration } from "@utils/generations";
 import { formatPokedexNumber, getPokemonSuggestions } from "@utils/search";
 import {
-    MAX_STAT,
-    STAT_LABELS,
     formatHeight,
     formatName,
     formatWeight,
+    MAX_STAT,
+    STAT_LABELS,
 } from "@utils/stats";
 import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
-
-import { typeDotClass, typePillClass } from "@styles/Pokedex";
 
 const IDS_PARAM = "ids";
 const MAX_COMPARED = 3;
