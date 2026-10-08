@@ -25,7 +25,12 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            api/package-lock.json
       - run: npm ci
+      # the api tests import express, which lives in api/'s own node_modules
+      - run: npm ci --prefix api
       - run: npx playwright install --with-deps chromium
       - run: npm run verify
 
