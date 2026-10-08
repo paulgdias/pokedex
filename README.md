@@ -1,5 +1,7 @@
 # Pokedex
 
+[![Verify](https://github.com/paulgdias/pokedex/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/paulgdias/pokedex/actions/workflows/verify.yml)
+
 A React + TypeScript Pokédex I started as a way to bond with my 9 year old niece. It also serves as a testbed for new libraries, design patterns and UX ideas.
 
 Browse every Pokémon, search by name or number, and filter by generation, type, and legendary/mythical status. Filters and sort order live in the URL, so any view can be shared or bookmarked. There are also a detail page per Pokémon, a side-by-side compare page, a type chart, and a light/dark theme.
