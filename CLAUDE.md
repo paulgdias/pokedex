@@ -75,6 +75,7 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 
 - **Sort semantics**: Default sort is `id:asc` (Bulbasaur #1 first). Each comparator produces natural `"asc"` order; `"desc"` reverses it. Ties always fall back to ascending `id`. See `.claude/rules/utils.md`.
 - **`Icons` casing**: the directory is `src/components/Icons/` on disk and in git; imports use `@components/Icons/...`. Keep that exact casing (it would only break on case-sensitive file systems if it drifted).
+- **Dev rebuilds**: Tailwind's automatic source detection registers every scanned file and folder as a watched dependency, so `src/styles/index.css` scopes it with `source("..")` (only `src/`); otherwise every save under `api/` (including the proxy's disk cache), `e2e/` or `.claude/` sends a hot update.
 - **`api/` server**: a small Express server (its own `package.json`; run `npm install` inside `api/`) that only hosts the optional PokeAPI proxy, no database. `api/` is tracked normally (only `/api/.cache` is gitignored, plus the generic `.env` and `node_modules` rules) and is linted and formatted by the root Biome. The old MongoDB routes and the `/teams` page were removed.
 
 ## Working agreements
