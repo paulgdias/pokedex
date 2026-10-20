@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { DefinePlugin } = require("@rspack/core");
+const { ReactRefreshRspackPlugin } = require("@rspack/plugin-react-refresh");
 const { TsCheckerRspackPlugin } = require("ts-checker-rspack-plugin");
 
 const plugins = [
@@ -33,6 +34,8 @@ const cacheHeaders = (req: { url?: string }) => {
     ];
 };
 
+const isDevelopment = (argv: { mode?: string }) => argv.mode === "development";
+
 module.exports = (_env: unknown, argv: { mode?: string }) => ({
     entry: "./src/index.tsx",
     output: {
@@ -58,8 +61,8 @@ module.exports = (_env: unknown, argv: { mode?: string }) => ({
                                 transform: {
                                     react: {
                                         runtime: "automatic",
-                                        development: false,
-                                        refresh: false,
+                                        development: isDevelopment(argv),
+                                        refresh: isDevelopment(argv),
                                     },
                                 },
                             },
@@ -74,7 +77,15 @@ module.exports = (_env: unknown, argv: { mode?: string }) => ({
             },
         ],
     },
-    plugins,
+    // React Refresh patches edited components (and pages compiled on first
+    // request) in place; without it every hot update is a full page reload
+    plugins: isDevelopment(argv)
+        ? [...plugins, new ReactRefreshRspackPlugin()]
+        : plugins,
+    // `rspack serve` otherwise compiles each lazy page on its first visit,
+    // which takes seconds on a cold server; compiling them all up front is
+    // cheap at this size
+    lazyCompilation: false,
     experiments: {
         css: true,
     },
