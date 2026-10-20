@@ -22,12 +22,7 @@ import {
     PokedexFilters,
     withFilters,
 } from "@utils/search";
-import {
-    DEFAULT_SORT,
-    getSortFromURLParams,
-    sortPokemon,
-    withSort,
-} from "@utils/sort";
+import { getSortFromURLParams, sortPokemon, withSort } from "@utils/sort";
 import { getViewFromURLParams, PokedexView, withView } from "@utils/view";
 
 const TEXT_DEBOUNCE_MS = 250;
@@ -61,16 +56,6 @@ const Pokedex: React.FC = () => {
         () => sortPokemon(applyFilters(allPokemon, deferredFilters), sort),
         [allPokemon, deferredFilters, sort]
     );
-
-    useEffect(() => {
-        if (!urlParams.has("sort")) {
-            setURLParams(withSort(urlParams, DEFAULT_SORT), {
-                replace: true,
-                preventScrollReset: true,
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const debouncedText = useDebounce(text, TEXT_DEBOUNCE_MS);
     useEffect(() => {

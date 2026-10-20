@@ -68,6 +68,31 @@ describe("pokedexLoader", () => {
         expect(fetches).toBe(0);
     });
 
+    it("waits for the persisted cache to be restored before reading it", async () => {
+        const queryClient = new QueryClient();
+        let restore: () => void = () => undefined;
+        const cacheRestored = new Promise<void>((resolve) => {
+            restore = resolve;
+        });
+        let fetches = 0;
+        queryClient.getQueryCache().subscribe((event) => {
+            if (event.type === "updated" && event.action.type === "fetch") {
+                fetches += 1;
+            }
+        });
+
+        const loading = pokedexLoader(queryClient, cacheRestored)();
+        await Promise.resolve();
+        // the restore lands after the loader has started
+        queryClient.setQueryData(pokedexQueryOptions.queryKey, {
+            pokemon: [raw(1, "bulbasaur", 1)],
+        });
+        restore();
+
+        expect((await loading).map((p) => p.name)).toEqual(["bulbasaur"]);
+        expect(fetches).toBe(0);
+    });
+
     it("keys the cache so a changed query shape is not reused", () => {
         expect(pokedexQueryOptions.queryKey).toEqual(["pokedex", "v5"]);
     });

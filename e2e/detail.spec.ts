@@ -32,8 +32,8 @@ test("the arrow keys step through the dex", async ({ page }) => {
 
     await page.keyboard.press("ArrowRight");
     await expect(page).toHaveURL("/pokedex/ivysaur");
-    // the key handler re-registers after each render, so wait for the page
-    // to settle on ivysaur before the next key
+    // wait for the page to settle on ivysaur, so the next key steps back
+    // from it rather than from bulbasaur
     await expect(
         page.getByRole("button", { name: "Previous: bulbasaur" })
     ).toBeVisible();

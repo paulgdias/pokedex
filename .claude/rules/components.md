@@ -12,7 +12,7 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 | Path | Purpose |
 |---|---|
 | `Nav/` | Sidebar (desktop) / top bar (mobile): logo, nav items (Home, Pokédex, Compare, Type chart), theme toggle, generation links with per-generation counts. Reads loader data via `useRouteLoaderData` (route ids `"pokedex"`, `"pokemon"`). |
-| `LoadingSpinner/` | Spinning Pokeball animation; used as the router `HydrateFallback`. |
+| `LoadingSpinner/` | Spinning Pokeball animation (`role="status"`, optional `className`); used as the router `HydrateFallback` and in `Layout`'s navigation overlay. |
 | `Buttons/ScrollTopButton/` | Fixed "scroll to top" button (`onPress`). |
 | `Icons/Pokeball/`, `Icons/Logos/` | SVG icons; `Logos` also exports `githubUrl` / `linkedinUrl`. |
 | `PokemonCard/` | Card: official art (with `preload` hint), dex number watermark, type pills, legendary/mythical badge. Supports `size="large" \| "default"`. Optional `sprite` prop overrides the image and `children` render as an overlay in the art area (used by the detail page for `SpriteToggle`). When `navigateCallback` is passed, wraps in an `<a>` tag for accessibility/links while triggering the callback. Prop types in `@customTypes/PokemonCardTypes`. |
@@ -46,7 +46,7 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 
 ## Loading, empty, error states
 
-- Route loading: `LoadingSpinner` via `HydrateFallback`. The loader awaits data, so `PlaceholderCard` / `isLoading` in `PokemonList` are currently not hit during initial route hydration on the Pokedex page.
+- Route loading: `LoadingSpinner` via `HydrateFallback` on first load; on client-side navigation `Layout` overlays it on `<main>` (`useNavigation`, only when the pathname changes, fading in after 200 ms so cached navigations do not flash it). The loader awaits data, so `PlaceholderCard` / `isLoading` in `PokemonList` are currently not hit during initial route hydration on the Pokedex page.
 - Empty results: inline `EmptyState` in `src/pages/Pokedex.tsx`.
 - Errors: `ErrorBoundary` in `Layout` (around the outlet) and around the list in `Pokedex`. Toasts via `sonner`.
 

@@ -30,10 +30,13 @@ const dataRoute = (
 });
 
 /** The app's routes, apart from the router that runs them. */
-export const createAppRoutes = (queryClient: QueryClient): RouteObject[] => {
+export const createAppRoutes = (
+    queryClient: QueryClient,
+    cacheRestored?: Promise<unknown>
+): RouteObject[] => {
     const pokedexError =
         "There was an error loading the Pokédex. Please try again.";
-    const loader = pokedexLoader(queryClient);
+    const loader = pokedexLoader(queryClient, cacheRestored);
 
     return [
         {
@@ -80,5 +83,7 @@ export const createAppRoutes = (queryClient: QueryClient): RouteObject[] => {
     ];
 };
 
-export const createAppRouter = (queryClient: QueryClient) =>
-    createBrowserRouter(createAppRoutes(queryClient));
+export const createAppRouter = (
+    queryClient: QueryClient,
+    cacheRestored?: Promise<unknown>
+) => createBrowserRouter(createAppRoutes(queryClient, cacheRestored));

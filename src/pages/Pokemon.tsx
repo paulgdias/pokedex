@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { ArrowLeft, ChevronLeft, ChevronRight, Scale } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { Button } from "react-aria-components";
 import { preconnect, preload } from "react-dom";
 import {
@@ -91,29 +91,28 @@ const Pokemon: React.FC = () => {
         }
     };
 
+    const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
+        if (
+            event.defaultPrevented ||
+            event.altKey ||
+            event.ctrlKey ||
+            event.metaKey ||
+            event.shiftKey ||
+            isTypingTarget(event.target)
+        ) {
+            return;
+        }
+        if (event.key === "ArrowLeft") {
+            goTo(prev, event.repeat);
+        } else if (event.key === "ArrowRight") {
+            goTo(next, event.repeat);
+        }
+    });
     useEffect(() => {
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (
-                event.defaultPrevented ||
-                event.altKey ||
-                event.ctrlKey ||
-                event.metaKey ||
-                event.shiftKey ||
-                isTypingTarget(event.target)
-            ) {
-                return;
-            }
-            if (event.key === "ArrowLeft") {
-                goTo(prev, event.repeat);
-            } else if (event.key === "ArrowRight") {
-                goTo(next, event.repeat);
-            }
-        };
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-        // goTo only closes over navigate/previous, which change with prev/next
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [prev, next, previous]);
+        const listener = (event: KeyboardEvent) => onKeyDown(event);
+        window.addEventListener("keydown", listener);
+        return () => window.removeEventListener("keydown", listener);
+    }, []);
 
     // the choice stays while moving between pokemon; falls back to the
     // artwork for the few that have no in-game sprite

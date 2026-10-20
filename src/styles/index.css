@@ -1,4 +1,6 @@
-@import "tailwindcss";
+/* only src/ holds classes; scanning the repo root would also make the dev
+   server rebuild on every save under api/, e2e/, .claude/ ... */
+@import "tailwindcss" source("..");
 @plugin "tailwindcss-react-aria-components";
 
 @theme {

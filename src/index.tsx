@@ -31,7 +31,15 @@ const queryClient = new QueryClient({
 removeLegacyLocalStorageCache();
 const persister = createAsyncStoragePersister({ storage: idbStorage });
 
-const router = createAppRouter(queryClient);
+// the router runs its loaders as soon as it is created, but the provider only
+// starts restoring the persisted cache after the first render; loaders wait
+// for the restore (success or not) so they do not refetch a cached dex
+let markCacheRestored: () => void = () => undefined;
+const cacheRestored = new Promise<void>((resolve) => {
+    markCacheRestored = resolve;
+});
+
+const router = createAppRouter(queryClient, cacheRestored);
 
 const root = createRoot(container);
 root.render(
@@ -39,6 +47,8 @@ root.render(
         <PersistQueryClientProvider
             client={queryClient}
             persistOptions={{ persister, maxAge: ONE_DAY }}
+            onSuccess={markCacheRestored}
+            onError={markCacheRestored}
         >
             <RouterProvider router={router} />
         </PersistQueryClientProvider>
