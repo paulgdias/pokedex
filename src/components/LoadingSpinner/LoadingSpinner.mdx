@@ -6,11 +6,12 @@ import * as Stories from "./LoadingSpinner.stories";
 
 # LoadingSpinner
 
-A full-height, centred spinning Pokéball. It is the router's `HydrateFallback`, shown while the first route data loads.
+A full-height, centred spinning Pokéball. It is the router's `HydrateFallback`, shown while the first route data loads, and `Layout` overlays it on the page during a client-side navigation whose loader is still running.
 
 ## Behaviour
 
-- Takes no props.
+- Rendered as `role="status"` labelled "Loading".
+- Optional `className`, merged with `twMerge`, so callers can override the default `h-screen` (the `Layout` overlay passes `h-auto`).
 
 ## Examples
 
