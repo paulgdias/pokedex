@@ -19,17 +19,17 @@ describe("PokemonCard", () => {
     it("shows the name, padded number and one pill per type", async () => {
         const screen = await render(<PokemonCard pokemon={bulbasaur} />);
         const card = screen.getByLabelText("Pokemon Card for bulbasaur");
-        await expect.element(card).toHaveTextContent("bulbasaur");
-        await expect.element(card).toHaveTextContent("#0001");
-        await expect.element(card).toHaveTextContent("grass");
-        await expect.element(card).toHaveTextContent("poison");
+        await expect.element(card).toMatchTextContent("bulbasaur");
+        await expect.element(card).toMatchTextContent("#0001");
+        await expect.element(card).toMatchTextContent("grass");
+        await expect.element(card).toMatchTextContent("poison");
     });
 
     it("renders a single type pill for a single-type pokémon", async () => {
         const screen = await render(<PokemonCard pokemon={charmander} />);
         const card = screen.getByLabelText("Pokemon Card for charmander");
-        await expect.element(card).toHaveTextContent("fire");
-        await expect.element(card).not.toHaveTextContent("poison");
+        await expect.element(card).toMatchTextContent("fire");
+        await expect.element(card).not.toMatchTextContent("poison");
     });
 
     it("labels legendary and mythical badges, mythical winning", async () => {

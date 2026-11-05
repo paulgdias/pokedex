@@ -255,7 +255,7 @@ describe("SearchBar toolbar", () => {
         const { screen } = await setup(withFilters({ category: "legendary" }));
         await expect
             .element(screen.getByText("shown"))
-            .toHaveTextContent("1 shown");
+            .toMatchTextContent("1 shown");
     });
 
     it("offers the four sorts and reports the chosen one", async () => {
