@@ -11,6 +11,9 @@ import tsconfigAliases from "./tsconfigAliases.cjs";
 const browser = (name: string) => ({
     enabled: true,
     headless: true,
+    // Vitest 5 matches locators exactly by default; the tests rely on
+    // case-insensitive substring matching (e.g. `getByText("shown")`)
+    locators: { exact: false },
     provider: playwright(),
     instances: [{ browser: "chromium" as const, name: `${name}-chromium` }],
 });

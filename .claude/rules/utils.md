@@ -1,6 +1,8 @@
 ---
+
 paths:
-  - "src/utils/**"
+- "src/utils/**"
+
 ---
 
 # Utils
@@ -9,20 +11,20 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...` (each u
 
 ## Files
 
-| File | Exports |
-|---|---|
-| `pokedexLoader/` | `pokedexLoader(queryClient)`: the loader shared by `/pokedex`, `/pokedex/:pokemon` and `/compare` (dex from the query cache -> `PokemonDetails[]` with evolutions). Kept out of the lazy pages so it starts immediately. |
-| `routes/` | `createAppRouter(queryClient)`. `dataRoute()` takes a page import (`() => import(...)`, used as the route's `lazy`) plus loader, `errorElement`, `HydrateFallback`; Home and Layout are in the entry chunk. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`. |
-| `generations/` | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type. |
-| `pokemon/` | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `id`). |
-| `evolution/` | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages). |
-| `search/` | Filters: `PokedexFilters`, `EMPTY_FILTERS`, `POKEMON_TYPES`, `CATEGORIES`, `getFiltersFromURLParams`, `withFilters`, `matchesText`, `applyFilters`. Suggestions: `getFilterSuggestions`, `getPokemonSuggestions`. Formatting: `capitalize`, `formatPokedexNumber` (formats to `#0001`). |
-| `sort/` | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`, `getSortLabel`. |
-| `stats/` | `STAT_LABELS`, `MAX_STAT`, `TYPE_ORDER`; formatters (`formatName`, `formatFlavorText`, `formatHeight`, `formatWeight`, `getFemaleShare`); `getTypeMatchups` (a defender's damage taken, dual types multiplied) `getOffense` (what an attacker hits) and `describeMatchup` (one-line "Fire → Grass: 2× (super effective)"), both from the `TypeEfficacy` map. |
-| `view/` | `PokedexView` (`cards` / `list`), `getViewFromURLParams`, `withView` (URL param `view`). |
-| `idbStorage/` | `idbStorage` (async `getItem` / `setItem` / `removeItem` on IndexedDB, failures swallowed; the React Query persister's storage) and `removeLegacyLocalStorageCache`. |
-| `useTheme/` | `useTheme` (preference `light` / `dark` / `system`, resolved theme, setter) and `initTheme` (call once at startup; follows OS changes while on `system`). |
-| `useNavigateToPokemon/` | Custom hook returning `(event, pokemon) => void`. Navigates to `/pokedex/:pokemonName` with `{ pokemon, previous }` router state (`PokemonLocationState`) so back navigation preserves previous filters and scroll. |
+| File                    | Exports                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pokedexLoader/`        | `pokedexLoader(queryClient)`: the loader shared by `/pokedex`, `/pokedex/:pokemon` and `/compare` (dex from the query cache -> `PokemonDetails[]` with evolutions). Kept out of the lazy pages so it starts immediately.                                                                                                                                     |
+| `routes/`               | `createAppRouter(queryClient)`. `dataRoute()` takes a page import (`() => import(...)`, used as the route's `lazy`) plus loader, `errorElement`, `HydrateFallback`; Home and Layout are in the entry chunk. Route ids `"pokedex"` / `"pokemon"` are relied on by `Nav` via `useRouteLoaderData`.                                                             |
+| `generations/`          | `GENERATIONS` (ids 1-9, roman numeral, region), `getGeneration`, `countByGeneration`, `Generation` type.                                                                                                                                                                                                                                                     |
+| `pokemon/`              | `convertToPokemonDetailsArray` (GraphQL `Pokemon` -> `PokemonDetails`, including `stats` / `statTotal`), `convertToPokemonInfo` (lazy detail query -> `PokemonInfo`), `withEvolutions` (sets each pokémon's `evolutions` to its whole chain, sorted by `id`).                                                                                                |
+| `evolution/`            | `getPokemonForm` (name -> `mega` / `gmax` / region / `other`), `formatEvolutionMethod` (PokeAPI evolution row -> label such as `Lv. 16`), `buildEvolutionLanes` (a chain -> lanes of ordered stages).                                                                                                                                                        |
+| `search/`               | Filters: `PokedexFilters`, `EMPTY_FILTERS`, `POKEMON_TYPES`, `CATEGORIES`, `getFiltersFromURLParams`, `withFilters`, `matchesText`, `applyFilters`. Suggestions: `getFilterSuggestions`, `getPokemonSuggestions`. Formatting: `capitalize`, `formatPokedexNumber` (formats to `#0001`).                                                                      |
+| `sort/`                 | `DEFAULT_SORT`, `sortPokemon`, `getNextSort`, `getSortFromURLParams`, `withSort`, `getSortLabel`.                                                                                                                                                                                                                                                            |
+| `stats/`                | `STAT_LABELS`, `MAX_STAT`, `TYPE_ORDER`; formatters (`formatName`, `formatFlavorText`, `formatHeight`, `formatWeight`, `getFemaleShare`); `getTypeMatchups` (a defender's damage taken, dual types multiplied) `getOffense` (what an attacker hits) and `describeMatchup` (one-line "Fire → Grass: 2× (super effective)"), both from the `TypeEfficacy` map. |
+| `view/`                 | `PokedexView` (`cards` / `list`), `getViewFromURLParams`, `withView` (URL param `view`).                                                                                                                                                                                                                                                                     |
+| `idbStorage/`           | `idbStorage` (async `getItem` / `setItem` / `removeItem` on IndexedDB, failures swallowed; the React Query persister's storage) and `removeLegacyLocalStorageCache`.                                                                                                                                                                                         |
+| `useTheme/`             | `useTheme` (preference `light` / `dark` / `system`, resolved theme, setter) and `initTheme` (call once at startup; follows OS changes while on `system`).                                                                                                                                                                                                    |
+| `useNavigateToPokemon/` | Custom hook returning `(event, pokemon) => void`. Navigates to `/pokedex/:pokemonName` with `{ pokemon, previous }` router state (`PokemonLocationState`) so back navigation preserves previous filters and scroll.                                                                                                                                          |
 
 ## Semantics that are easy to get wrong
 

@@ -124,7 +124,7 @@ describe("Nav layout", () => {
                 screen.container.querySelector("header") as Element
             ).display
         ).toBe("none");
-        await expect.element(link(screen, "Home")).toHaveTextContent("Home");
+        await expect.element(link(screen, "Home")).toMatchTextContent("Home");
     });
 
     it("shows a compact top bar on narrow screens, with icon-only named links", async () => {
@@ -157,11 +157,11 @@ describe("Nav generations", () => {
         await expect.element(screen.getByText("Generations")).toBeVisible();
         await expect
             .element(link(screen, /Every region/))
-            .toHaveTextContent(String(DEX.length));
-        await expect.element(link(screen, /Kanto/)).toHaveTextContent("8");
-        await expect.element(link(screen, /Johto/)).toHaveTextContent("1");
-        await expect.element(link(screen, /Hoenn/)).toHaveTextContent("1");
-        await expect.element(link(screen, /Kalos/)).toHaveTextContent("0");
+            .toMatchTextContent(String(DEX.length));
+        await expect.element(link(screen, /Kanto/)).toMatchTextContent("8");
+        await expect.element(link(screen, /Johto/)).toMatchTextContent("1");
+        await expect.element(link(screen, /Hoenn/)).toMatchTextContent("1");
+        await expect.element(link(screen, /Kalos/)).toMatchTextContent("0");
     });
 
     it("is not shown outside the Pokédex", async () => {
@@ -197,7 +197,7 @@ describe("Nav generations", () => {
         await expect
             .element(link(screen, /Kanto/))
             .not.toHaveAttribute("aria-current");
-        await expect.element(link(screen, /Kanto/)).toHaveTextContent("8");
+        await expect.element(link(screen, /Kanto/)).toMatchTextContent("8");
     });
 
     it("links to the list with the generation, keeping the other filters", async () => {
@@ -249,9 +249,9 @@ describe("Nav generations", () => {
             makePokemon({ id: 2, name: "b", generationId: 4 }),
         ];
         const screen = await setup("/pokedex", { dex });
-        await expect.element(link(screen, /Sinnoh/)).toHaveTextContent("2");
+        await expect.element(link(screen, /Sinnoh/)).toMatchTextContent("2");
         await expect
             .element(link(screen, /Every region/))
-            .toHaveTextContent("2");
+            .toMatchTextContent("2");
     });
 });

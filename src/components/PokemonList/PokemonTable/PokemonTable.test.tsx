@@ -135,7 +135,7 @@ describe("PokemonTable sorting", () => {
             .toHaveAttribute("aria-sort", "none");
         await expect
             .element(header(screen, "Pokémon"))
-            .toHaveTextContent("Pokémon");
+            .toMatchTextContent("Pokémon");
     });
 
     it("shows a direction arrow only on the sorted column", async () => {
