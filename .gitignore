@@ -7,6 +7,6 @@ dist
 coverage
 storybook-static
 __screenshots__
-.vitest-attachments
+.vitest
 test-results
 playwright-report
