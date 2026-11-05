@@ -32,13 +32,13 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "@tanstack/query-async-storage-persister": "^5.105.0",
-    "@tanstack/react-query": "^5.105.0",
-    "@tanstack/react-query-persist-client": "^5.105.0",
+    "@tanstack/query-async-storage-persister": "^5.105.2",
+    "@tanstack/react-query": "^5.105.2",
+    "@tanstack/react-query-persist-client": "^5.105.2",
     "@uidotdev/usehooks": "^2.4.1",
     "graphql": "^16.10.0",
     "graphql-request": "^7.4.0",
-    "lucide-react": "^1.64.0",
+    "lucide-react": "^1.66.0",
     "react": "^19.3.1",
     "react-aria-components": "^1.22.1",
     "react-dom": "^19.3.1",
@@ -49,7 +49,7 @@
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.9",
+    "@babel/core": "^8.1.0",
     "@babel/preset-react": "^8.0.1",
     "@biomejs/biome": "2.6.4",
     "@playwright/test": "^1.64.1",
@@ -67,7 +67,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/react-virtualized": "^9.22.4",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-react": "^6.2.1",
     "@vitest/browser-playwright": "^4.1.11",
     "@vitest/coverage-v8": "^4.1.11",
     "esbuild": "^0.28.2",
