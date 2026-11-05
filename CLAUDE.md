@@ -41,14 +41,14 @@ Tailwind theme tokens live in the `@theme` block of `src/styles/index.css`. `tai
 
 ## URL is the source of truth for Pokedex state
 
-| Param | Meaning |
-|---|---|
-| `q` | search text (debounced 250ms before writing to URL; UI filters immediately with `useDeferredValue`) |
-| `gen` | generation id 1-9 |
-| `type` | comma-separated types |
-| `only` | `legendary` or `mythical` |
-| `sort` | `key:direction` (e.g., `id:asc`; keys include `total` and the six stats) |
-| `view` | `list` for the table view; omitted for cards |
+| Param  | Meaning                                                                                             |
+| ------ | --------------------------------------------------------------------------------------------------- |
+| `q`    | search text (debounced 250ms before writing to URL; UI filters immediately with `useDeferredValue`) |
+| `gen`  | generation id 1-9                                                                                   |
+| `type` | comma-separated types                                                                               |
+| `only` | `legendary` or `mythical`                                                                           |
+| `sort` | `key:direction` (e.g., `id:asc`; keys include `total` and the six stats)                            |
+| `view` | `list` for the table view; omitted for cards                                                        |
 
 URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the query string on links. Navigating to a detail page passes `{ pokemon, previous: pathname + search }` in router state (`useNavigateToPokemon`) so back navigation returns to the exact same filters and query.
 
