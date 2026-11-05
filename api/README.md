@@ -24,10 +24,10 @@ Linting and formatting come from the root Biome config (`npm run biome:lint` / `
 
 Mounted at `/pokeapi`. It avoids PokeAPI's rate limits and gives sprites and cries a long cache lifetime.
 
-| Route | Description |
-|---|---|
+| Route                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `POST /pokeapi/graphql` | Forwards the app's `getPokedex`, `getPokemonInfo` and `getTypeEfficacy` queries to `https://beta.pokeapi.co/graphql/v1beta` (other operations, and documents with more than one operation, get a 400). Responses are cached on disk for 24 h (GraphQL errors and non-JSON bodies are never cached), written atomically, served stale if PokeAPI is down, and identical concurrent requests share one upstream call. 429s are retried honouring `Retry-After`. |
-| `GET /pokeapi/assets/*` | Sprites and cries from `raw.githubusercontent.com/PokeAPI/`, cached on disk and served with `Cache-Control: public, max-age=31536000, immutable`. |
+| `GET /pokeapi/assets/*` | Sprites and cries from `raw.githubusercontent.com/PokeAPI/`, cached on disk and served with `Cache-Control: public, max-age=31536000, immutable`.                                                                                                                                                                                                                                                                                                             |
 
 The GraphQL responses have their `raw.githubusercontent.com/PokeAPI/` URLs rewritten to `/pokeapi/assets/`, so the browser loads them same-origin. Cached files live in `api/.cache/` (gitignored); delete it to refetch everything.
 
