@@ -24,6 +24,7 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:contract": "POKEAPI_CONTRACT=1 vitest run --project contract",
     "e2e": "playwright test",
     "verify": "npm run biome:check && npm run type-check && npm run build && npm run test:coverage",
     "verify:full": "npm run verify && npm run e2e",

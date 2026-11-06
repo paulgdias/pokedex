@@ -3,7 +3,7 @@ const fs = require("fs/promises");
 const path = require("path");
 const { Router } = require("express");
 
-const GRAPHQL_URL = "https://beta.pokeapi.co/graphql/v1beta";
+const GRAPHQL_URL = "https://graphql.pokeapi.co/v1beta2";
 const ASSET_HOST = "https://raw.githubusercontent.com/PokeAPI/";
 const ASSET_PREFIX = "/pokeapi/assets/";
 

@@ -50,7 +50,7 @@ const isTypingTarget = (target: EventTarget | null) =>
         ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
 
 const Pokemon: React.FC = () => {
-    preconnect("https://beta.pokeapi.co");
+    preconnect("https://graphql.pokeapi.co");
     preconnect("https://raw.githubusercontent.com/");
 
     const scrollRef = useRef<HTMLDivElement>(null);

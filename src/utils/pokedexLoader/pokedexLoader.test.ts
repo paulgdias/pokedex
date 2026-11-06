@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it } from "vitest";
 
-import { pokedexQueryOptions } from "@api/pokedex";
+import { pokedexQuery, pokedexQueryOptions, queryHash } from "@api/pokedex";
 import { Pokemon } from "@customTypes/PokemonTypes";
 
 import { pokedexLoader } from ".";
@@ -93,7 +93,11 @@ describe("pokedexLoader", () => {
         expect(fetches).toBe(0);
     });
 
-    it("keys the cache so a changed query shape is not reused", () => {
-        expect(pokedexQueryOptions.queryKey).toEqual(["pokedex", "v5"]);
+    it("keys the cache by the query text so a changed query is not reused", () => {
+        expect(pokedexQueryOptions.queryKey).toEqual([
+            "pokedex",
+            queryHash(pokedexQuery),
+        ]);
+        expect(queryHash(pokedexQuery)).not.toBe(queryHash(`${pokedexQuery} `));
     });
 });

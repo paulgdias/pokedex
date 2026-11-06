@@ -87,6 +87,23 @@ export default defineConfig({
                     include: ["api/src/**/*.test.js"],
                 },
             },
+            // the real PokeAPI: runs the app's three queries against the live
+            // endpoint to catch a moved URL or changed schema. Opt-in
+            // (`npm run test:contract`) because it needs the network
+            ...(process.env.POKEAPI_CONTRACT
+                ? [
+                      {
+                          extends: false as const,
+                          resolve: { alias: tsconfigAliases() },
+                          test: {
+                              name: "contract",
+                              environment: "node",
+                              include: ["src/**/*.contract.ts"],
+                              testTimeout: 30_000,
+                          },
+                      },
+                  ]
+                : []),
             // every story runs in both themes; `.storybook/preview.tsx` reads
             // the variable to pick the theme. The Storybook UI's Vitest addon
             // sets VITEST_STORYBOOK, and the plugin then forces the same

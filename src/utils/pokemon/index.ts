@@ -72,7 +72,7 @@ export const withEvolutions = (pokemon: PokemonDetails[]): PokemonDetails[] => {
 };
 
 export const convertToPokemonInfo = (
-    pokemon: PokemonInfoResult["pokemon_v2_pokemon"][number]
+    pokemon: PokemonInfoResult["pokemon"][number]
 ): PokemonInfo => ({
     height: pokemon.height,
     weight: pokemon.weight,

@@ -222,7 +222,7 @@ const TypeHeader = ({
 };
 
 const TypeChart: React.FC = () => {
-    preconnect("https://beta.pokeapi.co");
+    preconnect("https://graphql.pokeapi.co");
 
     const { data: efficacy, isError } = useQuery(typeEfficacyQueryOptions);
     const canHover = useCanHover();

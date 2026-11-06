@@ -121,7 +121,7 @@ const Picker = ({
 };
 
 const Compare: React.FC = () => {
-    preconnect("https://beta.pokeapi.co");
+    preconnect("https://graphql.pokeapi.co");
     preconnect("https://raw.githubusercontent.com/");
 
     const allPokemon = useLoaderData() as PokemonDetails[];

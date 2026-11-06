@@ -28,7 +28,7 @@ import { getViewFromURLParams, PokedexView, withView } from "@utils/view";
 const TEXT_DEBOUNCE_MS = 250;
 
 const Pokedex: React.FC = () => {
-    preconnect("https://beta.pokeapi.co");
+    preconnect("https://graphql.pokeapi.co");
     preconnect("https://raw.githubusercontent.com/");
 
     const [urlParams, setURLParams] = useSearchParams();

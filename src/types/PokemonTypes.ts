@@ -34,7 +34,7 @@ export type EvolutionMethod = {
     location: NamedResource;
 };
 export type PokemonInfoResult = {
-    pokemon_v2_pokemon: {
+    pokemon: {
         height: number;
         weight: number;
         base_experience: number | null;
