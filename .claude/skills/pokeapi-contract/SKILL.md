@@ -16,5 +16,5 @@ Every other test uses fixtures or mocks, so none of them notice when PokeAPI mov
    - **CORS test fails but the queries pass**: PokeAPI stopped sending `Access-Control-Allow-Origin`. The browser cannot call it directly any more, so the app must use the proxy path (`dev:proxy`) or a different host. Report this to the user rather than working around it.
    - **A GraphQL validation error ("field ... not found")**: the schema changed. Introspect it (`{__type(name:"pokemon"){fields{name}}}`) for the failing type, rename the field in the query, then update the matching type in `src/types/PokemonTypes.ts`, `convertToPokemonInfo`/the converters in `src/utils/pokemon`, and the e2e mock responses (`e2e/mocks.ts`).
    - **Shape assertion fails (for example the dex has fewer than 1000 Pokémon, or `sprites[0].default` is not a GitHub URL)**: the query is valid but the data changed. Check the live response by hand before editing the test; do not loosen an assertion just to make it pass.
-4. After any query shape change, bump the persisted query key (the `bump-query-key` skill, if present), then run `npm run verify`.
+4. After any query shape change, run `npm run verify`. The persisted query keys include `queryHash(query)`, so there is no version to bump.
 5. Do not add the contract test to `verify` or a git hook: a PokeAPI outage must not block commits or merges.
