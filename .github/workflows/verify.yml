@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * 1"
 
 concurrency:
   group: verify-${{ github.ref }}
@@ -17,6 +19,7 @@ permissions:
 jobs:
   verify:
     name: verify
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -36,6 +39,7 @@ jobs:
 
   e2e:
     name: e2e
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -55,3 +59,20 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  # the only job that talks to the real PokeAPI; kept out of `verify` so a
+  # PokeAPI outage cannot block a merge. Also runs weekly to catch an endpoint
+  # or schema change that no code change would trigger
+  contract:
+    name: pokeapi contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run test:contract

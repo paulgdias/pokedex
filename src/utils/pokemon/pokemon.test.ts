@@ -182,8 +182,8 @@ describe("withEvolutions", () => {
 
 describe("convertToPokemonInfo", () => {
     const rawInfo = (
-        overrides: Partial<PokemonInfoResult["pokemon_v2_pokemon"][number]> = {}
-    ): PokemonInfoResult["pokemon_v2_pokemon"][number] => ({
+        overrides: Partial<PokemonInfoResult["pokemon"][number]> = {}
+    ): PokemonInfoResult["pokemon"][number] => ({
         height: 7,
         weight: 69,
         base_experience: 64,

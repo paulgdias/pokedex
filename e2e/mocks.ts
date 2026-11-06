@@ -92,7 +92,7 @@ export const DEX: Mon[] = [
 ];
 
 export const SPRITE_HOST = "https://raw.githubusercontent.com/";
-const GRAPHQL_URL = "https://beta.pokeapi.co/graphql/v1beta";
+const GRAPHQL_URL = "https://graphql.pokeapi.co/v1beta2";
 
 // a 1x1 transparent PNG
 const PNG = Buffer.from(
@@ -145,7 +145,7 @@ const dexResponse = () => ({
 
 const infoResponse = (id: number) => ({
     data: {
-        pokemon_v2_pokemon: [
+        pokemon: [
             {
                 height: 5 + id,
                 weight: 50 + id,

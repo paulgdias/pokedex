@@ -17,7 +17,7 @@ const realFetch = globalThis.fetch;
 const realSetTimeout = globalThis.setTimeout;
 
 const DAY = 24 * 60 * 60 * 1000;
-const GRAPHQL_URL = "https://beta.pokeapi.co/graphql/v1beta";
+const GRAPHQL_URL = "https://graphql.pokeapi.co/v1beta2";
 const ASSET_HOST = "https://raw.githubusercontent.com/PokeAPI/";
 const SPRITE = "sprites/master/sprites/pokemon/1.png";
 
