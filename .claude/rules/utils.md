@@ -1,8 +1,6 @@
 ---
-
 paths:
-- "src/utils/**"
-
+  - "src/utils/**"
 ---
 
 # Utils
