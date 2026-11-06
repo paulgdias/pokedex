@@ -1,5 +1,4 @@
 ---
-
 description: Run the full verification suite (lint, types, build, coverage)
 allowed-tools: Bash(npm run verify)
 ---

@@ -1,9 +1,7 @@
 ---
-
 paths:
-- "api/**"
-- "src/api/**"
-
+  - "api/**"
+  - "src/api/**"
 ---
 
 # PokeAPI proxy (`api/`)
