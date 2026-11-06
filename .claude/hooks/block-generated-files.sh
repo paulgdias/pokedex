@@ -10,7 +10,8 @@ case "$file" in
     */dist/* | */coverage/* | */storybook-static/* | */__screenshots__/* | \
         */playwright-report/* | */test-results/* | */.vitest/* | \
         */api/.cache/* | */node_modules/* | \
-        */package-lock.json | */api/package-lock.json)
+        */package-lock.json | */api/package-lock.json | \
+        */pokedex-architecture-map.html)
         echo "Blocked: $file is generated, cached or a lock file. Regenerate it with the proper command instead of editing it by hand." >&2
         exit 2
         ;;
