@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import type { CSSProperties } from "react";
 import { preload } from "react-dom";
 import { twMerge } from "tailwind-merge";
 
@@ -13,8 +14,9 @@ import {
     legendaryPokemonClass,
     mythicalPokemonClass,
     pixelArtClass,
+    tintedPillClass,
     typeDotClass,
-    typePillClass,
+    typeGradient,
 } from "@styles/Pokedex";
 import { formatPokedexNumber } from "@utils/search";
 
@@ -42,13 +44,24 @@ const PokemonCard: React.FC<PokemonCardType> = ({
         });
     }
 
+    // cards are tinted by their first type; a caller's own style wins
+    const primaryType = pokemon.types[0];
+    const typeStyle = (
+        primaryType
+            ? {
+                  "--card-art": typeGradient(primaryType),
+                  "--card-edge": `var(--color-${primaryType})`,
+              }
+            : {}
+    ) as CSSProperties;
+
     const category = isMythical ? "Mythical" : isLegendary ? "Legendary" : null;
 
     const Card = (
         <div
             ref={ref}
             key={pokemon.id}
-            style={style}
+            style={{ ...typeStyle, ...style }}
             tabIndex={navigateCallback ? 0 : -1}
             aria-label={`Pokemon Card for ${pokemon.name}`}
             className={`pokemonCard ${twMerge(
@@ -86,6 +99,11 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                         />
                     </span>
                 )}
+                <span
+                    aria-hidden="true"
+                    data-number={pokemon.id}
+                    className={`${cardNumberWatermarkClass} ${isLarge ? "text-7xl" : ""}`}
+                />
                 {children}
                 {sprite ? (
                     <img
@@ -93,34 +111,36 @@ const PokemonCard: React.FC<PokemonCardType> = ({
                         alt={pokemon.name}
                         loading="lazy"
                         decoding="async"
-                        className={`relative w-auto max-w-[80%] object-contain ${isLarge ? (pixelated ? "h-48" : "h-64") : "h-[120px]"} ${pixelated ? pixelArtClass : ""}`}
+                        className={`relative w-auto max-w-[80%] object-contain ${isLarge ? (pixelated ? "h-48" : "h-64") : "h-[130px] drop-shadow-lg transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none"} ${pixelated ? pixelArtClass : ""}`}
                         src={sprite}
                     />
-                ) : (
-                    <span
-                        aria-hidden="true"
-                        data-number={pokemon.id}
-                        className={`${cardNumberWatermarkClass} ${isLarge ? "text-7xl" : ""}`}
-                    />
-                )}
+                ) : null}
             </div>
             <div className={cardBodyClass}>
-                <div className="flex items-baseline justify-between gap-2">
+                <div className="flex flex-col gap-1">
+                    <span className="font-mono text-xs font-semibold text-subtle">
+                        {formatPokedexNumber(pokemon.id)}
+                    </span>
                     <span
                         title={pokemon.name}
-                        className={`truncate font-bold capitalize ${isLarge ? "text-2xl" : "text-base"}`}
+                        className={`truncate font-display leading-tight font-extrabold capitalize ${isLarge ? "text-3xl" : "text-2xl"}`}
                     >
                         {pokemon.name}
                     </span>
-                    <span className="font-mono text-xs text-subtle">
-                        {formatPokedexNumber(pokemon.id)}
-                    </span>
                 </div>
-                <div className="flex gap-1.5">
+                <div className="flex flex-wrap gap-2">
                     {pokemon.types.map((type) => (
-                        <span key={type} className={typePillClass}>
+                        <span
+                            key={type}
+                            className={tintedPillClass}
+                            style={
+                                {
+                                    "--pill": `var(--color-${type})`,
+                                } as CSSProperties
+                            }
+                        >
                             <span
-                                className={`${typeDotClass} ${typeColors[type]}`}
+                                className={`${typeDotClass} size-2.5 ${typeColors[type]}`}
                             />
                             {type}
                         </span>

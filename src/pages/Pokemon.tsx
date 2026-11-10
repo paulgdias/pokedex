@@ -27,20 +27,9 @@ import StatBars from "@components/PokemonDetail/StatBars";
 import TypeMatchups from "@components/PokemonDetail/TypeMatchups";
 import SpriteToggle, { SpriteView } from "@components/SpriteToggle";
 import { PokemonDetails } from "@customTypes/PokemonTypes";
+import { typeGradient } from "@styles/Pokedex";
 import { getGeneration } from "@utils/generations";
 import { PokemonLocationState } from "@utils/useNavigateToPokemon";
-
-/** Tints derived from the pokémon's types; they follow the light/dark theme. */
-const getTypeTheme = (types: string[]) => {
-    const mix = (type: string, percent: number, base: string) =>
-        `color-mix(in srgb, var(--color-${type}) ${percent}%, var(--color-${base}))`;
-    const [first, second = first] = types;
-
-    return {
-        header: `linear-gradient(100deg, ${mix(first, 26, "paper")}, ${mix(second, 26, "paper")})`,
-        art: `linear-gradient(135deg, ${mix(first, 26, "sand")}, ${mix(second, 26, "sand")})`,
-    };
-};
 
 const INFO_DEBOUNCE_MS = 300;
 
@@ -150,7 +139,6 @@ const Pokemon: React.FC = () => {
     }
 
     const generation = getGeneration(pokemon.generationId);
-    const theme = getTypeTheme(pokemon.types);
 
     return (
         <div
@@ -158,7 +146,7 @@ const Pokemon: React.FC = () => {
             className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto"
         >
             <div
-                style={{ background: theme.header }}
+                style={{ background: typeGradient(pokemon.types[0]) }}
                 className="flex flex-col gap-4 border-b border-line px-4 pt-5 pb-4 lg:px-8"
             >
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -196,14 +184,17 @@ const Pokemon: React.FC = () => {
                     </nav>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2">
-                    <h1 className="font-display text-[34px] leading-tight font-bold tracking-tight capitalize">
-                        {pokemon.name}
-                    </h1>
-                    {generation && (
-                        <span className="text-[15px] text-muted">
-                            Generation {generation.roman} · {generation.region}
-                        </span>
-                    )}
+                    <div className="flex flex-wrap items-baseline gap-x-3.5 rounded-2xl bg-surface/90 px-4 py-1.5 shadow-segment">
+                        <h1 className="font-display text-[34px] leading-tight font-bold tracking-tight capitalize">
+                            {pokemon.name}
+                        </h1>
+                        {generation && (
+                            <span className="text-[15px] text-muted">
+                                Generation {generation.roman} ·{" "}
+                                {generation.region}
+                            </span>
+                        )}
+                    </div>
                     <CryButton
                         url={infoQuery.data?.cry ?? null}
                         name={pokemon.name}
@@ -226,11 +217,6 @@ const Pokemon: React.FC = () => {
                 <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
                     <div className="flex flex-col gap-6">
                         <PokemonCard
-                            style={
-                                {
-                                    "--card-art": theme.art,
-                                } as React.CSSProperties
-                            }
                             className="w-full"
                             size="large"
                             pokemon={pokemon}
