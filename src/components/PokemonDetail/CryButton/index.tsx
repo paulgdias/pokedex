@@ -1,6 +1,7 @@
 import { Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "react-aria-components";
+
+import Button from "@components/Buttons/Button";
 
 const CryButton = ({ url, name }: { url: string | null; name: string }) => {
     const audio = useRef<HTMLAudioElement | null>(null);
@@ -33,9 +34,7 @@ const CryButton = ({ url, name }: { url: string | null; name: string }) => {
             aria-label={`Play ${name}'s cry`}
             isDisabled={!url}
             onPress={play}
-            className={`flex h-10 cursor-pointer items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface px-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
-                isPlaying ? "text-accent" : "text-ink"
-            }`}
+            className={isPlaying ? "text-accent" : undefined}
         >
             <Volume2 size={16} aria-hidden="true" />
             Cry

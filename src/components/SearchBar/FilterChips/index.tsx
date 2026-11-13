@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 
+import Button from "@components/Buttons/Button";
 import { getGeneration } from "@utils/generations";
 import { capitalize, PokedexFilters } from "@utils/search";
 
@@ -83,13 +84,9 @@ const FilterChips = ({
                     <X size={14} className="text-muted" aria-hidden="true" />
                 </button>
             ))}
-            <button
-                type="button"
-                onClick={onClearAll}
-                className="h-8 px-2 text-[13px] font-semibold text-accent hover:text-accent-strong"
-            >
+            <Button variant="link" size="sm" onPress={onClearAll}>
                 Clear all
-            </button>
+            </Button>
         </div>
     );
 };
