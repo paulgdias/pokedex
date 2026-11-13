@@ -4,6 +4,7 @@ import {
     ArrowDownAZ,
     ArrowDownZA,
     ArrowUpDown,
+    ChevronDown,
     LayoutGrid,
     List,
     LucideIcon,
@@ -133,10 +134,10 @@ const SearchBar = ({
     const optionId = (index: number) => `pokedex-suggestion-${index}`;
 
     return (
-        <div className="relative z-5 flex flex-col gap-3.5 border-b border-line bg-paper px-4 pt-5 pb-3.5 lg:px-8">
+        <div className="relative z-5 flex flex-col gap-3.5 border-b border-line bg-surface/90 px-5 pt-5 pb-4 shadow-segment backdrop-blur-xl lg:px-8">
             <div className="flex items-center gap-3">
-                <div className="relative grow">
-                    <label className="flex h-13 items-center gap-3 rounded-[14px] border-[1.5px] border-line-strong bg-surface px-4 focus-within:border-accent focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-accent)_12%,transparent)]">
+                <div className="relative min-w-0 grow">
+                    <label className="flex h-14 items-center gap-3 rounded-2xl border-2 border-line bg-paper px-4 focus-within:bg-surface focus-within:border-accent focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-accent)_12%,transparent)]">
                         <Search
                             size={20}
                             className="shrink-0 text-muted"
@@ -329,7 +330,7 @@ const SearchBar = ({
                     )}
                 </div>
 
-                <label className="flex h-13 shrink-0 items-center gap-2 rounded-[14px] border-[1.5px] border-line-strong bg-surface pr-1.5 pl-3.5 text-sm text-muted">
+                <label className="flex h-14 shrink-0 items-center gap-2 rounded-2xl border-2 border-line bg-paper pr-1.5 pl-3.5 text-sm text-muted">
                     <SortIcon size={18} aria-hidden="true" />
                     <span className="max-sm:sr-only">Sort</span>
                     <select
@@ -368,7 +369,7 @@ const SearchBar = ({
                 />
 
                 {/* the sidebar lists generations on wide screens */}
-                <label className="flex h-10 items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface pl-3.5 text-sm font-semibold text-ink lg:hidden">
+                <label className="relative flex h-11 items-center gap-2 rounded-xl border-2 border-line bg-paper pl-4 text-sm font-bold text-ink hover:border-line-strong hover:bg-surface lg:hidden">
                     Gen
                     <select
                         value={filters.generation ?? 0}
@@ -377,7 +378,7 @@ const SearchBar = ({
                                 generation: Number(event.target.value) || null,
                             })
                         }
-                        className="h-9 bg-transparent pr-1.5"
+                        className="h-9 cursor-pointer appearance-none bg-transparent pr-9 pl-1 font-bold field-sizing-content"
                     >
                         <option value={0}>All</option>
                         {GENERATIONS.map(({ id, roman, region }) => (
@@ -386,6 +387,11 @@ const SearchBar = ({
                             </option>
                         ))}
                     </select>
+                    <ChevronDown
+                        size={16}
+                        aria-hidden="true"
+                        className="pointer-events-none absolute right-3 text-muted"
+                    />
                 </label>
 
                 <ToggleButtonGroup
@@ -399,14 +405,14 @@ const SearchBar = ({
                             category: id === "all" ? null : (id as Category),
                         });
                     }}
-                    className="flex gap-0.5 rounded-xl bg-track p-[3px]"
+                    className="flex gap-1 rounded-2xl bg-track p-1"
                 >
                     {CATEGORY_OPTIONS.map(({ id, label }) => (
                         <ToggleButton
                             key={id}
                             id={id}
                             className={({ isSelected }) =>
-                                `h-[34px] cursor-pointer rounded-[9px] px-3.5 text-sm font-semibold ${
+                                `h-9 cursor-pointer rounded-xl px-4 text-sm font-bold ${
                                     isSelected
                                         ? "bg-surface text-ink shadow-segment"
                                         : "text-muted"
@@ -432,7 +438,7 @@ const SearchBar = ({
                         const [id] = Array.from(keys);
                         onViewChange(id as PokedexView);
                     }}
-                    className="flex gap-0.5 rounded-xl bg-track p-[3px]"
+                    className="flex gap-1 rounded-2xl bg-track p-1"
                 >
                     {VIEW_OPTIONS.map(({ id, label, Icon }) => (
                         <ToggleButton
@@ -440,7 +446,7 @@ const SearchBar = ({
                             id={id}
                             aria-label={label}
                             className={({ isSelected }) =>
-                                `flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] ${
+                                `flex size-9 cursor-pointer items-center justify-center rounded-xl ${
                                     isSelected
                                         ? "bg-surface text-ink shadow-segment"
                                         : "text-muted"

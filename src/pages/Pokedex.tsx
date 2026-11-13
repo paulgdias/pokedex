@@ -99,10 +99,6 @@ const Pokedex: React.FC = () => {
     };
 
     const generation = getGeneration(filters.generation);
-    const generationTotal = generation
-        ? allPokemon.filter((item) => item.generationId === generation.id)
-              .length
-        : allPokemon.length;
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
@@ -118,15 +114,15 @@ const Pokedex: React.FC = () => {
                 onViewChange={setView}
                 resultCount={pokemonList.length}
             />
-            <div className="flex min-h-0 flex-1 flex-col gap-5 px-4 pt-7 lg:px-8">
+            <div className="flex min-h-0 flex-1 flex-col gap-5 px-5 pt-8 lg:px-8">
                 <div className="flex flex-wrap items-baseline gap-x-3.5">
-                    <h1 className="font-display text-[34px] leading-tight font-bold tracking-tight">
+                    <h1 className="font-display text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">
                         {generation ? generation.region : "All regions"}
                     </h1>
-                    <span className="text-[15px] text-muted">
+                    <span className="text-base font-bold tracking-widest text-muted uppercase">
                         {generation
-                            ? `Generation ${generation.roman} · ${generationTotal} Pokémon`
-                            : `National Dex · ${generationTotal} Pokémon`}
+                            ? `Generation ${generation.roman} · ${pokemonList.length} Pokémon`
+                            : `National Dex · ${pokemonList.length} Pokémon`}
                     </span>
                 </div>
                 <ErrorBoundary

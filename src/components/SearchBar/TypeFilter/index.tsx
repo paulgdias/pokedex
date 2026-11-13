@@ -29,7 +29,7 @@ const TypeFilter = ({
 
     return (
         <DialogTrigger>
-            <Button className="flex h-10 items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface px-3.5 text-sm font-semibold text-ink">
+            <Button className="flex h-11 items-center gap-2 rounded-xl border-2 border-line bg-paper px-4 text-sm font-bold text-ink hover:border-line-strong hover:bg-surface">
                 <ListFilter size={16} aria-hidden="true" />
                 Type
                 {types.length > 0 && (

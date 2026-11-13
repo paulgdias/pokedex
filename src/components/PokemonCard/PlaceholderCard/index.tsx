@@ -25,8 +25,9 @@ const PlaceholderCard = ({
         >
             <div className={`${cardArtClass} h-[150px]`} />
             <div className={cardBodyClass}>
-                <div className="h-5 w-2/3 rounded bg-track" />
-                <div className="h-6 w-20 rounded-full bg-chip" />
+                <div className="h-4 w-12 rounded bg-track" />
+                <div className="h-7 w-2/3 rounded bg-track" />
+                <div className="h-7 w-20 rounded-full bg-chip" />
             </div>
         </div>
     );
