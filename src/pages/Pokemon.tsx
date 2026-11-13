@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { ArrowLeft, ChevronLeft, ChevronRight, Scale } from "lucide-react";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
-import { Button } from "react-aria-components";
 import { preconnect, preload } from "react-dom";
 import {
     useLoaderData,
@@ -15,6 +14,7 @@ import {
     pokemonInfoQueryOptions,
     typeEfficacyQueryOptions,
 } from "@api/pokedex";
+import Button from "@components/Buttons/Button";
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import EvolutionChain from "@components/EvolutionChain";
 import PokemonCard from "@components/PokemonCard";
@@ -152,7 +152,6 @@ const Pokemon: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <Button
                         aria-label="Back to Pokémon"
-                        className="flex h-10 w-fit cursor-pointer items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface pr-4 pl-3 text-sm font-semibold text-ink hover:bg-chip"
                         onPress={() => navigate(previous)}
                     >
                         <ArrowLeft size={16} aria-hidden="true" />
@@ -174,9 +173,9 @@ const Pokemon: React.FC = () => {
                                         ? `${word}: ${target.name}`
                                         : `${word} Pokémon`
                                 }
+                                icon
                                 isDisabled={!target}
                                 onPress={() => goTo(target)}
-                                className="flex size-10 cursor-pointer items-center justify-center rounded-[10px] border-[1.5px] border-line-strong bg-surface text-ink hover:bg-chip disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 <Icon size={18} aria-hidden="true" />
                             </Button>
@@ -205,7 +204,6 @@ const Pokemon: React.FC = () => {
                                 state: { previous },
                             })
                         }
-                        className="flex h-10 cursor-pointer items-center gap-2 rounded-[10px] border-[1.5px] border-line-strong bg-surface px-3 text-sm font-semibold text-ink hover:bg-chip"
                     >
                         <Scale size={16} aria-hidden="true" />
                         Compare

@@ -9,6 +9,7 @@ import {
     useSearchParams,
 } from "react-router";
 
+import Button from "@components/Buttons/Button";
 import PokemonList from "@components/PokemonList";
 import PokemonTable from "@components/PokemonList/PokemonTable";
 import SearchBar from "@components/SearchBar";
@@ -172,20 +173,12 @@ const EmptyState = ({
             Try removing a filter, or search across every generation.
         </div>
         <div className="flex flex-wrap justify-center gap-2.5">
-            <button
-                type="button"
-                onClick={onSearchAll}
-                className="h-11 rounded-[10px] border-[1.5px] border-line-strong bg-surface px-[18px] text-sm font-semibold"
-            >
+            <Button size="lg" onPress={onSearchAll}>
                 Search all generations
-            </button>
-            <button
-                type="button"
-                onClick={onClear}
-                className="h-11 rounded-[10px] bg-ink px-[18px] text-sm font-semibold text-paper"
-            >
+            </Button>
+            <Button variant="primary" size="lg" onPress={onClear}>
                 Clear filters
-            </button>
+            </Button>
         </div>
     </div>
 );

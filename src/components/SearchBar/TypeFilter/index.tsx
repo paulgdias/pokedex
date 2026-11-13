@@ -1,12 +1,12 @@
 import { ChevronDown, ListFilter } from "lucide-react";
 import {
-    Button,
     Dialog,
     DialogTrigger,
     Popover,
     ToggleButton,
 } from "react-aria-components";
 
+import Button from "@components/Buttons/Button";
 import { typeColors } from "@customTypes/PokemonTypes";
 import { typeDotClass } from "@styles/Pokedex";
 import { capitalize, POKEMON_TYPES, PokemonType } from "@utils/search";
@@ -29,7 +29,7 @@ const TypeFilter = ({
 
     return (
         <DialogTrigger>
-            <Button className="flex h-11 items-center gap-2 rounded-xl border-2 border-line bg-paper px-4 text-sm font-bold text-ink hover:border-line-strong hover:bg-surface">
+            <Button variant="field" size="lg" className="px-4">
                 <ListFilter size={16} aria-hidden="true" />
                 Type
                 {types.length > 0 && (
@@ -54,13 +54,13 @@ const TypeFilter = ({
                                 <span className="text-[13px] font-bold">
                                     Match any selected type
                                 </span>
-                                <button
-                                    type="button"
-                                    className="p-1.5 text-[13px] font-semibold text-accent hover:text-accent-strong"
-                                    onClick={() => onChange([])}
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    onPress={() => onChange([])}
                                 >
                                     Reset
-                                </button>
+                                </Button>
                             </div>
                             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                                 {POKEMON_TYPES.map((type) => (
@@ -83,13 +83,9 @@ const TypeFilter = ({
                                     </ToggleButton>
                                 ))}
                             </div>
-                            <button
-                                type="button"
-                                className="h-11 rounded-[10px] bg-ink text-sm font-semibold text-paper"
-                                onClick={close}
-                            >
+                            <Button variant="primary" size="lg" onPress={close}>
                                 Show {resultCount} results
-                            </button>
+                            </Button>
                         </>
                     )}
                 </Dialog>
