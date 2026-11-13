@@ -12,6 +12,11 @@ const CACHE_DIR =
     process.env.POKEAPI_CACHE_DIR || path.join(__dirname, "../.cache");
 const FRESH_MS = 24 * 60 * 60 * 1000;
 const MAX_TRIES = 3;
+// an upstream call that has not finished (headers and body) by then is aborted,
+// so a hung PokeAPI fails over to the stale entry instead of hanging forever
+const envTimeout = Number(process.env.POKEAPI_UPSTREAM_TIMEOUT_MS);
+const UPSTREAM_TIMEOUT_MS =
+    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 15000;
 // files unused for this long are evicted on startup; override with the env var
 const envDays = Number(process.env.POKEAPI_CACHE_MAX_AGE_DAYS);
 const MAX_AGE_DAYS = Number.isFinite(envDays) && envDays > 0 ? envDays : 30;
@@ -55,10 +60,16 @@ const shared = (key, load) => {
     return inFlight.get(key);
 };
 
-/** fetch that waits out 429s, honouring Retry-After. */
+/**
+ * fetch that waits out 429s, honouring Retry-After. Each attempt has its own
+ * timeout, which also covers reading the body.
+ */
 const fetchUpstream = async (url, init) => {
     for (let attempt = 1; ; attempt++) {
-        const response = await fetch(url, init);
+        const response = await fetch(url, {
+            ...init,
+            signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+        });
         if (response.status !== 429 || attempt === MAX_TRIES) {
             return response;
         }
