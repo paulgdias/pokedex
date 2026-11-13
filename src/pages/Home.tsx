@@ -2,6 +2,7 @@ import { preload } from "react-dom";
 import { Link } from "react-router";
 
 import { Email, GitHub, LinkedIn } from "@components/Icons/Logos";
+import Panel from "@components/Panel";
 
 const logo: string = new URL("../images/profile.jpg", import.meta.url).href;
 
@@ -11,7 +12,7 @@ const Home: React.FC = () => {
     });
     return (
         <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
-            <div className="flex w-full max-w-md flex-col items-center gap-5 rounded-2xl border border-line bg-surface px-8 py-10 text-center">
+            <Panel className="flex w-full max-w-md flex-col items-center gap-5 px-8 py-10 text-center">
                 <img
                     alt="Portrait of Paul Dias"
                     className="size-32 rounded-full bg-sand object-contain"
@@ -36,7 +37,7 @@ const Home: React.FC = () => {
                 >
                     Open the Pokédex
                 </Link>
-            </div>
+            </Panel>
         </div>
     );
 };

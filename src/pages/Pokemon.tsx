@@ -17,6 +17,7 @@ import {
 } from "@api/pokedex";
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import EvolutionChain from "@components/EvolutionChain";
+import PageHeader from "@components/PageHeader";
 import PokemonCard from "@components/PokemonCard";
 import AbilityList from "@components/PokemonDetail/AbilityList";
 import CryButton from "@components/PokemonDetail/CryButton";
@@ -145,9 +146,9 @@ const Pokemon: React.FC = () => {
             ref={scrollRef}
             className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto"
         >
-            <div
+            <PageHeader
                 style={{ background: typeGradient(pokemon.types[0]) }}
-                className="flex flex-col gap-4 border-b border-line px-4 pt-5 pb-4 lg:px-8"
+                className="gap-4 pt-5 pb-4"
             >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <Button
@@ -211,7 +212,7 @@ const Pokemon: React.FC = () => {
                         Compare
                     </Button>
                 </div>
-            </div>
+            </PageHeader>
 
             <div className="flex flex-col gap-10 px-4 py-7 lg:px-8">
                 <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)]">
