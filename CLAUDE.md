@@ -82,3 +82,4 @@ URL writes use `replace: true, preventScrollReset: true`. `Nav` preserves the qu
 
 - Run `npm run verify` before calling work done (also available as `/verify`). Lefthook hooks (`lefthook.yml`) run Biome and type-check on commit and `verify` on push; never bypass them with `--no-verify` unless asked. A PostToolUse hook (`.claude/hooks/biome-after-edit.sh`) runs Biome on edited TypeScript, JavaScript, JSON and CSS files.
 - Don't push unless asked.
+- A PR that changes how the app looks (components, pages, styles) includes screenshots, attached with `gh pr create --attach` / `gh pr edit --attach`, never committed or linked from a branch (`.claude/skills/pr-screenshots`).
