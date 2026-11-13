@@ -16,14 +16,25 @@ const PROXY_PATH = require.resolve("./pokeapiProxy.js");
 const realFetch = globalThis.fetch;
 const realSetTimeout = globalThis.setTimeout;
 
+// a response with every list the three operations require non-empty
+const FULL = {
+    pokemon: [{ id: 1 }],
+    efficacy: [{ damage_factor: 100 }],
+    types: [{ id: 1 }],
+};
+
 const DAY = 24 * 60 * 60 * 1000;
 const GRAPHQL_URL = "https://graphql.pokeapi.co/v1beta2";
 const ASSET_HOST = "https://raw.githubusercontent.com/PokeAPI/";
 const SPRITE = "sprites/master/sprites/pokemon/1.png";
 
-const POKEDEX = "query getPokedex { pokemon { id } }";
-const INFO = "query getPokemonInfo($id: Int) { pokemon(id: $id) { id } }";
-const EFFICACY = "query getTypeEfficacy { type { id } }";
+// the documents the proxy allows; src/api/allowedQueries.test.ts keeps them in
+// sync with the queries the app sends
+const {
+    getPokedex: POKEDEX,
+    getPokemonInfo: INFO,
+    getTypeEfficacy: EFFICACY,
+} = require("./allowedQueries.json");
 
 let cacheDir;
 let fetchMock;
@@ -177,20 +188,20 @@ afterEach(async () => {
 
 describe("POST /graphql: operation allowlist", () => {
     it.each([
-        ["getPokedex", POKEDEX],
-        ["getPokemonInfo", INFO],
-        ["getTypeEfficacy", EFFICACY],
-    ])("forwards %s", async (_name, query) => {
-        fetchMock.mockImplementation(async () => jsonResponse({ data: {} }));
+        ["getPokedex", POKEDEX, undefined],
+        ["getPokemonInfo", INFO, { id: 25 }],
+        ["getTypeEfficacy", EFFICACY, undefined],
+    ])("forwards %s", async (_name, query, variables) => {
+        fetchMock.mockImplementation(async () => jsonResponse({ data: FULL }));
 
-        const res = await post({ query });
+        const res = await post({ query, variables });
 
         expect(res.status).toBe(200);
         expect(upstreamCalls(GRAPHQL_URL)).toHaveLength(1);
     });
 
     it("sends the query and variables upstream as JSON", async () => {
-        fetchMock.mockImplementation(async () => jsonResponse({ data: {} }));
+        fetchMock.mockImplementation(async () => jsonResponse({ data: FULL }));
 
         await post({ query: INFO, variables: { id: 25 } });
 
@@ -211,7 +222,11 @@ describe("POST /graphql: operation allowlist", () => {
         ["shorthand", "{ x }"],
         ["an unknown operation", "query somethingElse { x }"],
         [
-            "a name that only starts with an allowed one",
+            "an allowed name with a different selection",
+            "query getPokedex { anything { at_all } }",
+        ],
+        [
+            "an allowed name that only starts with an allowed one",
             "query getPokedexEvil { x }",
         ],
         [
@@ -244,26 +259,96 @@ describe("POST /graphql: operation allowlist", () => {
     });
 
     it.each([
-        ["a second query", "query getPokedex { a } query somethingElse { b }"],
-        ["a trailing mutation", "query getPokedex { a } mutation m { b }"],
-        ["a trailing shorthand query", "query getPokedex { a } { b }"],
-    ])("rejects a document with %s", async (_name, query) => {
+        ["a second query", `${POKEDEX} query somethingElse { b }`],
+        ["a trailing mutation", `${POKEDEX} mutation m { b }`],
+        ["a trailing shorthand query", `${POKEDEX} { b }`],
+        ["a trailing fragment", `${POKEDEX} fragment F on pokemon { id }`],
+        ["a trailing comment", `${POKEDEX} # query getPokedex`],
+    ])("rejects an allowed document with %s", async (_name, query) => {
         const res = await post({ query });
 
         expect(res.status).toBe(400);
         expect(fetchMock).not.toHaveBeenCalled();
     });
 
-    it("accepts braces, keywords and fragments inside one operation", async () => {
-        fetchMock.mockImplementation(async () => jsonResponse({ data: {} }));
-        const query = `query getPokedex($where: pokemon_bool_exp = {name: {_eq: "query x { y }"}}) {
-            pokemon(where: $where) { ...F } # mutation m { z }
-        }
-        fragment F on pokemon { id }`;
+    it("accepts an allowed document with different whitespace", async () => {
+        fetchMock.mockImplementation(async () => jsonResponse({ data: FULL }));
+        const spaced = POKEDEX.replaceAll(" ", "\n    ");
 
-        const res = await post({ query });
+        const res = await post({ query: `  ${spaced}\n` });
 
         expect(res.status).toBe(200);
+    });
+
+    it("sends the whitespace-collapsed document upstream and caches it once", async () => {
+        fetchMock.mockImplementation(async () => jsonResponse({ data: FULL }));
+
+        await post({ query: POKEDEX.replaceAll(" ", "\n  ") });
+        await post({ query: POKEDEX });
+
+        expect(upstreamCalls(GRAPHQL_URL)).toHaveLength(1);
+        const [, init] = fetchMock.mock.calls[0];
+        expect(JSON.parse(init.body).query).toBe(POKEDEX);
+        await onlyGraphqlFile();
+    });
+    describe("variables", () => {
+        it.each([
+            ["getPokedex", POKEDEX],
+            ["getTypeEfficacy", EFFICACY],
+        ])("%s accepts none, null or an empty object", async (_n, query) => {
+            fetchMock.mockImplementation(async () =>
+                jsonResponse({ data: FULL })
+            );
+
+            for (const variables of [undefined, null, {}]) {
+                expect((await post({ query, variables })).status).toBe(200);
+            }
+
+            // all three share one cache entry and one upstream call
+            expect(upstreamCalls(GRAPHQL_URL)).toHaveLength(1);
+            await onlyGraphqlFile();
+        });
+
+        it.each([
+            ["getPokedex", POKEDEX],
+            ["getTypeEfficacy", EFFICACY],
+        ])("%s rejects any variable", async (_n, query) => {
+            const res = await post({ query, variables: { id: 1 } });
+
+            expect(res.status).toBe(400);
+            expect(fetchMock).not.toHaveBeenCalled();
+        });
+
+        it.each([
+            ["a missing id", undefined],
+            ["null", null],
+            ["an empty object", {}],
+            ["a string id", { id: "25" }],
+            ["a fractional id", { id: 1.5 }],
+            ["zero", { id: 0 }],
+            ["a negative id", { id: -1 }],
+            ["an id over the cap", { id: 100001 }],
+            ["an extra variable", { id: 25, extra: true }],
+            ["an array", [25]],
+        ])("getPokemonInfo rejects %s", async (_n, variables) => {
+            const res = await post({ query: INFO, variables });
+
+            expect(res.status).toBe(400);
+            expect(fetchMock).not.toHaveBeenCalled();
+            expect(await graphqlFiles()).toEqual([]);
+        });
+
+        it("getPokemonInfo accepts the smallest and largest id", async () => {
+            fetchMock.mockImplementation(async () =>
+                jsonResponse({ data: FULL })
+            );
+
+            for (const id of [1, 100000]) {
+                expect(
+                    (await post({ query: INFO, variables: { id } })).status
+                ).toBe(200);
+            }
+        });
     });
 });
 
@@ -286,6 +371,7 @@ describe("POST /graphql: caching", () => {
         fetchMock.mockImplementation(async () =>
             jsonResponse({
                 data: {
+                    ...FULL,
                     sprite: `${ASSET_HOST}${SPRITE}`,
                     cry: `${ASSET_HOST}cries/main/cries/pokemon/latest/1.ogg`,
                     again: `${ASSET_HOST}${SPRITE}`,
@@ -297,6 +383,7 @@ describe("POST /graphql: caching", () => {
 
         const expected = {
             data: {
+                ...FULL,
                 sprite: `/pokeapi/assets/${SPRITE}`,
                 cry: "/pokeapi/assets/cries/main/cries/pokemon/latest/1.ogg",
                 again: `/pokeapi/assets/${SPRITE}`,
@@ -308,7 +395,7 @@ describe("POST /graphql: caching", () => {
     });
 
     it("serves a fresh hit without calling upstream or touching the file", async () => {
-        const first = jsonResponse({ data: { n: 1 } });
+        const first = jsonResponse({ data: { ...FULL, n: 1 } });
         fetchMock.mockResolvedValueOnce(first);
         await post({ query: POKEDEX });
         const file = await onlyGraphqlFile();
@@ -318,32 +405,32 @@ describe("POST /graphql: caching", () => {
         const res = await post({ query: POKEDEX });
         await new Promise((resolve) => realSetTimeout(resolve, 50));
 
-        expect(await res.json()).toEqual({ data: { n: 1 } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: 1 } });
         expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(await mtime(file)).toBe(before);
     });
 
     it("refetches and rewrites an expired entry", async () => {
         fetchMock.mockImplementationOnce(async () =>
-            jsonResponse({ data: { n: 1 } })
+            jsonResponse({ data: { ...FULL, n: 1 } })
         );
         await post({ query: POKEDEX });
         const file = await onlyGraphqlFile();
         await backdate(file, DAY + 60 * 1000);
         fetchMock.mockImplementationOnce(async () =>
-            jsonResponse({ data: { n: 2 } })
+            jsonResponse({ data: { ...FULL, n: 2 } })
         );
 
         const res = await post({ query: POKEDEX });
 
-        expect(await res.json()).toEqual({ data: { n: 2 } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: 2 } });
         expect(fetchMock).toHaveBeenCalledTimes(2);
         expect(Date.now() - (await mtime(file))).toBeLessThan(60 * 1000);
     });
 
     it("keeps an entry just under 24 h old fresh", async () => {
         fetchMock.mockImplementation(async () =>
-            jsonResponse({ data: { n: 1 } })
+            jsonResponse({ data: { ...FULL, n: 1 } })
         );
         await post({ query: POKEDEX });
         await backdate(await onlyGraphqlFile(), DAY - 60 * 1000);
@@ -371,7 +458,7 @@ describe("POST /graphql: caching", () => {
 
     it("treats a missing and a null variables value the same", async () => {
         fetchMock.mockImplementation(async () =>
-            jsonResponse({ data: { n: 1 } })
+            jsonResponse({ data: { ...FULL, n: 1 } })
         );
 
         await post({ query: POKEDEX });
@@ -385,7 +472,8 @@ describe("POST /graphql: caching", () => {
         fetchMock.mockImplementation(
             () =>
                 new Promise((resolve) => {
-                    release = () => resolve(jsonResponse({ data: { n: 1 } }));
+                    release = () =>
+                        resolve(jsonResponse({ data: { ...FULL, n: 1 } }));
                 })
         );
 
@@ -399,7 +487,7 @@ describe("POST /graphql: caching", () => {
         expect(fetchMock).toHaveBeenCalledTimes(1);
         for (const res of responses) {
             expect(res.status).toBe(200);
-            expect(await res.json()).toEqual({ data: { n: 1 } });
+            expect(await res.json()).toEqual({ data: { ...FULL, n: 1 } });
         }
     });
 
@@ -407,7 +495,7 @@ describe("POST /graphql: caching", () => {
         fetchMock.mockResolvedValueOnce(new Response("", { status: 500 }));
         const failed = await post({ query: POKEDEX });
         fetchMock.mockImplementationOnce(async () =>
-            jsonResponse({ data: { n: 1 } })
+            jsonResponse({ data: { ...FULL, n: 1 } })
         );
 
         const retried = await post({ query: POKEDEX });
@@ -419,7 +507,7 @@ describe("POST /graphql: caching", () => {
 });
 
 describe("POST /graphql: upstream failures", () => {
-    const seedStale = async (data = { n: "stale" }) => {
+    const seedStale = async (data = { ...FULL, n: "stale" }) => {
         fetchMock.mockImplementationOnce(async () => jsonResponse({ data }));
         await post({ query: POKEDEX });
         const file = await onlyGraphqlFile();
@@ -438,7 +526,7 @@ describe("POST /graphql: upstream failures", () => {
         await new Promise((resolve) => realSetTimeout(resolve, 50));
 
         expect(res.status).toBe(200);
-        expect(await res.json()).toEqual({ data: { n: "stale" } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: "stale" } });
         expect(await mtime(file)).toBe(mtimeBefore);
     });
 
@@ -449,12 +537,12 @@ describe("POST /graphql: upstream failures", () => {
         );
         await post({ query: POKEDEX });
         fetchMock.mockImplementationOnce(async () =>
-            jsonResponse({ data: { n: "fresh" } })
+            jsonResponse({ data: { ...FULL, n: "fresh" } })
         );
 
         const res = await post({ query: POKEDEX });
 
-        expect(await res.json()).toEqual({ data: { n: "fresh" } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: "fresh" } });
         expect(fetchMock).toHaveBeenCalledTimes(3);
     });
 
@@ -469,6 +557,72 @@ describe("POST /graphql: upstream failures", () => {
         expect(res.status).toBe(502);
         expect(await res.json()).toEqual({ error: "Upstream request failed" });
         expect(await graphqlFiles()).toEqual([]);
+    });
+
+    it.each([
+        ["getPokedex", POKEDEX, undefined, { pokemon: [] }],
+        ["getTypeEfficacy", EFFICACY, undefined, { efficacy: [], types: [] }],
+        [
+            "getTypeEfficacy with only one list empty",
+            EFFICACY,
+            undefined,
+            { efficacy: [{ damage_factor: 100 }], types: [] },
+        ],
+        ["a null data", POKEDEX, undefined, null],
+        ["a missing data", POKEDEX, undefined, undefined],
+        ["a list that is not an array", POKEDEX, undefined, { pokemon: {} }],
+    ])(
+        "does not cache an empty or null answer: %s",
+        async (_n, query, variables, data) => {
+            fetchMock.mockImplementation(async () => jsonResponse({ data }));
+
+            const res = await post({ query, variables });
+
+            expect(res.status).toBe(502);
+            expect(await graphqlFiles()).toEqual([]);
+        }
+    );
+
+    it("caches an empty getPokemonInfo answer: an unknown id is valid", async () => {
+        fetchMock.mockImplementation(async () =>
+            jsonResponse({ data: { pokemon: [] } })
+        );
+
+        const res = await post({ query: INFO, variables: { id: 99999 } });
+
+        expect(res.status).toBe(200);
+        expect(await res.json()).toEqual({ data: { pokemon: [] } });
+        await onlyGraphqlFile();
+    });
+
+    it("serves a stale entry when upstream answers with an empty list", async () => {
+        const { file } = await seedStale();
+        fetchMock.mockImplementation(async () =>
+            jsonResponse({ data: { pokemon: [] } })
+        );
+
+        const res = await post({ query: POKEDEX });
+
+        expect(res.status).toBe(200);
+        expect((await res.json()).data.n).toBe("stale");
+        expect(JSON.parse(await fs.readFile(file, "utf8")).data.n).toBe(
+            "stale"
+        );
+    });
+
+    it("refetches instead of serving a fresh cached entry that is empty", async () => {
+        await seed(
+            `graphql/${createHash("sha256")
+                .update(JSON.stringify([POKEDEX, null]))
+                .digest("hex")}.json`,
+            JSON.stringify({ data: { pokemon: [] } })
+        );
+        fetchMock.mockImplementation(async () => jsonResponse({ data: FULL }));
+
+        const res = await post({ query: POKEDEX });
+
+        expect(res.status).toBe(200);
+        expect(upstreamCalls(GRAPHQL_URL)).toHaveLength(1);
     });
 
     it("does not cache a 200 response carrying GraphQL errors", async () => {
@@ -505,7 +659,7 @@ describe("POST /graphql: upstream failures", () => {
         const res = await post({ query: POKEDEX });
 
         expect(res.status).toBe(200);
-        expect(await res.json()).toEqual({ data: { n: "stale" } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: "stale" } });
     });
 
     it.each([
@@ -513,7 +667,7 @@ describe("POST /graphql: upstream failures", () => {
         ["truncated", '{"data": {"pokemon": ['],
     ])("refetches when a fresh cache file is %s", async (_n, content) => {
         fetchMock.mockImplementation(async () =>
-            jsonResponse({ data: { n: 1 } })
+            jsonResponse({ data: { ...FULL, n: 1 } })
         );
         const hash = createHash("sha256")
             .update(JSON.stringify([POKEDEX, null]))
@@ -523,7 +677,7 @@ describe("POST /graphql: upstream failures", () => {
         const res = await post({ query: POKEDEX });
 
         expect(res.status).toBe(200);
-        expect(await res.json()).toEqual({ data: { n: 1 } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: 1 } });
         expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
@@ -551,20 +705,20 @@ describe("POST /graphql: upstream failures", () => {
             }
         );
         fetchMock.mockImplementation(async () =>
-            jsonResponse({ data: { n: "new" } })
+            jsonResponse({ data: { ...FULL, n: "new" } })
         );
 
         const res = await post({ query: POKEDEX });
 
         expect(res.status).toBe(200);
-        expect(await res.json()).toEqual({ data: { n: "stale" } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: "stale" } });
         expect(await fs.readFile(file, "utf8")).toBe(oldContent);
         expect(await graphqlFiles()).toEqual([file]);
     });
 
     it("leaves no temp files behind after a successful write", async () => {
         fetchMock.mockImplementation(async () =>
-            jsonResponse({ data: { n: 1 } })
+            jsonResponse({ data: { ...FULL, n: 1 } })
         );
 
         await post({ query: POKEDEX });
@@ -580,7 +734,7 @@ describe("upstream 429 handling", () => {
         fetchMock
             .mockResolvedValueOnce(tooMany("3"))
             .mockImplementationOnce(async () =>
-                jsonResponse({ data: { n: 1 } })
+                jsonResponse({ data: { ...FULL, n: 1 } })
             );
 
         const res = await post({ query: POKEDEX });
@@ -594,7 +748,7 @@ describe("upstream 429 handling", () => {
         const sleeps = recordSleeps();
         fetchMock
             .mockResolvedValueOnce(tooMany("999"))
-            .mockImplementationOnce(async () => jsonResponse({ data: {} }));
+            .mockImplementationOnce(async () => jsonResponse({ data: FULL }));
 
         await post({ query: POKEDEX });
 
@@ -610,7 +764,7 @@ describe("upstream 429 handling", () => {
         fetchMock
             .mockResolvedValueOnce(tooMany(header))
             .mockResolvedValueOnce(tooMany(header))
-            .mockImplementationOnce(async () => jsonResponse({ data: {} }));
+            .mockImplementationOnce(async () => jsonResponse({ data: FULL }));
 
         const res = await post({ query: POKEDEX });
 
@@ -631,7 +785,7 @@ describe("upstream 429 handling", () => {
 
     it("serves a stale entry once the retries are exhausted", async () => {
         fetchMock.mockImplementationOnce(async () =>
-            jsonResponse({ data: { n: "stale" } })
+            jsonResponse({ data: { ...FULL, n: "stale" } })
         );
         await post({ query: POKEDEX });
         await backdate(await onlyGraphqlFile(), 2 * DAY);
@@ -640,7 +794,7 @@ describe("upstream 429 handling", () => {
 
         const res = await post({ query: POKEDEX });
 
-        expect(await res.json()).toEqual({ data: { n: "stale" } });
+        expect(await res.json()).toEqual({ data: { ...FULL, n: "stale" } });
     });
 
     it("retries asset downloads too", async () => {

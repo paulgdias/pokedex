@@ -17,9 +17,18 @@ const envDays = Number(process.env.POKEAPI_CACHE_MAX_AGE_DAYS);
 const MAX_AGE_DAYS = Number.isFinite(envDays) && envDays > 0 ? envDays : 30;
 const MAX_AGE_MS = MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
 
-// only the operations the app sends, so this is not an open proxy
-const OPERATIONS = new Set(["getPokedex", "getPokemonInfo", "getTypeEfficacy"]);
-const OPERATION_KEYWORDS = new Set(["query", "mutation", "subscription"]);
+// Only the exact documents the app sends (allowedQueries.json, kept in sync
+// with src/api/pokedex.ts by a test there), so this is not an open proxy: a
+// known operation name with a different selection set is rejected too.
+// Whitespace is collapsed before comparing, and the collapsed text is what is
+// cached and sent upstream.
+const normalize = (query) => query.replace(/\s+/g, " ").trim();
+const ALLOWED_QUERIES = new Map(
+    Object.entries(require("./allowedQueries.json")).map(([name, query]) => [
+        normalize(query),
+        name,
+    ])
+);
 // no empty, hidden or ".." segments
 const ASSET_PATH = /^(sprites|cries)(\/[\w-][\w.-]*)+\.(png|gif|svg|webp|ogg)$/;
 
@@ -76,61 +85,67 @@ const writeFile = async (file, data) => {
     }
 };
 
-/** a usable GraphQL response is a JSON object without `errors`. */
-const isUsable = (text) => {
+const isObject = (value) =>
+    value !== null && typeof value === "object" && !Array.isArray(value);
+
+/**
+ * Variables each operation accepts, so the free input behind a pinned query
+ * (and the cache files it can create) is bounded. Returns the variables to
+ * use, or null to reject. A pokemon id is 1..~1350 (forms reach ~10300);
+ * the cap only keeps a typo or a probe from creating arbitrary cache files.
+ */
+const MAX_POKEMON_ID = 100000;
+const noVariables = (variables) =>
+    variables == null ||
+    (isObject(variables) && Object.keys(variables).length === 0)
+        ? undefined
+        : null;
+const VARIABLES = {
+    getPokedex: noVariables,
+    getTypeEfficacy: noVariables,
+    getPokemonInfo: (variables) =>
+        isObject(variables) &&
+        Object.keys(variables).length === 1 &&
+        Number.isInteger(variables.id) &&
+        variables.id >= 1 &&
+        variables.id <= MAX_POKEMON_ID
+            ? { id: variables.id }
+            : null,
+};
+
+// Lists that must come back non-empty. An empty one means PokeAPI answered
+// from half-rebuilt tables, and caching it would blank the app for 24 h.
+// getPokemonInfo is not listed: an unknown id legitimately returns [].
+const REQUIRED_ROWS = {
+    getPokedex: ["pokemon"],
+    getPokemonInfo: [],
+    getTypeEfficacy: ["efficacy", "types"],
+};
+
+/**
+ * A usable response is a JSON object with a `data` object, no `errors`, and
+ * every list the operation requires non-empty.
+ */
+const isUsable = (text, operation) => {
     try {
         const body = JSON.parse(text);
         return (
-            body !== null &&
-            typeof body === "object" &&
-            !Array.isArray(body) &&
-            body.errors === undefined
+            isObject(body) &&
+            body.errors === undefined &&
+            isObject(body.data) &&
+            REQUIRED_ROWS[operation].every(
+                (key) =>
+                    Array.isArray(body.data[key]) && body.data[key].length > 0
+            )
         );
     } catch {
         return false;
     }
 };
 
-const readUsable = async (file) => {
+const readUsable = async (file, operation) => {
     const text = await readFile(file);
-    return text !== null && isUsable(text) ? text : null;
-};
-
-/**
- * counts the operations in a GraphQL document (fragments do not), so a second
- * operation cannot ride along behind an allowed name. Only top-level tokens
- * matter: braces and parentheses nest, and strings and comments are dropped.
- */
-const countOperations = (query) => {
-    const source = query.replace(
-        /"""[\s\S]*?"""|"(?:\\.|[^"\\])*"|#[^\n]*/g,
-        " "
-    );
-    let depth = 0;
-    let count = 0;
-    // what the next top-level "{" opens
-    let next = "shorthand";
-    for (const [token] of source.matchAll(/[{}()[\]]|\w+/g)) {
-        if ("{([".includes(token)) {
-            if (depth === 0 && token === "{") {
-                if (next === "shorthand") {
-                    count++;
-                }
-                next = "shorthand";
-            }
-            depth++;
-        } else if ("})]".includes(token)) {
-            depth--;
-        } else if (depth === 0) {
-            if (token === "fragment") {
-                next = "fragment";
-            } else if (OPERATION_KEYWORDS.has(token) && next !== "fragment") {
-                count++;
-                next = "operation";
-            }
-        }
-    }
-    return count;
+    return text !== null && isUsable(text, operation) ? text : null;
 };
 
 const age = async (file) => {
@@ -195,7 +210,7 @@ const graphqlCacheFile = (query, variables) => {
     return path.join(CACHE_DIR, "graphql", `${hash}.json`);
 };
 
-const loadGraphql = async (file, body) => {
+const loadGraphql = async (file, body, operation) => {
     const response = await fetchUpstream(GRAPHQL_URL, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -207,7 +222,7 @@ const loadGraphql = async (file, body) => {
     // sprite and cry URLs come back same-origin, served by /assets below
     const text = (await response.text()).replaceAll(ASSET_HOST, ASSET_PREFIX);
     // a 200 can still carry GraphQL errors or an error page; don't cache those
-    if (!isUsable(text)) {
+    if (!isUsable(text, operation)) {
         throw new Error("upstream returned an unusable response");
     }
     await writeFile(file, text);
@@ -217,27 +232,32 @@ const loadGraphql = async (file, body) => {
 const router = Router();
 
 router.post("/graphql", async (req, res) => {
-    const { query, variables } = req.body ?? {};
-    const operation =
-        typeof query === "string" && /^\s*query\s+(\w+)/.exec(query)?.[1];
-    if (
-        !operation ||
-        !OPERATIONS.has(operation) ||
-        countOperations(query) !== 1
-    ) {
+    const query =
+        typeof req.body?.query === "string" ? normalize(req.body.query) : null;
+    const operation = ALLOWED_QUERIES.get(query);
+    if (!operation) {
         return res.status(400).json({ error: "Operation not allowed" });
+    }
+    const variables = VARIABLES[operation](req.body.variables);
+    if (variables === null) {
+        return res.status(400).json({ error: "Variables not allowed" });
     }
 
     const file = graphqlCacheFile(query, variables);
     try {
-        let text = (await age(file)) < FRESH_MS ? await readUsable(file) : null;
+        let text =
+            (await age(file)) < FRESH_MS
+                ? await readUsable(file, operation)
+                : null;
         if (text === null) {
             const body = JSON.stringify({ query, variables });
             try {
-                text = await shared(file, () => loadGraphql(file, body));
+                text = await shared(file, () =>
+                    loadGraphql(file, body, operation)
+                );
             } catch (error) {
                 // serve stale rather than fail when upstream is down
-                text = await readUsable(file);
+                text = await readUsable(file, operation);
                 if (text === null) {
                     throw error;
                 }
