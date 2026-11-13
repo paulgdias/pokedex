@@ -172,6 +172,7 @@ afterEach(async () => {
     vi.unstubAllGlobals();
     delete process.env.POKEAPI_CACHE_DIR;
     delete process.env.POKEAPI_CACHE_MAX_AGE_DAYS;
+    delete process.env.POKEAPI_UPSTREAM_TIMEOUT_MS;
     await fs.rm(cacheDir, { recursive: true, force: true });
 });
 
@@ -571,6 +572,87 @@ describe("POST /graphql: upstream failures", () => {
 
         const files = await listFiles(cacheDir);
         expect(files.map((file) => path.extname(file))).toEqual([".json"]);
+    });
+});
+
+describe("upstream timeout", () => {
+    // a non-empty dex, so the answer is usable however strict the proxy is
+    const DEX = { pokemon: [{ id: 1 }] };
+
+    /** a fetch that never answers, but rejects when its signal aborts. */
+    const hang = (_url, init) =>
+        new Promise((_resolve, reject) => {
+            init.signal.addEventListener("abort", () =>
+                reject(init.signal.reason)
+            );
+        });
+
+    const reload = async (env) => {
+        await new Promise((resolve) => server.close(resolve));
+        proxy = loadProxy(env);
+        await listen();
+    };
+
+    it("passes an abort signal to every upstream call", async () => {
+        fetchMock.mockImplementation(async () => jsonResponse({ data: DEX }));
+
+        await post({ query: POKEDEX });
+        await getAsset(SPRITE);
+
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        for (const [, init] of fetchMock.mock.calls) {
+            expect(init.signal).toBeInstanceOf(AbortSignal);
+            expect(init.signal.aborted).toBe(false);
+        }
+    });
+
+    it("ignores a timeout override that is not a positive number", async () => {
+        await reload({ POKEAPI_UPSTREAM_TIMEOUT_MS: "soon" });
+        fetchMock.mockImplementation(async () => jsonResponse({ data: DEX }));
+
+        const res = await post({ query: POKEDEX });
+
+        expect(res.status).toBe(200);
+        expect(fetchMock.mock.calls[0][1].signal.aborted).toBe(false);
+    });
+
+    it("serves the stale entry when upstream hangs", async () => {
+        await reload({ POKEAPI_UPSTREAM_TIMEOUT_MS: "50" });
+        fetchMock.mockImplementationOnce(async () =>
+            jsonResponse({ data: { ...DEX, n: "stale" } })
+        );
+        await post({ query: POKEDEX });
+        await backdate(await onlyGraphqlFile(), 2 * DAY);
+        fetchMock.mockImplementation(hang);
+
+        const res = await post({ query: POKEDEX });
+
+        expect(res.status).toBe(200);
+        expect(await res.json()).toEqual({ data: { ...DEX, n: "stale" } });
+    });
+
+    it("answers 502 when upstream hangs with nothing cached, then tries again", async () => {
+        await reload({ POKEAPI_UPSTREAM_TIMEOUT_MS: "50" });
+        fetchMock.mockImplementation(hang);
+
+        const first = await post({ query: POKEDEX });
+        const second = await post({ query: POKEDEX });
+
+        expect(first.status).toBe(502);
+        expect(second.status).toBe(502);
+        // the hung call left the in-flight map, so the second one went out
+        expect(upstreamCalls(GRAPHQL_URL)).toHaveLength(2);
+        expect(await listFiles(cacheDir)).toEqual([]);
+    });
+
+    it("answers 502 when an asset download hangs", async () => {
+        await reload({ POKEAPI_UPSTREAM_TIMEOUT_MS: "50" });
+        fetchMock.mockImplementation(hang);
+
+        const res = await getAsset(SPRITE);
+
+        expect(res.status).toBe(502);
+        expect(await listFiles(cacheDir)).toEqual([]);
     });
 });
 
