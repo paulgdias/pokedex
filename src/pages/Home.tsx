@@ -1,6 +1,7 @@
 import { preload } from "react-dom";
 import { Link } from "react-router";
 
+import { buttonClass } from "@components/Buttons/Button/utils";
 import { Email, GitHub, LinkedIn } from "@components/Icons/Logos";
 
 const logo: string = new URL("../images/profile.jpg", import.meta.url).href;
@@ -32,7 +33,7 @@ const Home: React.FC = () => {
                 </div>
                 <Link
                     to="/pokedex"
-                    className="flex h-11 items-center rounded-[10px] bg-ink px-5 text-sm font-semibold text-paper"
+                    className={buttonClass({ variant: "primary", size: "lg" })}
                 >
                     Open the Pokédex
                 </Link>

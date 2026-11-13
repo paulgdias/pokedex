@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { ToggleButton, ToggleButtonGroup } from "react-aria-components";
 
+import Button from "@components/Buttons/Button";
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
 import { SortState } from "@customTypes/SortingTypes";
 import { typeDotClass } from "@styles/Pokedex";
@@ -190,14 +191,16 @@ const SearchBar = ({
                             }}
                         />
                         {filters.text && (
-                            <button
-                                type="button"
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                icon
                                 aria-label="Clear search"
-                                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-chip text-muted"
-                                onClick={() => onTextChange("")}
+                                className="bg-chip"
+                                onPress={() => onTextChange("")}
                             >
                                 <X size={14} aria-hidden="true" />
-                            </button>
+                            </Button>
                         )}
                     </label>
 

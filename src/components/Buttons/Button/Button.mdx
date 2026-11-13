@@ -1,0 +1,45 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./Button.stories";
+
+<Meta of={Stories} />
+
+# Button
+
+The app's standard button: a react-aria `Button` with one set of looks, heights and an icon-only mode, so a screen never hand-writes the same box again. It responds to click, tap, Enter and Space, and a disabled one is dimmed and ignores presses.
+
+## Behaviour
+
+- `variant`: `primary` (ink fill, the main action), `secondary` (outlined, the default), `ghost` (no box until hover), `link` (accent text only) and `field` (looks like the search box and the sort select next to it).
+- `size`: `sm` (32px), `md` (40px, the default) and `lg` (44px). `icon` makes it a square of that size; give an icon-only button an `aria-label`.
+- `className` overrides any of it (`twMerge`), e.g. `rounded-full` for a round button.
+- To style something that cannot be a `Button`, such as a router `Link`, call `buttonClass({ variant, size, icon, className })` from `./utils`.
+- Not for toggles or segmented controls: those use react-aria `ToggleButton` directly.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Default
+
+Pressing calls `onPress`, by click or by keyboard.
+
+<Canvas of={Stories.Default} />
+
+### Variants
+
+<Canvas of={Stories.Variants} />
+
+### Sizes
+
+<Canvas of={Stories.Sizes} />
+
+### Icon Only
+
+<Canvas of={Stories.IconOnly} />
+
+### Disabled
+
+<Canvas of={Stories.Disabled} />

@@ -2,7 +2,6 @@ import { useQueries } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
-    Button,
     ComboBox,
     Input,
     ListBox,
@@ -13,6 +12,7 @@ import { preconnect } from "react-dom";
 import { useLoaderData, useLocation, useSearchParams } from "react-router";
 
 import { pokemonInfoQueryOptions } from "@api/pokedex";
+import Button from "@components/Buttons/Button";
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
 import { typeDotClass, typePillClass } from "@styles/Pokedex";
 import { getGeneration } from "@utils/generations";
@@ -234,6 +234,9 @@ const Compare: React.FC = () => {
                                                         )}
                                                     </span>
                                                     <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        icon
                                                         aria-label={`Remove ${item.name}`}
                                                         onPress={() =>
                                                             setIds(
@@ -244,7 +247,6 @@ const Compare: React.FC = () => {
                                                                 )
                                                             )
                                                         }
-                                                        className="flex size-8 cursor-pointer items-center justify-center rounded-lg text-muted hover:bg-chip hover:text-ink"
                                                     >
                                                         <X
                                                             size={16}
