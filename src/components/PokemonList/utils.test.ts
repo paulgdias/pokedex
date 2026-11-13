@@ -4,11 +4,18 @@ import { makeDex } from "../__fixtures__/pokemon";
 import { getPokemonGridProps } from "./utils";
 
 describe("getPokemonGridProps", () => {
-    it("fits as many 190px cards as the width allows, counting the 16px gap", () => {
-        // 3 * (190 + 16) = 618
-        expect(getPokemonGridProps({ width: 617 }).columnCount).toBe(2);
-        expect(getPokemonGridProps({ width: 618 }).columnCount).toBe(3);
-        expect(getPokemonGridProps({ width: 1300 }).columnCount).toBe(6);
+    it("fits as many 200px cards as the width allows, counting the 20px gap", () => {
+        // 3 * (200 + 20) = 660
+        expect(getPokemonGridProps({ width: 659 }).columnCount).toBe(2);
+        expect(getPokemonGridProps({ width: 660 }).columnCount).toBe(3);
+        expect(getPokemonGridProps({ width: 900 }).columnCount).toBe(4);
+    });
+
+    it("caps the grid at five columns however wide it gets", () => {
+        // 5 * (200 + 20) = 1100; a sixth column would fit at 1320
+        expect(getPokemonGridProps({ width: 1100 }).columnCount).toBe(5);
+        expect(getPokemonGridProps({ width: 1320 }).columnCount).toBe(5);
+        expect(getPokemonGridProps({ width: 2400 }).columnCount).toBe(5);
     });
 
     it("never has fewer than one column", () => {
@@ -26,13 +33,13 @@ describe("getPokemonGridProps", () => {
 
     it("has a fixed row height of card height plus gap", () => {
         const { rowHeight, gridGap } = getPokemonGridProps({ width: 900 });
-        expect(gridGap).toBe(16);
-        expect(rowHeight).toBe(248);
+        expect(gridGap).toBe(20);
+        expect(rowHeight).toBe(288);
     });
 
     it("rounds the row count up", () => {
         const props = getPokemonGridProps({
-            width: 618,
+            width: 660,
             pokemon: makeDex(7),
         });
         expect(props.itemCount).toBe(7);
@@ -40,14 +47,14 @@ describe("getPokemonGridProps", () => {
     });
 
     it("has no rows without pokémon", () => {
-        const props = getPokemonGridProps({ width: 618 });
+        const props = getPokemonGridProps({ width: 660 });
         expect(props.itemCount).toBe(0);
         expect(props.rowCount).toBe(0);
     });
 
     it("uses 36 placeholder items while loading, whatever the list", () => {
         const props = getPokemonGridProps({
-            width: 618,
+            width: 660,
             pokemon: makeDex(2),
             isPlaceholder: true,
         });

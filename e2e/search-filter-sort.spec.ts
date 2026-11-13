@@ -63,6 +63,29 @@ test("the generation sidebar filters by generation", async ({ page }) => {
     await expect(page).toHaveURL(/gen=2/);
 });
 
+test("the heading names the region and counts the pokémon shown", async ({
+    page,
+}) => {
+    await page.goto("/pokedex");
+    const heading = page.getByRole("heading", { level: 1 });
+    await expect(heading).toHaveText("All regions");
+    await expect(page.getByText("National Dex · 22 Pokémon")).toBeVisible();
+
+    await page.getByRole("link", { name: /Johto/ }).click();
+    await expect(heading).toHaveText("Johto");
+    await expect(page.getByText("Generation II · 4 Pokémon")).toBeVisible();
+
+    // the count follows the filters, not just the generation
+    await page.getByRole("button", { name: /^Type/ }).click();
+    await page
+        .getByRole("dialog", { name: "Filter by type" })
+        .getByRole("button", { name: "Fire" })
+        .click();
+    await page.keyboard.press("Escape");
+    await expect(heading).toHaveText("Johto");
+    await expect(page.getByText("Generation II · 1 Pokémon")).toBeVisible();
+});
+
 test("sorting reorders the list and writes sort to the URL", async ({
     page,
 }) => {

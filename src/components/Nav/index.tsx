@@ -23,12 +23,12 @@ const NAV_ITEMS = [
 // focus outline is drawn inside: outside it is clipped by the scrolling list
 // and overlaps neighbouring rows
 const rowClass =
-    "flex min-h-11 w-full items-center rounded-[10px] px-3 text-left text-sm focus-visible:-outline-offset-2";
+    "flex min-h-12 w-full items-center rounded-xl px-3 text-left text-sm focus-visible:-outline-offset-2";
 
 const Logo = () => (
     <div className="flex items-center gap-2.5 px-2 py-1">
         <Pokeball width={32} height={32} />
-        <div className="font-display text-xl font-bold tracking-tight max-sm:sr-only">
+        <div className="font-display text-2xl font-extrabold tracking-tight max-sm:sr-only">
             Pokédex
         </div>
     </div>
@@ -66,7 +66,7 @@ const GenerationList = () => {
             <div className="px-3 pb-1 text-[11px] font-bold tracking-[0.12em] text-sidebar-label uppercase">
                 Generations
             </div>
-            <div className="flex flex-col gap-0.5 overflow-y-auto">
+            <div className="sidebar-scroll flex flex-col gap-0.5 overflow-y-auto pr-1">
                 {rows.map(({ id, roman, region, count }) => {
                     const isActive = isList && filters.generation === id;
                     const search = withFilters(params, {
@@ -117,7 +117,7 @@ const Nav: React.FC = () => {
     return (
         <>
             {/* below lg: a compact top bar */}
-            <header className="flex shrink-0 items-center justify-between bg-sidebar px-4 py-2.5 text-[#f3f0e8] lg:hidden">
+            <header className="flex shrink-0 items-center justify-between bg-sidebar px-4 py-2.5 text-sidebar-text lg:hidden">
                 <Logo />
                 <nav aria-label="Primary" className="flex gap-1">
                     {NAV_ITEMS.map(({ to, label, Icon }) => (
@@ -139,7 +139,7 @@ const Nav: React.FC = () => {
                 <ThemeToggle />
             </header>
 
-            <aside className="hidden w-66 shrink-0 flex-col gap-6 bg-sidebar px-3.5 py-5 text-[#f3f0e8] lg:flex">
+            <aside className="hidden w-66 shrink-0 flex-col gap-6 bg-sidebar px-3.5 py-5 text-sidebar-text lg:flex">
                 <Logo />
                 <nav aria-label="Primary" className="flex flex-col gap-0.5">
                     {NAV_ITEMS.map(({ to, label, Icon }) => (
@@ -148,9 +148,9 @@ const Nav: React.FC = () => {
                             to={toWithPreservedSearch(to)}
                             end={to === "/"}
                             className={({ isActive }) =>
-                                `${rowClass} gap-3 font-semibold hover:bg-sidebar-hover ${
+                                `${rowClass} gap-3 font-bold hover:bg-sidebar-hover ${
                                     isActive
-                                        ? "bg-sidebar-active text-white"
+                                        ? "bg-accent text-on-accent shadow-segment hover:bg-accent-strong"
                                         : "text-sidebar-text"
                                 }`
                             }

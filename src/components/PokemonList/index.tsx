@@ -44,7 +44,7 @@ const PokemonList = ({
 
     return (
         // pulled into the parent's right padding to absorb the trailing grid gap
-        <div className={twMerge("-mr-4 flex min-h-0 flex-1", className)}>
+        <div className={twMerge("-mr-5 flex min-h-0 flex-1", className)}>
             <AutoSizer>
                 {({ height, width }) => {
                     const {

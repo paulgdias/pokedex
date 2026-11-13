@@ -28,12 +28,14 @@ type Screen = Awaited<ReturnType<typeof render>>;
 const card = (screen: Screen, name: string) =>
     screen.getByLabelText(`Pokemon Card for ${name}`, { exact: true });
 
+// measured on the grid's row wrappers: the card itself lifts on hover, which
+// would move it off its neighbours' top edge
 const columns = (screen: Screen) => {
-    const cards = [
+    const rows = [
         ...screen.container.querySelectorAll<HTMLElement>(".pokemonCard"),
-    ];
-    const top = cards[0].getBoundingClientRect().top;
-    return cards.filter((c) => c.getBoundingClientRect().top === top).length;
+    ].map((c) => c.closest<HTMLElement>('[role="row"]') as HTMLElement);
+    const top = rows[0].getBoundingClientRect().top;
+    return rows.filter((r) => r.getBoundingClientRect().top === top).length;
 };
 
 describe("PokemonList", () => {
@@ -74,7 +76,7 @@ describe("PokemonList", () => {
         expect(columns(wide)).toBe(4);
         await wide.unmount();
 
-        const narrow = await setup({ pokemon: makeDex(40), width: 460 });
+        const narrow = await setup({ pokemon: makeDex(40), width: 500 });
         await expect.element(card(narrow, "mon-1")).toBeVisible();
         expect(columns(narrow)).toBe(2);
     });
