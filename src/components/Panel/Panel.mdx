@@ -1,0 +1,33 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./Panel.stories";
+
+<Meta of={Stories} />
+
+# Panel
+
+The card surface used across the app: rounded corners, a hairline border and the surface fill. It carries no padding or layout, so each use adds its own through `className`.
+
+## Behaviour
+
+- Renders a `div`, or a `section` with `as="section"`. A `section` needs `aria-labelledby` (or `aria-label`) to be a landmark.
+- Any other attribute (`role`, `aria-*`, `style`) is passed to the element.
+- `className` is merged with `twMerge`, so it can override the fill, e.g. `bg-surface/60`.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Default
+
+<Canvas of={Stories.Default} />
+
+### Labelled Section
+
+<Canvas of={Stories.LabelledSection} />
+
+### Translucent Override
+
+<Canvas of={Stories.TranslucentOverride} />

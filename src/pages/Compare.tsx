@@ -13,6 +13,8 @@ import { useLoaderData, useLocation, useSearchParams } from "react-router";
 
 import { pokemonInfoQueryOptions } from "@api/pokedex";
 import Button from "@components/Buttons/Button";
+import PageHeader from "@components/PageHeader";
+import Panel from "@components/Panel";
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
 import { typeDotClass, typePillClass } from "@styles/Pokedex";
 import { getGeneration } from "@utils/generations";
@@ -182,7 +184,7 @@ const Compare: React.FC = () => {
 
     return (
         <div className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
-            <div className="flex flex-col gap-4 border-b border-line px-4 pt-6 pb-5 lg:px-8">
+            <PageHeader className="gap-4">
                 <h1 className="font-display text-[34px] leading-tight font-bold tracking-tight">
                     Compare
                 </h1>
@@ -193,7 +195,7 @@ const Compare: React.FC = () => {
                         onAdd={(id) => setIds([...selectedIds, id])}
                     />
                 )}
-            </div>
+            </PageHeader>
 
             <div className="px-4 py-7 lg:px-8">
                 {selected.length < 2 ? (
@@ -205,7 +207,7 @@ const Compare: React.FC = () => {
                 ) : null}
 
                 {selected.length > 0 && (
-                    <div className="mt-6 overflow-x-auto rounded-2xl border border-line bg-surface">
+                    <Panel className="mt-6 overflow-x-auto">
                         <table className="w-full min-w-[34rem] table-fixed border-collapse">
                             <caption className="sr-only">
                                 Stats compared for{" "}
@@ -439,7 +441,7 @@ const Compare: React.FC = () => {
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                    </Panel>
                 )}
             </div>
         </div>

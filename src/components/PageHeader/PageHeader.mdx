@@ -1,0 +1,30 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PageHeader.stories";
+
+<Meta of={Stories} />
+
+# PageHeader
+
+The block at the top of a page (its title and controls) above the scrolling content: a flex column with the page's horizontal gutter (`px-4`, `lg:px-8`), `pt-6 pb-5` and a bottom rule. Used by the Compare, Type chart and Pokémon detail pages.
+
+## Behaviour
+
+- A plain `div`, not a `<header>`, so it adds no landmark.
+- It sets no `gap`: pass one (`gap-2`, `gap-4`) through `className`.
+- `className` is merged with `twMerge`, so the detail page overrides the vertical padding (`pt-5 pb-4`). `style` is passed through, which is how the detail page paints its type gradient.
+- The Pokédex toolbar (`SearchBar`) is not a `PageHeader`: it overrides most of the padding and adds a blur, shadow and translucent fill.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Default
+
+<Canvas of={Stories.Default} />
+
+### Denser With Background
+
+<Canvas of={Stories.DenserWithBackground} />

@@ -11,6 +11,9 @@ import {
 import { preconnect } from "react-dom";
 
 import { typeEfficacyQueryOptions } from "@api/pokedex";
+import PageHeader from "@components/PageHeader";
+import Panel from "@components/Panel";
+import SectionLabel from "@components/SectionLabel";
 import { TypeEfficacy, typeColors } from "@customTypes/PokemonTypes";
 import { typeDotClass, typePillClass } from "@styles/Pokedex";
 import {
@@ -75,9 +78,9 @@ const OffenseDetails = ({
     efficacy: TypeEfficacy;
 }) => (
     <div className="flex flex-col gap-2">
-        <div className="text-[13px] font-bold tracking-wider text-muted uppercase">
+        <SectionLabel>
             <span className="capitalize">{type}</span> attacking
-        </div>
+        </SectionLabel>
         {getOffense(type, efficacy).map(({ multiplier, label, types }) => (
             <GroupRow key={multiplier} label={label} types={types} />
         ))}
@@ -92,9 +95,9 @@ const DefenseDetails = ({
     efficacy: TypeEfficacy;
 }) => (
     <div className="flex flex-col gap-2">
-        <div className="text-[13px] font-bold tracking-wider text-muted uppercase">
+        <SectionLabel>
             <span className="capitalize">{type}</span> defending
-        </div>
+        </SectionLabel>
         {getTypeMatchups([type], efficacy).map(
             ({ multiplier, label, types }) => (
                 <GroupRow
@@ -255,7 +258,7 @@ const TypeChart: React.FC = () => {
 
     return (
         <div className="pokedex-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
-            <div className="flex flex-col gap-2 border-b border-line px-4 pt-6 pb-5 lg:px-8">
+            <PageHeader className="gap-2">
                 <h1 className="font-display text-[34px] leading-tight font-bold tracking-tight">
                     Type chart
                 </h1>
@@ -265,7 +268,7 @@ const TypeChart: React.FC = () => {
                         ? "Hover or focus a type for details."
                         : "Tap a type for details."}
                 </p>
-            </div>
+            </PageHeader>
 
             <div className="flex flex-col gap-6 px-4 py-7 lg:px-8">
                 {!efficacy ? (
@@ -275,7 +278,7 @@ const TypeChart: React.FC = () => {
                             : "Loading…"}
                     </p>
                 ) : (
-                    <div className="pokedex-scroll overflow-auto rounded-2xl border border-line bg-surface">
+                    <Panel className="pokedex-scroll overflow-auto">
                         <table
                             onPointerOver={handleCellHover}
                             onPointerLeave={clearCellHover}
@@ -354,7 +357,7 @@ const TypeChart: React.FC = () => {
                                 ))}
                             </tbody>
                         </table>
-                    </div>
+                    </Panel>
                 )}
             </div>
             {efficacy && cell && (

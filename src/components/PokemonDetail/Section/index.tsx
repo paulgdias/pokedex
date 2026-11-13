@@ -1,6 +1,8 @@
 import { ReactNode, useId } from "react";
 import { twMerge } from "tailwind-merge";
 
+import Panel from "@components/Panel";
+import SectionLabel from "@components/SectionLabel";
 import { PokemonInfo } from "@customTypes/PokemonTypes";
 
 const Section = ({
@@ -15,21 +17,16 @@ const Section = ({
     const id = useId();
 
     return (
-        <section
+        <Panel
+            as="section"
             aria-labelledby={id}
-            className={twMerge(
-                "flex flex-col gap-4 rounded-2xl border border-line bg-surface p-5",
-                className
-            )}
+            className={twMerge("flex flex-col gap-4 p-5", className)}
         >
-            <h2
-                id={id}
-                className="text-[13px] font-bold tracking-wider text-muted uppercase"
-            >
+            <SectionLabel as="h2" id={id}>
                 {title}
-            </h2>
+            </SectionLabel>
             {children}
-        </section>
+        </Panel>
     );
 };
 

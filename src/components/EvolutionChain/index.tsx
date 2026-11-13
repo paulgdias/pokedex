@@ -2,6 +2,8 @@ import { ArrowDown, ArrowRight } from "lucide-react";
 import { Fragment } from "react";
 import { twMerge } from "tailwind-merge";
 
+import Panel from "@components/Panel";
+import SectionLabel from "@components/SectionLabel";
 import {
     EvolutionLane,
     EvolutionStep,
@@ -211,12 +213,8 @@ const Lane = ({
     currentId: number;
     onSelect: ReturnType<typeof useNavigateToPokemon>;
 }) => (
-    <div className="flex flex-col gap-3 rounded-2xl border border-line bg-surface/60 p-4 md:p-5">
-        {label && (
-            <h3 className="text-[13px] font-bold tracking-wider text-muted uppercase">
-                {label}
-            </h3>
-        )}
+    <Panel className="flex flex-col gap-3 bg-surface/60 p-4 md:p-5">
+        {label && <SectionLabel as="h3">{label}</SectionLabel>}
         <div className="pokedex-scroll flex flex-col md:flex-row md:overflow-x-auto md:pb-1">
             {lane.stages.map((stage, index) => (
                 <Fragment key={stage[0].pokemon.id}>
@@ -251,7 +249,7 @@ const Lane = ({
                 </Fragment>
             ))}
         </div>
-    </div>
+    </Panel>
 );
 
 const EvolutionChain = ({

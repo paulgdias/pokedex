@@ -4,6 +4,7 @@ import AutoSizer from "react-virtualized/dist/es/AutoSizer";
 import List from "react-virtualized/dist/es/List";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
+import Panel from "@components/Panel";
 import { PokemonDetails, typeColors } from "@customTypes/PokemonTypes";
 import { SortKey, SortState, STAT_SORT_KEYS } from "@customTypes/SortingTypes";
 import { typeDotClass } from "@styles/Pokedex";
@@ -95,11 +96,11 @@ const PokemonTable = ({
 
     return (
         <div className="flex min-h-0 flex-1 flex-col pb-4">
-            <div
+            <Panel
                 role="table"
                 aria-label="Pokémon"
                 aria-rowcount={pokemon.length + 1}
-                className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-surface"
+                className="flex min-h-0 flex-1 flex-col overflow-hidden"
             >
                 {/* biome-ignore lint/a11y/useFocusableInteractive: the sortable header buttons are the tab stops */}
                 <div
@@ -246,7 +247,7 @@ const PokemonTable = ({
                         )}
                     </AutoSizer>
                 </div>
-            </div>
+            </Panel>
             <ScrollTopButton
                 onPress={() => list.current?.scrollToPosition(0)}
             />
