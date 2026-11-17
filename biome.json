@@ -11,7 +11,8 @@
       "**",
       "!public",
       "!pokedex-architecture-map.html",
-      "!.claude/**/*.md"
+      "!.claude/**/*.md",
+      "!.kiro/**/*.md"
     ]
   },
   "formatter": {
