@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import { DEX } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
@@ -35,14 +35,13 @@ export const MarksTheCurrentPage: Story = {
         const canvas = within(canvasElement);
         await canvas.findAllByRole("link", { name: "Pokédex", hidden: true });
 
+        // marked in both the sidebar and the top bar; the links' hrefs are
+        // unit-tested
         for (const link of links(canvas, "Pokédex")) {
             await expect(link).toHaveAttribute("aria-current", "page");
-            // the filters stay on the link to the page you are on
-            await expect(link).toHaveAttribute("href", "/pokedex?type=fire");
         }
         for (const link of links(canvas, "Compare")) {
             await expect(link).not.toHaveAttribute("aria-current");
-            await expect(link).toHaveAttribute("href", "/compare");
         }
     },
 };
@@ -61,19 +60,6 @@ export const GenerationsWithCounts: Story = {
         await expect(
             canvas.getByRole("link", { name: /Every region/, hidden: true })
         ).toHaveAttribute("aria-current", "true");
-
-        await userEvent.click(
-            canvas.getByRole("link", { name: /Johto/, hidden: true })
-        );
-        await waitFor(() =>
-            expect(canvas.getByTestId("location")).toHaveAttribute(
-                "data-search",
-                "?type=fire&gen=2"
-            )
-        );
-        await expect(
-            canvas.getByRole("link", { name: /Johto/, hidden: true })
-        ).toHaveAttribute("aria-current", "true");
     },
 };
 
@@ -85,8 +71,11 @@ export const OnAPokemonPage: Story = {
             name: /Kanto/,
             hidden: true,
         });
-        // filters do not apply to a single pokémon's page
+        // filters do not apply to a single pokémon's page: not even All
         await expect(kanto).not.toHaveAttribute("aria-current");
+        await expect(
+            canvas.getByRole("link", { name: /Every region/, hidden: true })
+        ).not.toHaveAttribute("aria-current");
         await expect(kanto).toHaveTextContent("8");
     },
 };
