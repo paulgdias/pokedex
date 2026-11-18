@@ -61,6 +61,7 @@ describe("createAppRouter", () => {
             "/pokedex",
             "/pokedex/:pokemon",
             "/compare",
+            "/party",
             "/types",
         ]);
     });
@@ -79,6 +80,7 @@ describe("createAppRouter", () => {
         expect(child(children, "/pokedex").id).toBe("pokedex");
         expect(child(children, "/pokedex/:pokemon").id).toBe("pokemon");
         expect(child(children, "/compare").id).toBe("compare");
+        expect(child(children, "/party").id).toBe("party");
     });
 
     it("shares one loader between the dex routes", () => {
@@ -88,6 +90,7 @@ describe("createAppRouter", () => {
         expect(loader).toBeTypeOf("function");
         expect(child(children, "/pokedex/:pokemon").loader).toBe(loader);
         expect(child(children, "/compare").loader).toBe(loader);
+        expect(child(children, "/party").loader).toBe(loader);
     });
 
     it("loads the dex from the cache through that loader", async () => {
@@ -112,7 +115,12 @@ describe("createAppRouter", () => {
         const { router, root, children } = routes();
         disposable = router;
         expect(root.hydrateFallbackElement).toBeTruthy();
-        for (const path of ["/pokedex", "/pokedex/:pokemon", "/compare"]) {
+        for (const path of [
+            "/pokedex",
+            "/pokedex/:pokemon",
+            "/compare",
+            "/party",
+        ]) {
             const route = child(children, path);
             expect(route.hydrateFallbackElement).toBeTruthy();
             expect(route.errorElement).toBeTruthy();
@@ -126,6 +134,7 @@ describe("createAppRouter", () => {
             "/pokedex",
             "/pokedex/:pokemon",
             "/compare",
+            "/party",
             "/types",
         ]) {
             const lazy = child(children, path).lazy as () => Promise<{

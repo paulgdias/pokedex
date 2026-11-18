@@ -36,14 +36,20 @@ afterEach(async () => {
 });
 
 describe("Nav links", () => {
-    it("offers Home, Pokédex, Compare and Type chart", async () => {
+    it("offers Home, Pokédex, Compare, Party and Type chart", async () => {
         const screen = await setup("/types");
         const names = screen
             .getByRole("navigation", { name: "Primary" })
             .getByRole("link")
             .elements()
             .map((item) => item.textContent);
-        expect(names).toEqual(["Home", "Pokédex", "Compare", "Type chart"]);
+        expect(names).toEqual([
+            "Home",
+            "Pokédex",
+            "Compare",
+            "Party",
+            "Type chart",
+        ]);
     });
 
     it("marks the current page", async () => {
