@@ -10,3 +10,7 @@ __screenshots__
 .vitest
 test-results
 playwright-report
+
+# Kiro per-spec state, not shared
+**/.kiro/**/tasks.meta.json
+**/.kiro/**/.config.kiro
