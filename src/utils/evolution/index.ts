@@ -162,10 +162,8 @@ export const buildEvolutionLanes = (
             for (const id of [...members.keys()]) {
                 let parent = species.get(species.get(id)?.parentId ?? 0);
                 while (parent && !members.has(parent.id)) {
-                    members.set(
-                        parent.id,
-                        parent.regional.get(region) ?? parent.base
-                    );
+                    // a parent with this regional form is already a member
+                    members.set(parent.id, parent.base);
                     parent = species.get(parent.parentId);
                 }
             }

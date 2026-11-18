@@ -1,5 +1,4 @@
 import { ReactNode, useId } from "react";
-import { twMerge } from "tailwind-merge";
 
 import Panel from "@components/Panel";
 import SectionLabel from "@components/SectionLabel";
@@ -20,7 +19,8 @@ const Section = ({
         <Panel
             as="section"
             aria-labelledby={id}
-            className={twMerge("flex flex-col gap-4 p-5", className)}
+            // Panel merges the classes, so className can still override
+            className={`flex flex-col gap-4 p-5 ${className ?? ""}`}
         >
             <SectionLabel as="h2" id={id}>
                 {title}

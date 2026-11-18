@@ -48,7 +48,6 @@ const PokemonList = ({
                         columnCount,
                         columnWidth,
                         rowHeight,
-                        itemCount,
                         rowCount,
                         gridGap,
                         overscanRowCount,
@@ -105,11 +104,7 @@ const PokemonList = ({
                             height={height}
                             rowHeight={rowHeight}
                             rowCount={rowCount}
-                            columnCount={
-                                itemCount < columnCount
-                                    ? itemCount
-                                    : columnCount
-                            }
+                            columnCount={columnCount}
                             width={width}
                             columnWidth={columnWidth}
                             aria-label="Pokémon"
