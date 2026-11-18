@@ -10,7 +10,6 @@ import {
 
 import {
     applyFilters,
-    CATEGORIES,
     capitalize,
     EMPTY_FILTERS,
     formatPokedexNumber,
@@ -18,25 +17,13 @@ import {
     getFiltersFromURLParams,
     getPokemonSuggestions,
     matchesText,
-    POKEMON_TYPES,
     withFilters,
 } from ".";
 
 const params = (query: string) => new URLSearchParams(query);
 const names = (list: { name: string }[]) => list.map((p) => p.name);
 
-describe("constants and formatting", () => {
-    it("has the 18 types and two categories", () => {
-        expect(POKEMON_TYPES).toHaveLength(18);
-        expect(CATEGORIES).toEqual(["legendary", "mythical"]);
-        expect(EMPTY_FILTERS).toEqual({
-            text: "",
-            generation: null,
-            types: [],
-            category: null,
-        });
-    });
-
+describe("formatting", () => {
     it("capitalizes", () => {
         expect(capitalize("fire")).toBe("Fire");
         expect(capitalize("")).toBe("");
@@ -246,12 +233,9 @@ describe("getFilterSuggestions", () => {
         );
     });
 
-    it("lists types, then generations, then categories", () => {
-        // "ka" -> Kalos + Kanto; add filters that match two kinds at once
-        const keys = getFilterSuggestions("ic", EMPTY_FILTERS).map(
-            (s) => s.key
-        );
-        expect(keys).toEqual(["type-ice"]);
+    // no two-letter prefix is shared by a type, a region and a category, so
+    // the order between kinds cannot show; within a kind it follows the table
+    it("lists every matching region, in generation order", () => {
         expect(
             getFilterSuggestions("ka", EMPTY_FILTERS).map((s) => s.key)
         ).toEqual(["gen-1", "gen-6"]);

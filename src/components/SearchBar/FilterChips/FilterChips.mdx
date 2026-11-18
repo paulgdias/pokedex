@@ -19,17 +19,11 @@ One removable chip per active filter (generation, types, category), plus "Clear 
 
 ## Examples
 
-### Removes One Filter
+### Shows Active Filters
 
-A chip's remove button clears its own filter.
+One chip per active filter; each chip's button removes its own filter, and "Clear all" calls `onClearAll`.
 
-<Canvas of={Stories.RemovesOneFilter} />
-
-### Clears All
-
-"Clear all" calls `onClearAll`.
-
-<Canvas of={Stories.ClearsAll} />
+<Canvas of={Stories.ShowsActiveFilters} />
 
 ### Nothing To Show
 
