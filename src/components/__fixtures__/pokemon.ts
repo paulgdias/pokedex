@@ -240,6 +240,25 @@ export const MISSINGNO = makePokemon({
     generationId: 3,
 });
 
+/** Normal / flying: immune to ground, weak to electric and ice in `EFFICACY`. */
+export const PIDGEY = makePokemon({
+    id: 16,
+    name: "pidgey",
+    types: ["normal", "flying"],
+});
+/** Electric, generation 1: hits water and flying for 2× in `EFFICACY`. */
+export const PIKACHU = makePokemon({
+    id: 25,
+    name: "pikachu",
+    types: ["electric"],
+});
+/** Dragon: `EFFICACY` has no dragon matchups, so its type data is missing. */
+export const DRATINI = makePokemon({
+    id: 147,
+    name: "dratini",
+    types: ["dragon"],
+});
+
 /** A small dex spanning types, generations and both special categories. */
 export const DEX: PokemonDetails[] = [
     bulbasaur,
