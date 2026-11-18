@@ -47,7 +47,9 @@ export const TranslucentOverride: Story = {
     args: { className: "bg-surface/60 p-5" },
     play: async ({ canvasElement }) => {
         const panel = within(canvasElement).getByText("Charizard");
-        await expect(panel).toHaveClass("bg-surface/60");
-        await expect(panel).not.toHaveClass("bg-surface");
+        // the surface really is see-through, not just classed
+        await expect(getComputedStyle(panel).backgroundColor).toMatch(
+            /[ ,/] ?0?\.6\)$/
+        );
     },
 };

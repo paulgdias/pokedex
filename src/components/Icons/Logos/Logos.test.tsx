@@ -1,47 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
 
-import { Email, GitHub, githubUrl, LinkedIn, linkedinUrl } from ".";
+import { Email, GitHub, LinkedIn } from ".";
 
-describe("Logos", () => {
-    it("exports the profile URLs", () => {
-        expect(githubUrl).toMatch(/^https:\/\/github\.com\//);
-        expect(linkedinUrl).toMatch(/^https:\/\/www\.linkedin\.com\/in\//);
+// the links (href, target, rel) are covered by the story
+describe.each([
+    ["GitHub", GitHub],
+    ["LinkedIn", LinkedIn],
+    ["Email", Email],
+])("%s logo", (name, Logo) => {
+    const svgOf = (screen: Awaited<ReturnType<typeof render>>) =>
+        screen.getByRole("link", { name }).element().querySelector("svg");
+
+    it("is 32px square by default", async () => {
+        const screen = await render(<Logo />);
+        expect(svgOf(screen)?.getAttribute("width")).toBe("32");
+        expect(svgOf(screen)?.getAttribute("height")).toBe("32");
     });
 
-    it("GitHub links to the profile and sizes its svg", async () => {
-        const screen = await render(<GitHub width={40} height={24} />);
-        const link = screen.getByRole("link", { name: "GitHub" });
-        await expect.element(link).toHaveAttribute("href", githubUrl);
-        const svg = screen.container.querySelector("svg") as SVGSVGElement;
-        expect(svg.getAttribute("width")).toBe("40");
-        expect(svg.getAttribute("height")).toBe("24");
-    });
-
-    it("LinkedIn links to the profile and sizes its svg", async () => {
-        const screen = await render(<LinkedIn width={40} height={24} />);
-        await expect
-            .element(screen.getByRole("link", { name: "LinkedIn" }))
-            .toHaveAttribute("href", linkedinUrl);
-        const svg = screen.container.querySelector("svg") as SVGSVGElement;
-        expect(svg.getAttribute("width")).toBe("40");
-    });
-
-    it("Email opens a mail draft", async () => {
-        const screen = await render(<Email width={40} height={40} />);
-        await expect
-            .element(screen.getByRole("link", { name: "Email" }))
-            .toHaveAttribute("href", expect.stringMatching(/^mailto:.+@.+/));
-    });
-
-    it("falls back to default sizes", async () => {
-        const screen = await render(
-            <>
-                <GitHub />
-                <LinkedIn />
-                <Email />
-            </>
-        );
-        expect(screen.container.querySelectorAll("a")).toHaveLength(3);
+    it("takes its size from the props", async () => {
+        const screen = await render(<Logo width={40} height={24} />);
+        expect(svgOf(screen)?.getAttribute("width")).toBe("40");
+        expect(svgOf(screen)?.getAttribute("height")).toBe("24");
     });
 });

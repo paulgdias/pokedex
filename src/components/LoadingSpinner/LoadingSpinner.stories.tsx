@@ -15,9 +15,14 @@ type Story = StoryObj<typeof meta>;
 export const Spinning: Story = {
     play: async ({ canvasElement }) => {
         const spinner = canvasElement.firstElementChild as HTMLElement;
-        await expect(spinner).toHaveClass("animate-spin");
+        const ball = spinner.querySelector("svg") as SVGSVGElement;
         // the animation is really applied, not just named
         await expect(getComputedStyle(spinner).animationName).toBe("spin");
-        await expect(spinner.querySelector("svg")).not.toBeNull();
+        await expect(ball.getBoundingClientRect().width).toBe(52);
+        await expect(ball.getBoundingClientRect().height).toBe(52);
+        // centred in the full viewport height
+        await expect(spinner.getBoundingClientRect().height).toBe(
+            window.innerHeight
+        );
     },
 };
