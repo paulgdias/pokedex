@@ -1,0 +1,28 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./MemberMatchups.stories";
+
+<Meta of={Stories} />
+
+# MemberMatchups
+
+One panel per party member on the Party Analyzer page: sprite, name and type pills, then the member's own defensive matchups through the detail page's `TypeMatchups`.
+
+## Behaviour
+
+- Each panel is a section labelled "[name] matchups".
+- Only non-neutral groups (4×, 2×, ½×, ¼×, 0×) are shown; a member with none says "No weaknesses or resistances".
+- A member with a type the chart never mentions (`hasTypeData` is false) says "Type data unavailable" instead, rather than reading as all 1×.
+- An empty party renders nothing.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Default
+
+Bulbasaur, Charmander, Pidgey and Dratini. The fixture chart never mentions dragon, so Dratini shows "Type data unavailable".
+
+<Canvas of={Stories.Default} />

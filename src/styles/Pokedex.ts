@@ -35,6 +35,8 @@ const tintedPillClass = `
     text-[color-mix(in_srgb,var(--pill)_40%,var(--color-ink))]
 `;
 const typeDotClass = `size-2 shrink-0 rounded-full ring-1 ring-inset ring-black/20`;
+// the heading above each analysis block on the party page
+const sectionHeadingClass = `font-display text-xl font-bold tracking-tight`;
 const legendaryPokemonClass = `text-[#9aa3b5]`;
 const mythicalPokemonClass = `text-[#d9a515]`;
 const categoryBadgeClass = `
@@ -55,6 +57,7 @@ export {
     legendaryPokemonClass,
     mythicalPokemonClass,
     pixelArtClass,
+    sectionHeadingClass,
     tintedPillClass,
     typeDotClass,
     typeGradient,

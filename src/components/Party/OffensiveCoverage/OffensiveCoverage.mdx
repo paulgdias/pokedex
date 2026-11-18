@@ -1,0 +1,37 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./OffensiveCoverage.stories";
+
+<Meta of={Stories} />
+
+# OffensiveCoverage
+
+Which of the 18 types the party can hit super-effectively with its members' own types, and which are coverage gaps that nobody hits for 2×. The classification comes from `computeOffensiveCoverage` (`@utils/partyAnalyzer`), which checks each member type with `getOffense`.
+
+## Behaviour
+
+- All 18 types are listed in `TYPE_ORDER`. Covered types are normal type pills; gaps are outlined with a dashed border and muted text, and screen readers hear "Coverage gap" after the type.
+- A summary line counts the gaps, or confirms full coverage when there are none.
+- With an empty party it shows a prompt and lists no types.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### With Gaps
+
+Bulbasaur and Charmander.
+
+<Canvas of={Stories.WithGaps} />
+
+### Full Coverage
+
+A type chart where normal hits everything for 2×.
+
+<Canvas of={Stories.FullCoverage} />
+
+### Empty Party
+
+<Canvas of={Stories.EmptyParty} />

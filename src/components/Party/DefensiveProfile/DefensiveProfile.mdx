@@ -1,0 +1,39 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./DefensiveProfile.stories";
+
+<Meta of={Stories} />
+
+# DefensiveProfile
+
+The party's combined defence on the Party Analyzer page. Every one of the 18 attacking types lands in exactly one of four bands, computed by `computeDefensiveProfile` (`@utils/partyAnalyzer`) from each member's `getTypeMatchups`.
+
+## Behaviour
+
+- Bands are always shown in the order Immune, Resistant, Neutral, Weak, each a labelled `Panel` section. An empty band says "No types in this band".
+- Band priority is Weak > Immune > Resistant > Neutral: one member's immunity never hides another member's weakness, so a type with a 2× member is Weak even if someone is immune.
+- Weak pills carry a badge with how many members take 2× or more; screen readers hear "N members weak to [type]" instead.
+- A member with a type the chart never mentions (`hasTypeData` is false) is left out of the bands, with "Type data unavailable for [name]" below them.
+- With an empty party it shows "Add Pokémon to see the defensive profile".
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Mixed Party
+
+Bulbasaur, Charmander and Pidgey. Pidgey is immune to ground, but Charmander is weak to it, so ground is Weak.
+
+<Canvas of={Stories.MixedParty} />
+
+### Empty Party
+
+<Canvas of={Stories.EmptyParty} />
+
+### Missing Type Data
+
+The fixture type chart has no dragon matchups, so Dratini is left out.
+
+<Canvas of={Stories.MissingTypeData} />

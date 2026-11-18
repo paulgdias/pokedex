@@ -1,0 +1,36 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./ThreatAnalysis.stories";
+
+<Meta of={Stories} />
+
+# ThreatAnalysis
+
+Tests the party against up to three opponent types. A grid shows the damage multiplier each member takes from each threat type, computed by `computeThreatGrid` (`@utils/partyAnalyzer`).
+
+## Behaviour
+
+- The "Add a threat type" control is a react-aria `Select` listing the 18 types, leaving out types already added. A select, not a combobox: with 18 fixed options there is nothing to search, and it closes after each pick instead of reopening over the grid. It is disabled once three threats are set.
+- Each threat is a pill with a "Remove [type] threat" button. The component holds no threats itself: `onAddThreat` / `onRemoveThreat` report changes and the page writes them to the `threats` URL param.
+- With at least one member and one threat, a table has one row per member and one column per threat. Cells read 0×, ¼×, ½×, 1×, 2× or 4× and are colored from the defender's side: red for 2× and 4×, green for ½× and ¼×, dark for 0× and plain for 1×. Each cell carries a screen-reader sentence from `describeMatchup`, e.g. "Fire → Bulbasaur: 2× (super effective)".
+- Otherwise a prompt explains what is missing (the feature, Pokémon or a threat).
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Grid
+
+<Canvas of={Stories.Grid} />
+
+### Add And Remove
+
+Threats kept in local state, as the page keeps them in the URL.
+
+<Canvas of={Stories.AddAndRemove} />
+
+### Empty
+
+<Canvas of={Stories.Empty} />

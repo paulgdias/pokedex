@@ -1,0 +1,28 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PartySlot.stories";
+
+<Meta of={Stories} />
+
+# PartySlot
+
+One of the six slots on the Party Analyzer page, labelled "Slot N".
+
+## Behaviour
+
+- Empty: a dashed panel holding a `SlotPicker`. The rest of the party (`selectedIds`) is never offered, so a Pokémon fills one slot at most. Picking one calls `onSet(id)`.
+- Filled: the member's sprite, dex number, name and type pills, with a "Remove [name]" button that calls `onSet(null)`.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Filled
+
+<Canvas of={Stories.Filled} />
+
+### Empty
+
+<Canvas of={Stories.Empty} />
