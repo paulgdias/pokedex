@@ -8,11 +8,15 @@ export default defineConfig({
     // IndexedDB), so tests are independent and can run in parallel
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
-    retries: process.env.CI ? 2 : 0,
+    // no retries: a test that fails only sometimes should fail the run, not
+    // turn green on a second try
+    retries: 0,
     reporter: [["list"], ["html", { open: "never" }]],
     use: {
         baseURL: `http://localhost:${PORT}`,
-        trace: "on-first-retry",
+        // without retries "on-first-retry" would never record; keep the trace
+        // of every failing test (CI uploads test-results/ on failure)
+        trace: "retain-on-failure",
         // AutoSizer renders nothing at 0 height; 1280 is above the `lg`
         // breakpoint, so the generation sidebar exists
         viewport: { width: 1280, height: 800 },

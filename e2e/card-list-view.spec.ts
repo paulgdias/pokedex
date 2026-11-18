@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 
 import { mockPokeApi } from "./mocks";
 
+// header toggling and the row links' router state are covered by the
+// PokemonTable tests; these check the page wires the view and sort to the URL
 test.beforeEach(async ({ page }) => {
     await mockPokeApi(page);
 });
@@ -29,7 +31,9 @@ test("switching to list view keeps the filters and shows every match", async ({
     ).toBeVisible();
 });
 
-test("a column header sorts the table", async ({ page }) => {
+test("a column header writes the sort to the URL and the table follows it", async ({
+    page,
+}) => {
     await page.goto("/pokedex?view=list");
     const attack = page.getByRole("columnheader", { name: "Atk" });
 
@@ -42,23 +46,4 @@ test("a column header sorts the table", async ({ page }) => {
         .getByRole("row")
         .nth(1);
     await expect(firstRow).toContainText("rayquaza");
-
-    await attack.getByRole("button").click();
-    await expect(attack).toHaveAttribute("aria-sort", "ascending");
-});
-
-test("opening a row from the list and going Back keeps the list view", async ({
-    page,
-}) => {
-    await page.goto("/pokedex?view=list&type=water");
-    await page
-        .getByRole("table", { name: "Pokémon" })
-        .getByRole("link", { name: "squirtle" })
-        .click();
-    await expect(page).toHaveURL("/pokedex/squirtle");
-
-    await page.getByRole("button", { name: "Back to Pokémon" }).click();
-    await expect(page).toHaveURL(/view=list/);
-    await expect(page).toHaveURL(/type=water/);
-    await expect(page.getByRole("table", { name: "Pokémon" })).toBeVisible();
 });
