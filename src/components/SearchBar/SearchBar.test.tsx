@@ -139,7 +139,10 @@ describe("SearchBar search box", () => {
         expect(screen.getByRole("listbox").query()).toBeNull();
     });
 
-    it("closes the list on Escape (the browser also clears a search field)", async () => {
+    // in Chromium, Escape also clears the field, which closes the list on its
+    // own; the onKeyDown handler is what closes it in Safari (WebKit keeps
+    // the text), which this suite does not run
+    it("closes the list on Escape", async () => {
         const { screen, search } = await setup();
         await search.fill("mew");
         await expect.element(screen.getByRole("listbox")).toBeVisible();

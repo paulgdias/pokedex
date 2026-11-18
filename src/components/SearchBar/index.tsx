@@ -168,6 +168,9 @@ const SearchBar = ({
                             onBlur={() => setIsFocused(false)}
                             onKeyDown={(event) => {
                                 if (event.key === "Escape") {
+                                    // Chromium and Firefox clear a search
+                                    // field on Escape, which closes the list;
+                                    // Safari keeps the text, so close it here
                                     setIsFocused(false);
                                 } else if (event.key === "ArrowDown") {
                                     event.preventDefault();
