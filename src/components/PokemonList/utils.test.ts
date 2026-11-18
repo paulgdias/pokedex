@@ -45,14 +45,4 @@ describe("getPokemonGridProps", () => {
         expect(props.itemCount).toBe(0);
         expect(props.rowCount).toBe(0);
     });
-
-    it("uses 36 placeholder items while loading, whatever the list", () => {
-        const props = getPokemonGridProps({
-            width: 750,
-            pokemon: makeDex(2),
-            isPlaceholder: true,
-        });
-        expect(props.itemCount).toBe(36);
-        expect(props.rowCount).toBe(12);
-    });
 });

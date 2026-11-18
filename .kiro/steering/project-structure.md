@@ -21,7 +21,6 @@ pokedex/
 │   │   ├── PageHeader/
 │   │   ├── Panel/
 │   │   ├── PokemonCard/
-│   │   │   └── PlaceholderCard/
 │   │   ├── PokemonDetail/      Components shown on the Pokemon detail page
 │   │   │   ├── AbilityList/
 │   │   │   ├── CryButton/
