@@ -83,7 +83,7 @@ const PokemonCard: React.FC<PokemonCardType> = ({
             }}
         >
             <div
-                className={`${cardArtClass} ${isLarge ? "h-72" : "h-[150px]"}`}
+                className={`${cardArtClass} ${isLarge ? "h-72" : "h-[146px]"}`}
             >
                 {category && (
                     <span

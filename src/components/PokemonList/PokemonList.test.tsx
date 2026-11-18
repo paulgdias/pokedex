@@ -56,12 +56,12 @@ describe("PokemonList", () => {
     });
 
     it("fits the number of columns to the width", async () => {
-        const wide = await setup({ pokemon: makeDex(40), width: 1000 });
+        const wide = await setup({ pokemon: makeDex(40), width: 1100 });
         await expect.element(card(wide, "mon-1")).toBeVisible();
         expect(columns(wide)).toBe(4);
         await wide.unmount();
 
-        const narrow = await setup({ pokemon: makeDex(40), width: 500 });
+        const narrow = await setup({ pokemon: makeDex(40), width: 600 });
         await expect.element(card(narrow, "mon-1")).toBeVisible();
         expect(columns(narrow)).toBe(2);
     });
