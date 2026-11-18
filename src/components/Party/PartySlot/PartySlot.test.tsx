@@ -24,14 +24,7 @@ const setup = async (
 };
 
 describe("PartySlot", () => {
-    it("shows a picker when empty", async () => {
-        const { screen } = await setup(null);
-        await expect
-            .element(screen.getByRole("combobox", { name: "Slot 1 Pokémon" }))
-            .toBeVisible();
-        expect(screen.getByRole("button").query()).toBeNull();
-    });
-
+    // the filled and empty looks are covered by the stories
     it("fills the slot with the picked Pokémon", async () => {
         const { screen, onSet } = await setup(null);
         await screen.getByRole("combobox").fill("char");
@@ -42,23 +35,13 @@ describe("PartySlot", () => {
     it("does not offer Pokémon already in the party", async () => {
         const { screen } = await setup(null, [1]);
         await screen.getByRole("combobox").fill("saur");
-        expect(
-            screen.getByRole("option", { name: /bulbasaur/ }).query()
-        ).toBeNull();
+        // wait for the list before checking what it leaves out
         await expect
             .element(screen.getByRole("option", { name: /ivysaur/ }))
             .toBeVisible();
-    });
-
-    it("shows the member's sprite, number, name and types when filled", async () => {
-        const { screen } = await setup(bulbasaur);
-        await expect.element(screen.getByText("bulbasaur")).toBeVisible();
-        await expect.element(screen.getByText("#0001")).toBeVisible();
-        await expect.element(screen.getByText("poison")).toBeVisible();
-        expect(screen.getByRole("combobox").query()).toBeNull();
-        expect(screen.container.querySelector("img")?.getAttribute("alt")).toBe(
-            ""
-        );
+        expect(
+            screen.getByRole("option", { name: /bulbasaur/ }).query()
+        ).toBeNull();
     });
 
     it("clears the slot from its remove button", async () => {

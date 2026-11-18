@@ -37,8 +37,15 @@ export const Default: Story = {
             canvas.getByRole("heading", { name: "Suggested replacement" })
         ).toBeVisible();
         // squirtle would trade bulbasaur's water for fire: no net gain
+        const [card] = canvas.getAllByRole("listitem");
         await expect(canvas.getAllByRole("listitem")).toHaveLength(1);
-        await expect(canvas.getByText("pikachu")).toBeVisible();
+        // a card: sprite, dex number, name and type pills
+        const sprite = card.querySelector("img");
+        await expect(sprite).toBeVisible();
+        await expect(sprite).toHaveAttribute("alt", "");
+        await expect(within(card).getByText("#0025")).toBeVisible();
+        await expect(within(card).getByText("pikachu")).toBeVisible();
+        await expect(within(card).getByText("electric")).toBeVisible();
     },
 };
 
