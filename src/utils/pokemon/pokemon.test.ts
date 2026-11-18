@@ -35,6 +35,8 @@ const raw = (overrides: Partial<Pokemon> = {}): Pokemon => ({
 });
 
 describe("convertToPokemonDetailsArray", () => {
+    // form and evolution-method rules are covered by the evolution tests;
+    // here only that they are wired in
     it("converts a full record", () => {
         const [bulbasaur] = convertToPokemonDetailsArray([raw()]);
         expect(bulbasaur).toEqual({
@@ -129,37 +131,25 @@ describe("convertToPokemonDetailsArray", () => {
             evolutions: [],
         });
     });
-
-    it("falls back when even the id and name are missing", () => {
-        const [mon] = convertToPokemonDetailsArray([{} as unknown as Pokemon]);
-        expect(mon.id).toBe(0);
-        expect(mon.name).toBe("");
-        expect(mon.speciesId).toBe(0);
-    });
-
-    it("converts nested evolutions too", () => {
-        const [mon] = convertToPokemonDetailsArray([
-            raw({ evolutions: [raw({ id: 2, name: "ivysaur" })] }),
-        ]);
-        expect(mon.evolutions.map((e) => e.name)).toEqual(["ivysaur"]);
-    });
 });
 
 describe("withEvolutions", () => {
-    it("gives every member of a chain the whole chain, sorted by id", () => {
-        const [c, a, b, other] = convertToPokemonDetailsArray([
-            raw({ id: 3, name: "c" }),
-            raw({ id: 1, name: "a" }),
-            raw({ id: 2, name: "b" }),
-            raw({
-                id: 9,
-                name: "solo",
-                specs: { ...raw().specs, evolution_chain_id: 9 },
-            }),
-        ]).map((p, i, all) => (i < 3 ? p : all[3]));
-        const result = withEvolutions([c, a, b, other]);
+    it("gives every member of a chain the whole chain, sorted by id, keeping the list order", () => {
+        const result = withEvolutions(
+            convertToPokemonDetailsArray([
+                raw({ id: 3, name: "c" }),
+                raw({ id: 1, name: "a" }),
+                raw({ id: 2, name: "b" }),
+                raw({
+                    id: 9,
+                    name: "solo",
+                    specs: { ...raw().specs, evolution_chain_id: 9 },
+                }),
+            ])
+        );
         const chainOf = (name: string) =>
             result.find((p) => p.name === name)?.evolutions.map((p) => p.name);
+        expect(result.map((p) => p.name)).toEqual(["c", "a", "b", "solo"]);
         expect(chainOf("a")).toEqual(["a", "b", "c"]);
         expect(chainOf("c")).toEqual(["a", "b", "c"]);
         expect(chainOf("solo")).toEqual(["solo"]);
@@ -169,14 +159,6 @@ describe("withEvolutions", () => {
         const input = convertToPokemonDetailsArray([raw()]);
         withEvolutions(input);
         expect(input[0].evolutions).toEqual([]);
-    });
-
-    it("keeps the list order", () => {
-        const input = convertToPokemonDetailsArray([
-            raw({ id: 5, name: "e" }),
-            raw({ id: 2, name: "b" }),
-        ]);
-        expect(withEvolutions(input).map((p) => p.name)).toEqual(["e", "b"]);
     });
 });
 

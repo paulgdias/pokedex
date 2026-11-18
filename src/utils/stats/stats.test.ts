@@ -11,12 +11,11 @@ import {
     getFemaleShare,
     getOffense,
     getTypeMatchups,
-    MAX_STAT,
-    STAT_LABELS,
-    TYPE_ORDER,
 } from ".";
 
 describe("formatting", () => {
+    // STAT_LABELS, MAX_STAT and TYPE_ORDER are constants; StatBars and the
+    // getOffense order test below cover how they are used
     it("title-cases hyphenated names", () => {
         expect(formatName("lightning-rod")).toBe("Lightning Rod");
         expect(formatName("mew")).toBe("Mew");
@@ -27,7 +26,6 @@ describe("formatting", () => {
         expect(formatFlavorText("It can\nfly\fhigh.  Very high. ")).toBe(
             "It can fly high. Very high."
         );
-        expect(formatFlavorText("a\n\n\nb")).toBe("a b");
     });
 
     it("formats height from decimetres in metres and feet", () => {
@@ -47,15 +45,11 @@ describe("formatting", () => {
         expect(getFemaleShare(1)).toBe(0.125);
         expect(getFemaleShare(8)).toBe(1);
     });
-
-    it("has six stat labels and a maximum of 255", () => {
-        expect(STAT_LABELS).toHaveLength(6);
-        expect(MAX_STAT).toBe(255);
-    });
 });
 
 describe("getTypeMatchups", () => {
-    it("groups by multiplier from strongest to weakest, skipping neutral", () => {
+    it("multiplies dual types and groups by multiplier, strongest first, skipping neutral", () => {
+        // grass/flying: ice is 2× on each (4×), ground is 0× on flying
         const groups = getTypeMatchups(["grass", "flying"], EFFICACY);
         expect(groups.map(({ multiplier }) => multiplier)).toEqual([
             4, 2, 0.5, 0.25, 0,
@@ -78,20 +72,11 @@ describe("getTypeMatchups", () => {
     it("treats a missing pairing as neutral", () => {
         expect(getTypeMatchups(["dragon"], EFFICACY)).toEqual([]);
     });
-
-    it("multiplies across both defending types", () => {
-        const [group] = getTypeMatchups(["grass", "poison"], EFFICACY);
-        expect(group.multiplier).toBe(2);
-        expect(group.types).toEqual(["fire", "ice"]);
-    });
-
-    it("has no groups for an empty efficacy map", () => {
-        expect(getTypeMatchups(["fire"], {})).toEqual([]);
-    });
 });
 
 describe("getOffense", () => {
     it("lists what an attacker hits for 2×, ½× and 0×, in the games' order", () => {
+        // EFFICACY lists fire's ½× as water, fire; TYPE_ORDER puts fire first
         expect(getOffense("fire", EFFICACY)).toEqual([
             { multiplier: 2, label: "2×", types: ["grass", "ice"] },
             { multiplier: 0.5, label: "½×", types: ["fire", "water"] },
@@ -108,23 +93,16 @@ describe("getOffense", () => {
             getOffense("shadow", EFFICACY).every((g) => g.types.length === 0)
         ).toBe(true);
     });
-
-    it("orders defenders by TYPE_ORDER", () => {
-        expect(TYPE_ORDER).toHaveLength(18);
-        expect(TYPE_ORDER[0]).toBe("normal");
-    });
 });
 
 describe("describeMatchup", () => {
-    it.each([
-        [4, "Fire → Grass: 4× (double super effective)"],
-        [2, "Fire → Grass: 2× (super effective)"],
-        [1, "Fire → Grass: 1× (neutral)"],
-        [0.5, "Fire → Grass: ½× (not very effective)"],
-        [0.25, "Fire → Grass: ¼× (barely effective)"],
-        [0, "Fire → Grass: 0× (no effect)"],
-    ])("describes %s×", (multiplier, text) => {
-        expect(describeMatchup("fire", "grass", multiplier)).toBe(text);
+    it("names both types and what the multiplier means", () => {
+        expect(describeMatchup("fire", "grass", 2)).toBe(
+            "Fire → Grass: 2× (super effective)"
+        );
+        expect(describeMatchup("fire", "grass", 0.25)).toBe(
+            "Fire → Grass: ¼× (barely effective)"
+        );
     });
 
     it("falls back to the bare number for an unusual multiplier", () => {

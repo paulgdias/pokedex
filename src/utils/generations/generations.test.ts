@@ -1,20 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { countByGeneration, GENERATIONS, getGeneration } from ".";
+import { countByGeneration, getGeneration } from ".";
 
 describe("generations", () => {
-    it("lists generations 1-9 in order with roman numerals and regions", () => {
-        expect(GENERATIONS.map(({ id }) => id)).toEqual([
-            1, 2, 3, 4, 5, 6, 7, 8, 9,
-        ]);
-        expect(GENERATIONS[0]).toEqual({ id: 1, roman: "I", region: "Kanto" });
-        expect(GENERATIONS[8]).toEqual({
-            id: 9,
-            roman: "IX",
-            region: "Paldea",
-        });
-    });
-
+    // the GENERATIONS table itself is data; Nav and the search filter tests
+    // cover how its ids are used
     it("looks a generation up by id", () => {
         expect(getGeneration(5)?.region).toBe("Unova");
     });
