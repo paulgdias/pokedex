@@ -1,4 +1,4 @@
-import { Grid3x3, House, LibraryBig, Scale } from "lucide-react";
+import { Grid3x3, House, LibraryBig, Scale, Users } from "lucide-react";
 import {
     Link,
     NavLink,
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
     { to: "/", label: "Home", Icon: House },
     { to: "/pokedex", label: "Pokédex", Icon: LibraryBig },
     { to: "/compare", label: "Compare", Icon: Scale },
+    { to: "/party", label: "Party", Icon: Users },
     { to: "/types", label: "Type chart", Icon: Grid3x3 },
 ];
 

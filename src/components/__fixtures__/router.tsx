@@ -4,6 +4,7 @@ import {
     RouterProvider,
     useLocation,
     useNavigate,
+    useNavigationType,
 } from "react-router";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
@@ -13,12 +14,15 @@ const Page = createContext<ReactNode>(null);
 /** Publishes the current location so tests can assert on navigation. */
 export const LocationProbe = () => {
     const { pathname, search, state } = useLocation();
+    // PUSH, REPLACE or POP: how the current entry was reached
+    const navigationType = useNavigationType();
     return (
         <div
             hidden
             data-testid="location"
             data-pathname={pathname}
             data-search={search}
+            data-navigation-type={navigationType}
             data-previous={(state as { previous?: string } | null)?.previous}
             data-pokemon={
                 (state as { pokemon?: PokemonDetails } | null)?.pokemon?.name
@@ -45,8 +49,9 @@ const Content = () => (
 );
 
 /**
- * A memory data router around `children`. With `dex`, the `"pokedex"` and
- * `"pokemon"` routes load it, like the app's routes do for `Nav`.
+ * A memory data router around `children`. With `dex`, the `"pokedex"`,
+ * `"pokemon"` and `"party"` routes load it, like the app's routes do (for
+ * `Nav`, and for pages that read `useLoaderData`).
  */
 const TestRouter = ({
     children,
@@ -71,6 +76,12 @@ const TestRouter = ({
                           {
                               id: "pokemon",
                               path: "/pokedex/:pokemon",
+                              loader: () => dex,
+                              element: <Content />,
+                          },
+                          {
+                              id: "party",
+                              path: "/party",
                               loader: () => dex,
                               element: <Content />,
                           },

@@ -70,6 +70,13 @@ export const createAppRoutes = (
                     loader,
                     pokedexError
                 ),
+                dataRoute(
+                    "party",
+                    "/party",
+                    () => import("../../pages/Party"),
+                    loader,
+                    pokedexError
+                ),
                 {
                     path: "/types",
                     lazy: async () => ({
