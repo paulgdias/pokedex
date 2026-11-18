@@ -33,8 +33,9 @@ export const WithHiddenAbility: Story = {
 export const WithoutEffectText: Story = {
     args: { abilities: [{ name: "run-away", isHidden: false, effect: "" }] },
     play: async ({ canvasElement }) => {
-        const item = within(canvasElement).getByRole("listitem");
-        await expect(item).toHaveTextContent("Run Away");
-        await expect(item.querySelectorAll("span")).toHaveLength(1);
+        // only the name, with no badge
+        await expect(
+            within(canvasElement).getByRole("listitem")
+        ).toHaveTextContent(/^Run Away$/);
     },
 };

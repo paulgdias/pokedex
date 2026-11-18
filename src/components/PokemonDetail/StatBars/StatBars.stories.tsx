@@ -19,6 +19,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** How much of the meter's track its fill covers, as drawn. */
+const filled = (meter: HTMLElement) =>
+    (meter.firstElementChild as HTMLElement).getBoundingClientRect().width /
+    meter.getBoundingClientRect().width;
+
 export const Bulbasaur: Story = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -29,11 +34,7 @@ export const Bulbasaur: Story = {
         await expect(canvas.getByText("318")).toBeVisible();
 
         // bar length is the stat's share of the highest possible stat
-        const fill = speed.firstElementChild as HTMLElement;
-        await expect(parseFloat(fill.style.width)).toBeCloseTo(
-            (45 / 255) * 100,
-            2
-        );
+        await expect(filled(speed)).toBeCloseTo(45 / 255, 2);
     },
 };
 
@@ -42,10 +43,9 @@ export const CapsAtTheMaximum: Story = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const bar = (name: string) =>
-            canvas.getByRole("meter", { name })
-                .firstElementChild as HTMLElement;
-        await expect(bar("HP").style.width).toBe("100%");
-        await expect(bar("Attack").style.width).toBe("100%");
-        await expect(bar("Defense").style.width).toBe("0%");
+            filled(canvas.getByRole("meter", { name }));
+        await expect(bar("HP")).toBe(1);
+        await expect(bar("Attack")).toBe(1);
+        await expect(bar("Defense")).toBe(0);
     },
 };

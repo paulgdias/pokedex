@@ -26,21 +26,30 @@ const value = (canvas: ReturnType<typeof within>, label: string) =>
 export const Facts: Story = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(value(canvas, "Height")).toHaveTextContent(
-            "0.7 m (2′04″)"
-        );
-        await expect(value(canvas, "Weight")).toHaveTextContent(
-            "6.9 kg (15.2 lb)"
-        );
-        await expect(value(canvas, "Egg groups")).toHaveTextContent(
-            "Monster, Plant"
-        );
-        await expect(value(canvas, "Growth rate")).toHaveTextContent(
-            "Medium Slow"
-        );
-        await expect(value(canvas, "Gender")).toHaveTextContent(
-            "12.5% female · 87.5% male"
-        );
+        for (const [label, shown] of [
+            ["Height", "0.7 m (2′04″)"],
+            ["Weight", "6.9 kg (15.2 lb)"],
+            ["Base experience", "64"],
+            ["Capture rate", "45"],
+            ["Base happiness", "50"],
+            ["Gender", "12.5% female · 87.5% male"],
+            ["Egg groups", "Monster, Plant"],
+            ["Growth rate", "Medium Slow"],
+            ["Habitat", "Grassland"],
+            ["Color", "Green"],
+            ["Shape", "Quadruped"],
+        ]) {
+            await expect(value(canvas, label)).toHaveTextContent(shown);
+        }
+
+        // the pink part of the bar is the female share
+        const bar = value(canvas, "Gender").firstElementChild
+            ?.firstElementChild as HTMLElement;
+        const female = bar.firstElementChild as HTMLElement;
+        await expect(
+            female.getBoundingClientRect().width /
+                bar.getBoundingClientRect().width
+        ).toBeCloseTo(0.125, 2);
     },
 };
 

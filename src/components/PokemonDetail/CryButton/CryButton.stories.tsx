@@ -8,7 +8,11 @@ const meta = {
     title: "PokemonDetail/CryButton",
     component: CryButton,
     args: { url: makeInfo().cry, name: "bulbasaur" },
-    // an audio element whose cry is still playing when the play() resolves
+    // a stand-in Audio whose cry keeps playing, so the story can show the
+    // highlight: a play's scripted click is not a user gesture, so in the
+    // Storybook UI the autoplay policy can refuse a real play(), and the
+    // fixture cry is empty, so a real one would end at once. The real audio
+    // paths are covered by CryButton.test.tsx
     beforeEach: () => {
         const RealAudio = window.Audio;
         window.Audio = class {
