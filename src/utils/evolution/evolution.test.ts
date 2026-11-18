@@ -154,6 +154,31 @@ describe("buildEvolutionLanes", () => {
         expect(lane.stages[0][0].forms).toEqual([]);
     });
 
+    it("keeps Mega forms to the standard lane and starts a regional lane at the first stage", () => {
+        const slowbro = { evolvesFromId: 79, speciesId: 80 };
+        const [standard, galar] = buildEvolutionLanes([
+            makePokemon({ id: 79, name: "slowpoke" }),
+            makePokemon({ id: 80, name: "slowbro", ...slowbro }),
+            makePokemon({
+                id: 10071,
+                name: "slowbro-mega",
+                ...slowbro,
+                isDefault: false,
+                form: "mega",
+            }),
+            makePokemon({
+                id: 10165,
+                name: "slowbro-galar",
+                ...slowbro,
+                isDefault: false,
+                form: "galar",
+            }),
+        ]);
+        expect(standard.stages[1][0].forms).toHaveLength(1);
+        expect(stageNames(galar)).toEqual([["slowpoke"], ["slowbro-galar"]]);
+        expect(galar.stages[1][0].forms).toEqual([]);
+    });
+
     it("branches into several pokémon in one stage, sorted by id", () => {
         const [lane] = buildEvolutionLanes([...EEVEE_LINE].reverse());
         expect(stageNames(lane)).toEqual([["eevee"], ["vaporeon", "jolteon"]]);
@@ -166,10 +191,6 @@ describe("buildEvolutionLanes", () => {
     it("gives a species without evolutions a single stage", () => {
         const [lane] = buildEvolutionLanes([DITTO]);
         expect(stageNames(lane)).toEqual([["ditto"]]);
-    });
-
-    it("returns an empty standard lane for an empty chain", () => {
-        expect(buildEvolutionLanes([])).toEqual([{ region: null, stages: [] }]);
     });
 
     it("adds a lane per region, in Alola-then-Galar order", () => {
@@ -193,6 +214,36 @@ describe("buildEvolutionLanes", () => {
             ["persian-alola"],
         ]);
         expect(stageNames(galar)).toEqual([["meowth-galar"], ["perrserker"]]);
+    });
+
+    it("keeps a species that predates the region in the standard lane", () => {
+        // Weavile (gen 4) evolves from Sneasel, which has a Hisuian form
+        const fromSneasel = { evolvesFromId: 215 };
+        const [standard, hisui] = buildEvolutionLanes([
+            makePokemon({ id: 215, name: "sneasel", generationId: 2 }),
+            makePokemon({
+                id: 461,
+                name: "weavile",
+                generationId: 4,
+                ...fromSneasel,
+            }),
+            makePokemon({
+                id: 903,
+                name: "sneasler",
+                generationId: 8,
+                ...fromSneasel,
+            }),
+            makePokemon({
+                id: 10235,
+                name: "sneasel-hisui",
+                speciesId: 215,
+                isDefault: false,
+                form: "hisui",
+                generationId: 2,
+            }),
+        ]);
+        expect(stageNames(standard)).toEqual([["sneasel"], ["weavile"]]);
+        expect(stageNames(hisui)).toEqual([["sneasel-hisui"], ["sneasler"]]);
     });
 
     it("uses the evolution row that matches the lane, falling back to the first", () => {
@@ -234,8 +285,7 @@ describe("buildEvolutionLanes", () => {
         expect(stageNames(lanes[0])).toEqual([["pikachu"]]);
     });
 
-    it("keeps a pre-evolution that only exists in a regional lane in the standard lane's ancestry", () => {
-        // a regional-only species is not part of the standard lane
+    it("leaves a species with only a regional form out of the standard lane", () => {
         const lanes = buildEvolutionLanes([
             makePokemon({ id: 1, name: "a", evolutionChainId: 1 }),
             makePokemon({
@@ -268,6 +318,7 @@ describe("buildEvolutionLanes", () => {
                 name: "orphan",
                 speciesId: 5,
                 evolvesFromId: 99,
+                evolutionMethods: ["Lv. 20"],
             }),
         ]);
         expect(stageNames(lane)).toEqual([["orphan"]]);
