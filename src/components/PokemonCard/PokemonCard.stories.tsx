@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, userEvent, within } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 
 import {
     bulbasaur,
@@ -26,29 +26,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Navigates: Story = {
-    play: async ({ args, canvasElement }) => {
+export const Default: Story = {
+    play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const card = canvas.getByLabelText("Pokemon Card for bulbasaur");
         await expect(canvas.getByText("bulbasaur")).toBeVisible();
         await expect(canvas.getByText("#0001")).toBeVisible();
         await expect(canvas.getByText("grass")).toBeVisible();
         await expect(canvas.getByText("poison")).toBeVisible();
-
-        await userEvent.click(card);
-        await expect(args.navigateCallback).toHaveBeenCalledTimes(1);
-        await expect(args.navigateCallback).toHaveBeenLastCalledWith(
-            expect.anything(),
-            bulbasaur
-        );
-
-        card.focus();
-        await userEvent.keyboard("{Enter}");
-        await expect(args.navigateCallback).toHaveBeenCalledTimes(2);
-
-        // other keys do nothing
-        await userEvent.keyboard("a");
-        await expect(args.navigateCallback).toHaveBeenCalledTimes(2);
+        // an ordinary pokémon has no badge
+        await expect(
+            canvas.queryByRole("img", { name: /Legendary|Mythical/ })
+        ).toBeNull();
+        // with a callback the card is a focusable, clickable link; what it
+        // calls is unit-tested
+        await expect(card).toHaveAttribute("tabindex", "0");
+        await expect(getComputedStyle(card).cursor).toBe("pointer");
     },
 };
 
@@ -115,6 +108,7 @@ export const LargePixelated: Story = {
         const image = canvas.getByAltText("bulbasaur");
         await expect(image).toHaveAttribute("src", args.sprite);
         await expect(getComputedStyle(image).imageRendering).toBe("pixelated");
-        await expect(image.className).toContain("h-48");
+        // shown at 2× the 96px sprite, so its pixels stay whole
+        await expect(image.getBoundingClientRect().height).toBe(192);
     },
 };
