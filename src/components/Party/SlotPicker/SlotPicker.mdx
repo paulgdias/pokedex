@@ -1,0 +1,27 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./SlotPicker.stories";
+
+<Meta of={Stories} />
+
+# SlotPicker
+
+The search box of an empty party slot, built like the Compare page's picker: a react-aria `ComboBox` whose suggestions come from `getPokemonSuggestions` (`@utils/search`).
+
+## Behaviour
+
+- Labelled "Slot N Pokémon", with N the slot's position (`index + 1`).
+- Typing a name or dex number lists up to eight matches, each with its sprite, `#0001`-style number and name. Pokémon in `excludedIds` (the rest of the party) are never offered.
+- Picking one calls `onSelect(id)` and clears the text.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Picks A Pokémon
+
+Bulbasaur is excluded, as if it were already in the party.
+
+<Canvas of={Stories.PicksAPokemon} />

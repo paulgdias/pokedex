@@ -1,0 +1,35 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./ReplacementSuggestions.stories";
+
+<Meta of={Stories} />
+
+# ReplacementSuggestions
+
+The Party Analyzer's stretch goal: suggests swapping the party's weakest offensive contributor for up to three Pokémon from the same generation that would leave the party covering more types. The ranking is `rankReplacements` (`@utils/partyAnalyzer`).
+
+## Behaviour
+
+- `party` is the six slots (empty ones `null`), so the suggestion can name the member's real slot.
+- The weakest contributor is the member adding the fewest types nobody else hits for 2×; a tie goes to the highest dex number.
+- Candidates are default forms (no Mega or Gigantamax) of the same `generationId`, from species not already in the party.
+- They are ranked by net coverage gain: how many more types the party would cover with the candidate in that slot. That is the gaps it closes minus the types only the current member covered, so a swap that trades one gap for another is never suggested. Ties go to the lower dex number, and at most three are shown as cards (sprite, number, name, type pills).
+- The whole section is hidden with fewer than two members, with full coverage, or when no candidate has a net gain.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Default
+
+Bulbasaur and Charmander. Pikachu keeps water covered and adds flying; Squirtle is not offered, because it would close fire but lose water.
+
+<Canvas of={Stories.Default} />
+
+### Hidden
+
+A single member renders nothing.
+
+<Canvas of={Stories.Hidden} />

@@ -1,0 +1,27 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as Stories from "./PartySlots.stories";
+
+<Meta of={Stories} />
+
+# PartySlots
+
+The party on the Party Analyzer page: a list of exactly six `PartySlot`s in a grid, two columns below `md` and three from `md` up.
+
+## Behaviour
+
+- `party` always has six entries; `null` is an empty slot.
+- `onSet(index, id)` fills a slot and `onSet(index, null)` clears it. The component holds no party itself; the page writes it to the `party` URL param.
+- Every empty slot's picker leaves out the Pokémon already in the party.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Examples
+
+### Builds A Party
+
+The party kept in local state, as the page keeps it in the URL.
+
+<Canvas of={Stories.BuildsAParty} />
