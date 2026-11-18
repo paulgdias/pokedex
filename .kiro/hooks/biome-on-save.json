@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Biome on save",
+      "trigger": "PostFileSave",
+      "description": "Runs Biome check --write on any TS/JS/JSON/CSS file after it is saved, and feeds lint errors back as a HOOK_INSTRUCTION.",
+      "matcher": "\\.(ts|tsx|mts|js|mjs|cjs|json|css)$",
+      "action": {
+        "type": "command",
+        "command": "cd \"$WORKSPACE_DIR\" && npx --no-install biome check --write \"$FILE\" 2>&1 || true",
+        "timeout": 30
+      }
+    }
+  ]
+}

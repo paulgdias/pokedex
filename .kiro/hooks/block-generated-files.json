@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Block generated files",
+      "trigger": "PreToolUse",
+      "description": "Prevents edits to generated, cached, and lock files. Blocks the write and feeds the reason back as a HOOK_INSTRUCTION.",
+      "matcher": "fs_write|str_replace",
+      "action": {
+        "type": "command",
+        "command": "file=$(echo \"$TOOL_INPUT\" | jq -r '.path // .file_path // empty'); [ -z \"$file\" ] && exit 0; case \"$file\" in */dist/*|*/coverage/*|*/storybook-static/*|*/__screenshots__/*|*/playwright-report/*|*/test-results/*|*/.vitest/*|*/api/.cache/*|*/node_modules/*|*/package-lock.json|*/api/package-lock.json|*/pokedex-architecture-map.html) echo \"Blocked: $file is generated, cached, or a lock file. Regenerate it with the proper command instead of editing it by hand.\" >&2; exit 2 ;; esac; exit 0",
+        "timeout": 10
+      }
+    }
+  ]
+}
