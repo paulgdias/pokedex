@@ -43,7 +43,12 @@ export const DenserWithBackground: Story = {
         const header = within(canvasElement)
             .getByRole("heading", { name: "Type chart" })
             .closest("div");
-        await expect(header).toHaveClass("pt-5", "pb-4");
-        await expect(header).not.toHaveClass("pt-6");
+        // the denser padding is what the page shows, not just the classes
+        await expect(getComputedStyle(header as Element).paddingTop).toBe(
+            "20px"
+        );
+        await expect(getComputedStyle(header as Element).paddingBottom).toBe(
+            "16px"
+        );
     },
 };
