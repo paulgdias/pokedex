@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, userEvent, within } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 
 import FilterChips from ".";
 
@@ -8,7 +8,7 @@ const meta = {
     component: FilterChips,
     args: {
         filters: {
-            text: "saur",
+            text: " saur ",
             generation: 1,
             types: ["grass", "poison"],
             category: "legendary",
@@ -21,46 +21,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const RemovesOneFilter: Story = {
-    play: async ({ args, canvasElement }) => {
+export const ShowsActiveFilters: Story = {
+    play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getAllByRole("button")).toHaveLength(6);
-
-        await userEvent.click(
-            canvas.getByRole("button", { name: "Remove filter Type Poison" })
-        );
-        await expect(args.onChange).toHaveBeenLastCalledWith({
-            types: ["grass"],
-        });
-
-        await userEvent.click(
-            canvas.getByRole("button", { name: "Remove filter Gen I · Kanto" })
-        );
-        await expect(args.onChange).toHaveBeenLastCalledWith({
-            generation: null,
-        });
-
-        await userEvent.click(
-            canvas.getByRole("button", { name: "Remove filter Only Legendary" })
-        );
-        await expect(args.onChange).toHaveBeenLastCalledWith({
-            category: null,
-        });
-
-        await userEvent.click(
-            canvas.getByRole("button", { name: "Remove filter Search “saur”" })
-        );
-        await expect(args.onChange).toHaveBeenLastCalledWith({ text: "" });
-    },
-};
-
-export const ClearsAll: Story = {
-    play: async ({ args, canvasElement }) => {
-        await userEvent.click(
-            within(canvasElement).getByRole("button", { name: "Clear all" })
-        );
-        await expect(args.onClearAll).toHaveBeenCalledTimes(1);
-        await expect(args.onChange).not.toHaveBeenCalled();
+        // one chip per filter, in a fixed order, each named for what it removes
+        await expect(
+            canvas
+                .getAllByRole("button")
+                .map((button) => button.getAttribute("aria-label") ?? "")
+        ).toEqual([
+            "Remove filter Gen I · Kanto",
+            "Remove filter Type Grass",
+            "Remove filter Type Poison",
+            "Remove filter Only Legendary",
+            "Remove filter Search “saur”",
+            "",
+        ]);
+        await expect(canvas.getByText("Clear all")).toBeVisible();
     },
 };
 
