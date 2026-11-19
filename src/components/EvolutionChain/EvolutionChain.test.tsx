@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
@@ -6,8 +7,6 @@ import { PokemonDetails } from "@customTypes/PokemonTypes";
 import {
     bulbasaur,
     chain,
-    DITTO,
-    EEVEE_LINE,
     ivysaur,
     MEOWTH_LINE,
     makePokemon,
@@ -20,17 +19,18 @@ import EvolutionChain from ".";
 
 const setup = async (
     pokemon: PokemonDetails,
-    { previous, at = "/pokedex/x?y=1" }: { previous?: string; at?: string } = {}
-) => {
-    const screen = await render(
-        <TestRouter initialEntries={[at]}>
+    { previous }: { previous?: string } = {}
+) =>
+    render(
+        <TestRouter initialEntries={["/pokedex/x?y=1"]}>
             <EvolutionChain pokemon={pokemon} previous={previous} />
         </TestRouter>
     );
-    return screen;
-};
 
 type Screen = Awaited<ReturnType<typeof render>>;
+
+const section = (screen: Screen) =>
+    screen.getByRole("region", { name: "Evolution chain" }).element();
 
 const lane = (screen: Screen, heading: string) =>
     screen.getByRole("heading", { name: heading }).element()
@@ -42,20 +42,13 @@ const names = (root: ParentNode) =>
             node.querySelector(".capitalize")?.textContent ?? node.textContent
     );
 
+// how lanes, stages and branches are built is covered by the evolution util;
+// the hidden section, the branches, the lane labels, the card's number and
+// types, the accent border and the dashed forms box are covered by the stories
 describe("EvolutionChain visibility", () => {
-    it("is hidden for a species that neither evolves nor has other forms", async () => {
-        const screen = await setup({ ...DITTO, evolutions: [DITTO] });
-        expect(screen.getByRole("heading").query()).toBeNull();
-    });
-
-    it("is hidden with no chain data at all", async () => {
-        const screen = await setup({ ...DITTO, evolutions: [] });
-        expect(screen.getByRole("heading").query()).toBeNull();
-    });
-
     it("is shown for a lone species that has Mega forms", async () => {
-        const lone = [
-            { ...makePokemon({ id: 6, name: "charizard" }) },
+        const [charizard] = chain([
+            makePokemon({ id: 6, name: "charizard" }),
             makePokemon({
                 id: 10034,
                 name: "charizard-mega-x",
@@ -63,25 +56,37 @@ describe("EvolutionChain visibility", () => {
                 isDefault: false,
                 form: "mega",
             }),
-        ];
-        const [charizard] = chain(lone);
+        ]);
 
         const screen = await setup(charizard);
 
         await expect
-            .element(screen.getByRole("heading", { name: "Evolution chain" }))
-            .toBeVisible();
-        await expect
             .element(screen.getByText("Mega Charizard X"))
             .toBeVisible();
+    });
+
+    it("is shown for a lone species that has a regional form", async () => {
+        const [zapdos] = chain([
+            makePokemon({ id: 145, name: "zapdos" }),
+            makePokemon({
+                id: 10171,
+                name: "zapdos-galar",
+                speciesId: 145,
+                isDefault: false,
+                form: "galar",
+            }),
+        ]);
+
+        const screen = await setup(zapdos);
+
+        expect(names(lane(screen, "Galar"))).toEqual(["zapdos-galar"]);
     });
 });
 
 describe("EvolutionChain stages", () => {
     it("lists the stages in order with the way each is reached", async () => {
         const screen = await setup(ivysaur);
-        const region = screen.getByRole("region", { name: "Evolution chain" });
-        const root = region.element();
+        const root = section(screen);
 
         expect(names(root).slice(0, 3)).toEqual([
             "bulbasaur",
@@ -96,10 +101,9 @@ describe("EvolutionChain stages", () => {
 
     it("marks the current pokémon instead of linking to it", async () => {
         const screen = await setup(ivysaur);
-        const current = screen
-            .getByRole("region", { name: "Evolution chain" })
-            .element()
-            .querySelectorAll('[aria-current="page"]');
+        const current = section(screen).querySelectorAll(
+            '[aria-current="page"]'
+        );
         expect(current).toHaveLength(1);
         expect(current[0].textContent).toContain("ivysaur");
         expect(current[0].tagName).toBe("DIV");
@@ -115,32 +119,10 @@ describe("EvolutionChain stages", () => {
             .toHaveAttribute("href", "/pokedex/bulbasaur");
     });
 
-    it("shows types and padded numbers", async () => {
-        const screen = await setup(ivysaur);
-        await expect.element(screen.getByText("#0001")).toBeVisible();
-        expect(
-            screen.getByText("poison").elements().length
-        ).toBeGreaterThanOrEqual(3);
-    });
-
     it("draws a thumbnail only for pokémon with artwork", async () => {
         const noArt = chain([bulbasaur, { ...ivysaur, sprite: "" }]);
         const screen = await setup(noArt[0]);
-        const images = screen
-            .getByRole("region", { name: "Evolution chain" })
-            .element()
-            .querySelectorAll("img");
-        expect(images).toHaveLength(1);
-    });
-
-    it("renders branching evolutions side by side", async () => {
-        const screen = await setup(EEVEE_LINE[1]);
-        const root = screen
-            .getByRole("region", { name: "Evolution chain" })
-            .element();
-        expect(names(root)).toEqual(["eevee", "vaporeon", "jolteon"]);
-        expect(root.textContent).toContain("Use Water Stone");
-        expect(root.textContent).toContain("Use Thunder Stone");
+        expect(section(screen).querySelectorAll("img")).toHaveLength(1);
     });
 
     it("has no connector pill when the method is unknown", async () => {
@@ -157,10 +139,7 @@ describe("EvolutionChain stages", () => {
         ]);
         const screen = await setup(silent[0]);
         expect(
-            screen
-                .getByRole("region", { name: "Evolution chain" })
-                .element()
-                .querySelectorAll(".rounded-full.bg-chip")
+            section(screen).querySelectorAll(".rounded-full.bg-chip")
         ).toHaveLength(0);
     });
 });
@@ -203,21 +182,8 @@ describe("EvolutionChain other forms", () => {
 });
 
 describe("EvolutionChain lanes", () => {
-    it("adds one lane per regional variant", async () => {
+    it("renders each lane's own stages under its heading", async () => {
         const screen = await setup(MEOWTH_LINE[0]);
-        const headings = screen
-            .getByRole("heading", { level: 3 })
-            .elements()
-            .map((heading) => heading.textContent);
-        expect(headings).toEqual(["Standard", "Alola", "Galar"]);
-    });
-
-    it("puts each regional form in its own lane", async () => {
-        const screen = await setup(MEOWTH_LINE[0]);
-        expect(names(lane(screen, "Standard")).slice(0, 2)).toEqual([
-            "meowth",
-            "persian",
-        ]);
         expect(names(lane(screen, "Alola"))).toEqual([
             "meowth-alola",
             "persian-alola",
@@ -227,29 +193,30 @@ describe("EvolutionChain lanes", () => {
             "perrserker",
         ]);
     });
+});
 
-    it("uses the evolution row that belongs to the lane", async () => {
-        const screen = await setup(MEOWTH_LINE[0]);
-        expect(lane(screen, "Standard").textContent).toContain("Lv. 28");
-        expect(lane(screen, "Alola").textContent).toContain("High friendship");
-        expect(lane(screen, "Galar").textContent).toContain("Lv. 28");
-    });
-
-    it("marks the current regional form in its lane only", async () => {
-        const screen = await setup(MEOWTH_LINE[1]);
-        const current = screen
-            .getByRole("region", { name: "Evolution chain" })
-            .element()
-            .querySelectorAll('[aria-current="page"]');
-        expect(current).toHaveLength(1);
-        expect(lane(screen, "Alola").contains(current[0])).toBe(true);
+describe("EvolutionChain layout", () => {
+    // stories render at desktop width, where the stages run across
+    it("stacks the stages vertically below md", async () => {
+        await page.viewport(414, 896);
+        const screen = await setup(ivysaur);
+        const [first, second] = names(section(screen)).map((name) =>
+            screen
+                .getByText(name as string, { exact: true })
+                .element()
+                .closest("a, [aria-current]")
+                ?.getBoundingClientRect()
+        );
+        expect(second?.top).toBeGreaterThanOrEqual(first?.bottom ?? Infinity);
+        expect(second?.left).toBe(first?.left);
     });
 });
 
+// the fallback to the current location is covered by useNavigateToPokemon
 describe("EvolutionChain navigation", () => {
     const at = (screen: Screen) => screen.getByTestId("location");
 
-    it("goes to another stage's page, remembering the current location", async () => {
+    it("goes to another stage's page with that pokémon", async () => {
         const screen = await setup(ivysaur);
 
         await screen.getByRole("link", { name: /venusaur #0003/ }).click();
@@ -259,13 +226,10 @@ describe("EvolutionChain navigation", () => {
             .toHaveAttribute("data-pathname", "/pokedex/venusaur");
         await expect
             .element(at(screen))
-            .toHaveAttribute("data-previous", "/pokedex/x?y=1");
-        await expect
-            .element(at(screen))
-            .toHaveAttribute("data-pokemon", "venusaur");
+            .toHaveAttribute("data-pokemon", venusaur.name);
     });
 
-    it("prefers an explicit `previous` (the list the user came from)", async () => {
+    it("passes `previous` (the list the user came from) along", async () => {
         const screen = await setup(ivysaur, { previous: "/pokedex?q=saur" });
 
         await screen.getByRole("link", { name: /bulbasaur/ }).click();
@@ -275,7 +239,7 @@ describe("EvolutionChain navigation", () => {
             .toHaveAttribute("data-previous", "/pokedex?q=saur");
     });
 
-    it("goes to an alternate form's page", async () => {
+    it("goes to an alternate form's page with that form", async () => {
         const screen = await setup(venusaur);
 
         await screen.getByRole("link", { name: /Mega Venusaur/ }).click();
