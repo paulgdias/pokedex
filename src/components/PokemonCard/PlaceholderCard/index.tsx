@@ -23,7 +23,7 @@ const PlaceholderCard = ({
             )}
             style={style}
         >
-            <div className={`${cardArtClass} h-[150px]`} />
+            <div className={`${cardArtClass} h-[146px]`} />
             <div className={cardBodyClass}>
                 <div className="h-4 w-12 rounded bg-track" />
                 <div className="h-7 w-2/3 rounded bg-track" />

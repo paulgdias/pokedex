@@ -1,9 +1,11 @@
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
 const GRID_GAP = 20;
-const MIN_CARD_WIDTH = 200;
+/** the narrowest card on which two type pills still fit on one line */
+export const MIN_CARD_WIDTH = 230;
 const MAX_COLUMNS = 5;
-const CARD_HEIGHT = 268;
+/** a default PokemonCard's height, border included; the grid row is this plus the gap */
+export const CARD_HEIGHT = 268;
 
 /**
  * `width` includes one trailing gap (the list is pulled into its parent's
