@@ -53,19 +53,6 @@ export const VirtualizedGrid: Story = {
     },
 };
 
-export const Loading: Story = {
-    args: { pokemon: makeDex(6), isLoading: true },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await waitFor(() =>
-            expect(
-                canvasElement.querySelectorAll('[aria-hidden="true"]').length
-            ).toBeGreaterThan(0)
-        );
-        await expect(canvas.queryByLabelText(/Pokemon Card for/)).toBeNull();
-    },
-};
-
 export const Empty: Story = {
     args: { pokemon: [] },
     play: async ({ canvasElement }) => {

@@ -140,8 +140,9 @@ const REQUIRED_ROWS = {
 const isUsable = (text, operation) => {
     try {
         const body = JSON.parse(text);
+        // a null body throws on `.errors` (caught below); any other
+        // non-object has no `data` object
         return (
-            isObject(body) &&
             body.errors === undefined &&
             isObject(body.data) &&
             REQUIRED_ROWS[operation].every(

@@ -1,9 +1,11 @@
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
 const GRID_GAP = 20;
-const MIN_CARD_WIDTH = 200;
+/** the narrowest card on which two type pills still fit on one line */
+export const MIN_CARD_WIDTH = 230;
 const MAX_COLUMNS = 5;
-const CARD_HEIGHT = 268;
+/** a default PokemonCard's height, border included; the grid row is this plus the gap */
+export const CARD_HEIGHT = 268;
 
 /**
  * `width` includes one trailing gap (the list is pulled into its parent's
@@ -12,11 +14,9 @@ const CARD_HEIGHT = 268;
 export const getPokemonGridProps = ({
     width,
     pokemon = [],
-    isPlaceholder = false,
 }: {
     width: number;
     pokemon?: PokemonDetails[];
-    isPlaceholder?: boolean;
 }) => {
     const gridGap = GRID_GAP;
     const columnCount =
@@ -24,7 +24,7 @@ export const getPokemonGridProps = ({
         1;
     const columnWidth = width / columnCount;
     const rowHeight = CARD_HEIGHT + gridGap;
-    const itemCount = isPlaceholder ? 36 : pokemon.length;
+    const itemCount = pokemon.length;
     const rowCount = Math.ceil(itemCount / columnCount);
     const overscanRowCount = 2;
 

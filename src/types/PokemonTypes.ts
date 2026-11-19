@@ -85,7 +85,6 @@ export type Pokemon = {
         evolution_chain_id: number;
         evolves_from_species_id: number;
     };
-    evolutions?: Pokemon[];
 };
 
 export type PokemonDetails = {

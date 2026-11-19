@@ -23,24 +23,25 @@ const toStats = (stats: Pokemon["stats"] | undefined) => {
 const toPokemonDetails = (pokemon: Pokemon): PokemonDetails => {
     const stats = toStats(pokemon.stats);
     return {
-        id: pokemon.id ?? 0,
-        name: pokemon.name ?? "",
+        id: pokemon.id,
+        name: pokemon.name,
         sprite: pokemon.sprites?.[0]?.default ?? "",
         inGameSprite: pokemon.sprites?.[0]?.pixel ?? null,
         isLegendary: pokemon.specs?.is_legendary ?? false,
         isMythical: pokemon.specs?.is_mythical ?? false,
         generationId: pokemon.specs?.generation_id ?? 0,
         evolutionChainId: pokemon.specs?.evolution_chain_id ?? 0,
-        speciesId: pokemon.specs?.species_id ?? pokemon.id ?? 0,
+        speciesId: pokemon.specs?.species_id ?? pokemon.id,
         evolvesFromId: pokemon.specs?.evolves_from_species_id ?? 0,
         isDefault: pokemon.is_default ?? true,
-        form: getPokemonForm(pokemon.name ?? "", pokemon.is_default ?? true),
+        form: getPokemonForm(pokemon.name, pokemon.is_default ?? true),
         stats,
         statTotal: stats.reduce((sum, value) => sum + value, 0),
         evolutionMethods:
             pokemon.specs?.evolution_methods?.map(formatEvolutionMethod) ?? [],
         types: pokemon.types?.map((t) => t.type.name) ?? [],
-        evolutions: pokemon.evolutions?.map(toPokemonDetails) ?? [],
+        // filled in by withEvolutions
+        evolutions: [],
     };
 };
 
