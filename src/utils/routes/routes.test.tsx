@@ -83,26 +83,21 @@ describe("createAppRouter", () => {
         expect(child(children, "/party").id).toBe("party");
     });
 
-    it("shares one loader between the dex routes", () => {
+    it("loads the dex from the cache on every dex route", async () => {
         const { router, children } = routes();
         disposable = router;
-        const loader = child(children, "/pokedex").loader;
-        expect(loader).toBeTypeOf("function");
-        expect(child(children, "/pokedex/:pokemon").loader).toBe(loader);
-        expect(child(children, "/compare").loader).toBe(loader);
-        expect(child(children, "/party").loader).toBe(loader);
-    });
-
-    it("loads the dex from the cache through that loader", async () => {
-        const { router, children } = routes();
-        disposable = router;
-        const loader = child(children, "/pokedex").loader as (
-            args: unknown
-        ) => Promise<{ name: string }[]>;
-
-        const dex = await loader({});
-
-        expect(dex.map((p) => p.name)).toEqual(["bulbasaur"]);
+        for (const path of [
+            "/pokedex",
+            "/pokedex/:pokemon",
+            "/compare",
+            "/party",
+        ]) {
+            const loader = child(children, path).loader as (
+                args: unknown
+            ) => Promise<{ name: string }[]>;
+            const dex = await loader({});
+            expect(dex.map((p) => p.name)).toEqual(["bulbasaur"]);
+        }
     });
 
     it("needs no data for the type chart", () => {
@@ -127,7 +122,8 @@ describe("createAppRouter", () => {
         }
     });
 
-    it("splits every page except Home into a lazy chunk", async () => {
+    // that each import has a default export is checked by tsc (PageModule)
+    it("splits every page except Home into a lazy chunk", () => {
         const { router, children } = routes();
         disposable = router;
         for (const path of [
@@ -137,11 +133,7 @@ describe("createAppRouter", () => {
             "/party",
             "/types",
         ]) {
-            const lazy = child(children, path).lazy as () => Promise<{
-                Component: unknown;
-            }>;
-            expect(lazy).toBeTypeOf("function");
-            expect((await lazy()).Component).toBeTruthy();
+            expect(child(children, path).lazy).toBeTypeOf("function");
         }
     });
 });

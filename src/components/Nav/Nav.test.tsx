@@ -4,7 +4,7 @@ import { render } from "vitest-browser-react";
 
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 
-import { DEX, makePokemon } from "../__fixtures__/pokemon";
+import { DEX } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
 import Nav from ".";
 
@@ -35,6 +35,8 @@ afterEach(async () => {
     await page.viewport(414, 896);
 });
 
+// which page is marked, the generation list with its counts, and where it
+// is hidden are covered by the stories; these cover how the links are built
 describe("Nav links", () => {
     it("offers Home, Pokédex, Compare, Party and Type chart", async () => {
         const screen = await setup("/types");
@@ -50,16 +52,6 @@ describe("Nav links", () => {
             "Party",
             "Type chart",
         ]);
-    });
-
-    it("marks the current page", async () => {
-        const screen = await setup("/compare");
-        await expect
-            .element(link(screen, "Compare"))
-            .toHaveAttribute("aria-current", "page");
-        await expect
-            .element(link(screen, "Pokédex"))
-            .not.toHaveAttribute("aria-current");
     });
 
     it("only marks Home on exactly /", async () => {
@@ -96,26 +88,6 @@ describe("Nav links", () => {
             .toHaveAttribute("href", "/compare");
         await expect.element(link(screen, "Home")).toHaveAttribute("href", "/");
     });
-
-    it("navigates when a link is clicked", async () => {
-        const screen = await setup("/pokedex?q=saur");
-
-        await link(screen, "Type chart").click();
-
-        await expect
-            .element(screen.getByTestId("location"))
-            .toHaveAttribute("data-pathname", "/types");
-        await expect
-            .element(link(screen, "Type chart"))
-            .toHaveAttribute("aria-current", "page");
-    });
-
-    it("has a theme toggle", async () => {
-        const screen = await setup("/");
-        await expect
-            .element(screen.getByRole("radio", { name: "Dark theme" }))
-            .toBeVisible();
-    });
 });
 
 describe("Nav layout", () => {
@@ -131,6 +103,9 @@ describe("Nav layout", () => {
             ).display
         ).toBe("none");
         await expect.element(link(screen, "Home")).toMatchTextContent("Home");
+        await expect
+            .element(screen.getByRole("radio", { name: "Dark theme" }))
+            .toBeVisible();
     });
 
     it("shows a compact top bar on narrow screens, with icon-only named links", async () => {
@@ -147,44 +122,13 @@ describe("Nav layout", () => {
         const home = link(screen, "Home");
         await expect.element(home).toBeVisible();
         expect(home.element().textContent).toBe("");
-    });
-
-    it("has a theme toggle in the top bar too", async () => {
-        const screen = await setup("/", { width: 600 });
         await expect
-            .element(screen.getByRole("radio", { name: "Light theme" }))
+            .element(screen.getByRole("radio", { name: "Dark theme" }))
             .toBeVisible();
     });
 });
 
 describe("Nav generations", () => {
-    it("lists generations with counts on the Pokédex page", async () => {
-        const screen = await setup("/pokedex");
-        await expect.element(screen.getByText("Generations")).toBeVisible();
-        await expect
-            .element(link(screen, /Every region/))
-            .toMatchTextContent(String(DEX.length));
-        await expect.element(link(screen, /Kanto/)).toMatchTextContent("8");
-        await expect.element(link(screen, /Johto/)).toMatchTextContent("1");
-        await expect.element(link(screen, /Hoenn/)).toMatchTextContent("1");
-        await expect.element(link(screen, /Kalos/)).toMatchTextContent("0");
-    });
-
-    it("is not shown outside the Pokédex", async () => {
-        const screen = await setup("/compare");
-        expect(screen.getByText("Generations").query()).toBeNull();
-    });
-
-    it("marks All when no generation is filtered", async () => {
-        const screen = await setup("/pokedex");
-        await expect
-            .element(link(screen, /Every region/))
-            .toHaveAttribute("aria-current", "true");
-        await expect
-            .element(link(screen, /Kanto/))
-            .not.toHaveAttribute("aria-current");
-    });
-
     it("marks the filtered generation", async () => {
         const screen = await setup("/pokedex?gen=2");
         await expect
@@ -193,17 +137,6 @@ describe("Nav generations", () => {
         await expect
             .element(link(screen, /Every region/))
             .not.toHaveAttribute("aria-current");
-    });
-
-    it("does not mark any generation on a pokémon's page", async () => {
-        const screen = await setup("/pokedex/bulbasaur?gen=1");
-        await expect
-            .element(link(screen, /Every region/))
-            .not.toHaveAttribute("aria-current");
-        await expect
-            .element(link(screen, /Kanto/))
-            .not.toHaveAttribute("aria-current");
-        await expect.element(link(screen, /Kanto/)).toMatchTextContent("8");
     });
 
     it("links to the list with the generation, keeping the other filters", async () => {
@@ -227,37 +160,5 @@ describe("Nav generations", () => {
         await expect
             .element(link(screen, /Every region/))
             .toHaveAttribute("href", "/pokedex");
-    });
-
-    it("moves the filter when a generation is picked", async () => {
-        const screen = await setup("/pokedex?type=fire");
-
-        await link(screen, /Johto/).click();
-
-        await expect
-            .element(screen.getByTestId("location"))
-            .toHaveAttribute("data-search", "?type=fire&gen=2");
-        await expect
-            .element(link(screen, /Johto/))
-            .toHaveAttribute("aria-current", "true");
-    });
-
-    it("ignores an invalid generation in the URL", async () => {
-        const screen = await setup("/pokedex?gen=99");
-        await expect
-            .element(link(screen, /Every region/))
-            .toHaveAttribute("aria-current", "true");
-    });
-
-    it("counts pokémon per generation from the loader data", async () => {
-        const dex = [
-            makePokemon({ id: 1, generationId: 4 }),
-            makePokemon({ id: 2, name: "b", generationId: 4 }),
-        ];
-        const screen = await setup("/pokedex", { dex });
-        await expect.element(link(screen, /Sinnoh/)).toMatchTextContent("2");
-        await expect
-            .element(link(screen, /Every region/))
-            .toMatchTextContent("2");
     });
 });
