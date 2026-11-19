@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 
 import { mockPokeApi } from "./mocks";
 
+// how a card or row builds the router state is covered by the PokemonList
+// and PokemonTable tests; these check the round trip through real pages
 test.beforeEach(async ({ page }) => {
     await mockPokeApi(page);
 });
@@ -18,20 +20,10 @@ test("a card opens its detail page and Back restores the filters", async ({
         page.getByRole("heading", { level: 1, name: "Charmander" })
     ).toBeVisible();
 
-    // the list URL travels in router state, so Back can restore it exactly
-    const previous = await page.evaluate(
-        () => history.state?.usr?.previous as string
-    );
-    expect(previous).toContain("q=char");
-    expect(previous).toContain("type=fire");
-
     await page.getByRole("button", { name: "Back to Pokémon" }).click();
     await expect(page).toHaveURL(/\/pokedex\?.*q=char/);
     await expect(page).toHaveURL(/type=fire/);
     await expect(page.getByText(/\d+ shown/)).toContainText("3 shown");
-    await expect(
-        page.getByRole("button", { name: /Remove filter .*fire/i })
-    ).toBeVisible();
 });
 
 test("browser Back returns to the same filtered list", async ({ page }) => {

@@ -26,7 +26,7 @@ const mon = (
     extra: Partial<Mon> = {}
 ): Mon => ({ id, name, types, gen, stats, chain, ...extra });
 
-export const DEX: Mon[] = [
+const DEX: Mon[] = [
     mon(1, "bulbasaur", ["grass", "poison"], 1, [45, 49, 49, 65, 65, 45], 1),
     mon(2, "ivysaur", ["grass", "poison"], 1, [60, 62, 63, 80, 80, 60], 1, {
         from: 1,
