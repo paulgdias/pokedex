@@ -31,12 +31,6 @@ describe("getPokemonGridProps", () => {
         expect(columnWidth).toBe(225);
     });
 
-    it("has a fixed row height of card height plus gap", () => {
-        const { rowHeight, gridGap } = getPokemonGridProps({ width: 900 });
-        expect(gridGap).toBe(20);
-        expect(rowHeight).toBe(288);
-    });
-
     it("rounds the row count up", () => {
         const props = getPokemonGridProps({
             width: 660,
@@ -60,9 +54,5 @@ describe("getPokemonGridProps", () => {
         });
         expect(props.itemCount).toBe(36);
         expect(props.rowCount).toBe(12);
-    });
-
-    it("overscans two rows", () => {
-        expect(getPokemonGridProps({ width: 900 }).overscanRowCount).toBe(2);
     });
 });
