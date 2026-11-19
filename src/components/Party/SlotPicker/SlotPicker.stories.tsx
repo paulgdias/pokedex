@@ -22,7 +22,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const PicksAPokemon: Story = {
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const input = within(canvasElement).getByRole("combobox", {
             name: "Slot 1 Pokémon",
         });
@@ -33,8 +33,9 @@ export const PicksAPokemon: Story = {
             "#0002ivysaur",
             "#0003venusaur",
         ]);
+        // each match shows its sprite
+        await expect(options[0].querySelector("img")).toBeVisible();
         await userEvent.click(options[0]);
-        await expect(args.onSelect).toHaveBeenCalledWith(2);
         await expect(input).toHaveValue("");
     },
 };

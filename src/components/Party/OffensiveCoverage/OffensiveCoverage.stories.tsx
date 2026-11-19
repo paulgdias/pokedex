@@ -30,9 +30,22 @@ type Story = StoryObj<typeof meta>;
 export const WithGaps: Story = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getAllByRole("listitem")).toHaveLength(18);
+        const pills = canvas.getAllByRole("listitem");
+        await expect(pills).toHaveLength(18);
         // grass hits water, fire hits grass and ice: 15 types left uncovered
         await expect(canvas.getAllByText("Coverage gap")).toHaveLength(15);
+        await expect(
+            canvas.getByText("15 coverage gaps", { exact: false })
+        ).toBeVisible();
+        // a gap is an outline: dashed border and no fill
+        const pill = (type: string) =>
+            pills.find((item) => item.textContent?.startsWith(type)) as Element;
+        const gap = getComputedStyle(pill("fire"));
+        const covered = getComputedStyle(pill("water"));
+        await expect(gap.borderTopStyle).toBe("dashed");
+        await expect(covered.borderTopStyle).not.toBe("dashed");
+        await expect(gap.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+        await expect(covered.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
     },
 };
 

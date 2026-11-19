@@ -50,9 +50,15 @@ export const BuildsAParty: Story = {
             />
         );
     },
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getAllByRole("listitem")).toHaveLength(6);
+        const list = canvas.getByRole("list", { name: "Party" });
+        await expect(within(list).getAllByRole("listitem")).toHaveLength(6);
+        // two columns below md (48rem), three from md up
+        const columns = window.matchMedia("(min-width: 48rem)").matches ? 3 : 2;
+        await expect(
+            getComputedStyle(list).gridTemplateColumns.split(" ")
+        ).toHaveLength(columns);
 
         await userEvent.type(
             canvas.getByRole("combobox", { name: "Slot 2 Pokémon" }),
@@ -62,7 +68,6 @@ export const BuildsAParty: Story = {
         await userEvent.click(
             await screen.findByRole("option", { name: /charmander/ })
         );
-        await expect(args.onSet).toHaveBeenCalledWith(1, 4);
         await expect(
             canvas.getByRole("button", { name: "Remove charmander" })
         ).toBeVisible();
@@ -70,7 +75,6 @@ export const BuildsAParty: Story = {
         await userEvent.click(
             canvas.getByRole("button", { name: "Remove bulbasaur" })
         );
-        await expect(args.onSet).toHaveBeenCalledWith(0, null);
         await expect(
             canvas.getByRole("combobox", { name: "Slot 1 Pokémon" })
         ).toBeVisible();

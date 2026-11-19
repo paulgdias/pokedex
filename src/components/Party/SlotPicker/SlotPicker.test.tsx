@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 
-import { DEX } from "../../__fixtures__/pokemon";
+import { DEX, makePokemon } from "../../__fixtures__/pokemon";
 import SlotPicker from ".";
 
 const setup = async (excludedIds: number[] = []) => {
@@ -26,33 +26,35 @@ const optionNames = (screen: Awaited<ReturnType<typeof render>>) =>
         .map((option) => option.textContent);
 
 describe("SlotPicker", () => {
-    it("is labelled by its slot number", async () => {
-        const { input } = await setup();
-        await expect.element(input).toBeVisible();
-    });
-
-    it("suggests matches with their sprite and dex number", async () => {
-        const { screen, input } = await setup();
-        await input.fill("saur");
-        expect(optionNames(screen)).toEqual([
-            "#0001bulbasaur",
-            "#0002ivysaur",
-            "#0003venusaur",
-        ]);
-    });
-
+    // the label, the matches and the cleared text are covered by the stories
     it("leaves out Pokémon already in the party", async () => {
         const { screen, input } = await setup([1, 3]);
         await input.fill("saur");
         expect(optionNames(screen)).toEqual(["#0002ivysaur"]);
     });
 
-    it("reports the pick and clears the text", async () => {
+    it("offers at most eight matches", async () => {
+        const many = Array.from({ length: 12 }, (_, index) =>
+            makePokemon({ id: 500 + index, name: `mon-${index}` })
+        );
+        const screen = await render(
+            <SlotPicker
+                index={0}
+                allPokemon={many}
+                excludedIds={[]}
+                onSelect={vi.fn()}
+            />
+        );
+        await screen.getByRole("combobox").fill("mon");
+        await expect.element(screen.getByRole("option").first()).toBeVisible();
+        expect(optionNames(screen)).toHaveLength(8);
+    });
+
+    it("reports the pick", async () => {
         const { screen, input, onSelect } = await setup();
         await input.fill("char");
         await screen.getByRole("option", { name: /charmander/ }).click();
         expect(onSelect).toHaveBeenCalledWith(4);
-        await expect.element(input).toHaveValue("");
     });
 
     it("says when nothing matches", async () => {

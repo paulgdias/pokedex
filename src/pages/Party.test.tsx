@@ -57,6 +57,7 @@ afterEach(() => {
     vi.restoreAllMocks();
 });
 
+// parsing rules are owned by the partyAnalyzer tests; this covers the wiring
 describe("Party page URL state", () => {
     it("restores the party and threats from the URL", async () => {
         const screen = await loaded("?party=1,4,0,0,0,0&threats=fire");
@@ -73,29 +74,6 @@ describe("Party page URL state", () => {
         await expect
             .element(screen.getByText("Fire → Bulbasaur: 2× (super effective)"))
             .toBeInTheDocument();
-    });
-
-    it("ignores a party param that is not six slots", async () => {
-        const screen = await loaded("?party=1,4");
-        expect(screen.getByRole("combobox").elements()).toHaveLength(6);
-        await expect
-            .element(
-                screen.getByText("Add Pokémon to see the defensive profile")
-            )
-            .toBeVisible();
-    });
-
-    it("puts a Pokémon repeated in the URL in one slot only", async () => {
-        const screen = await loaded("?party=1,1,4,0,0,0&threats=fire,fire");
-        expect(
-            screen.getByRole("button", { name: "Remove bulbasaur" }).elements()
-        ).toHaveLength(1);
-        expect(screen.getByRole("combobox").elements()).toHaveLength(4);
-        expect(
-            screen
-                .getByRole("button", { name: "Remove fire threat" })
-                .elements()
-        ).toHaveLength(1);
     });
 
     it("writes a picked Pokémon to its slot in the URL, replacing the entry", async () => {
