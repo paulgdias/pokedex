@@ -35,6 +35,16 @@ Wrap components that need routing in the shared `TestRouter` from `src/component
 
 Use `makePokemon`, `DEX`, `makeDex`, `makeInfo`, and the named evolution lines from `src/components/__fixtures__/pokemon.ts` for test data. Sprites are inline data URIs — no test or story should request the network.
 
+## Writing tests
+
+Each test must be able to fail for a real regression.
+
+- **Split by kind.** Stories own what a viewer sees per state (computed style, size, text, aria state); they also carry axe in both themes. `.test.tsx` owns logic, callbacks, keyboard paths and edge cases. A check present in both stays on the stronger side. Stories do not assert callback payloads; tests do not re-check what a story shows. When a story is moved or removed, update its `.mdx` page.
+- **One owner per rule.** A `src/utils/*` test owns the semantics (sort order, filters, matchup math). A component test covers only what the component adds: wiring, what it passes, what it does with the result. A caller's job (for example the Pokédex page passing the whole dex to `SearchBar`) is tested at the caller or in e2e.
+- **Avoid** class-list tests that copy the implementation, restated constants, markup snapshots, library behavior (a router following a link, react-aria basics) and states the UI cannot reach (a stray `<option>`, a missing required field).
+- **A negative test must act.** "Does not call X" presses or triggers first, otherwise it passes on a no-op. A test name claims only what its assertions check.
+- **Deleting is fine.** Never delete the only guard of a real contract, and do not offset new tests by dropping an independent one. A test cleanup is net-negative in lines unless the PR body justifies growth.
+
 ## Screenshots
 
 Browser tests can capture screenshots for visual assertions. Screenshots are written to `__screenshots__/` folders next to the test file (gitignored). Name them by the test description.

@@ -39,6 +39,7 @@ Project-wide context is in the root `CLAUDE.md`. Data/filter/sort logic lives in
 - Props are typed inline unless shared (`PokemonCard`).
 - Plain action buttons use `@components/Buttons/Button` (never a hand-styled `<button>`); other interactive primitives come from `react-aria-components` (`ToggleButton`, `ToggleButtonGroup`, ...); icons from `lucide-react`.
 - React 19: `ref` is passed directly as a prop (no `forwardRef`).
+- Tests vs stories: stories show, tests do (see "Writing tests" in the root `CLAUDE.md`). A test does not list Tailwind classes, snapshot markup or re-check a story, and a story does not assert callback payloads. Rules a util owns (sort, filter, matchup math) are tested in the util, not through the component.
 
 ## Styling
 

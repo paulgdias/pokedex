@@ -56,3 +56,6 @@ Data/filter/sort logic lives in `src/utils/` (see `utils-guide.md`). Components 
 4. Run `npm run verify`.
 
 **MDX note**: Storybook's MDX engine has no GFM, so `| pipe |` tables render as plain text. Use an HTML `<table>` for props when the type lives in `src/types/` (as with `PokemonCard`).
+## Tests vs stories
+
+Stories show, tests do. See "Writing tests" in `testing-standards.md`: no class-list tests, no markup snapshots, no callback payloads in stories, and util rules are tested in the util.
