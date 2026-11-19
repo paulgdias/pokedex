@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Plus } from "lucide-react";
-import { expect, fn, userEvent, within } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 
 import Button from ".";
 
@@ -21,17 +21,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const button = within(canvasElement).getByRole("button", {
             name: "Save",
         });
-
-        await userEvent.click(button);
-        await expect(args.onPress).toHaveBeenCalledTimes(1);
-
-        button.focus();
-        await userEvent.keyboard("{Enter}");
-        await expect(args.onPress).toHaveBeenCalledTimes(2);
+        // the default is a medium, outlined (secondary) button
+        await expect(button.getBoundingClientRect().height).toBe(40);
+        await expect(getComputedStyle(button).borderTopWidth).not.toBe("0px");
     },
 };
 
@@ -57,9 +53,16 @@ export const Variants: Story = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        for (const name of ["Primary", "Secondary", "Ghost", "Link", "Field"]) {
-            await expect(canvas.getByRole("button", { name })).toBeVisible();
-        }
+        // each variant has its own look: no two share fill, text and border
+        const looks = ["Primary", "Secondary", "Ghost", "Link", "Field"].map(
+            (name) => {
+                const style = getComputedStyle(
+                    canvas.getByRole("button", { name })
+                );
+                return `${style.backgroundColor}|${style.color}|${style.borderTopWidth}`;
+            }
+        );
+        await expect(new Set(looks).size).toBe(looks.length);
     },
 };
 
@@ -91,27 +94,24 @@ export const Sizes: Story = {
 
 export const IconOnly: Story = {
     args: { icon: true, "aria-label": "Add", children: <Plus size={16} /> },
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const button = within(canvasElement).getByRole("button", {
             name: "Add",
         });
         const { width, height } = button.getBoundingClientRect();
         await expect(width).toBe(height);
-
-        await userEvent.click(button);
-        await expect(args.onPress).toHaveBeenCalledTimes(1);
     },
 };
 
 export const Disabled: Story = {
     args: { isDisabled: true },
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const button = within(canvasElement).getByRole("button", {
             name: "Save",
         });
-
+        // dimmed and marked unavailable; that it ignores presses is unit-tested
         await expect(button).toBeDisabled();
-        await userEvent.click(button);
-        await expect(args.onPress).not.toHaveBeenCalled();
+        await expect(getComputedStyle(button).opacity).toBe("0.5");
+        await expect(getComputedStyle(button).cursor).toBe("not-allowed");
     },
 };

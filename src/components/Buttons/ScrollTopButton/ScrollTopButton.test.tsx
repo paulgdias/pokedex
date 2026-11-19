@@ -3,7 +3,7 @@ import { render } from "vitest-browser-react";
 
 import ScrollTopButton from ".";
 
-// keyboard activation is Button's contract (Button stories)
+// keyboard activation is Button's contract (Button.test.tsx)
 describe("ScrollTopButton", () => {
     it("calls onPress once per press", async () => {
         const onPress = vi.fn();

@@ -1,21 +1,23 @@
 import { describe, expect, it, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 
 import Button from ".";
 
+// the looks (variants, sizes, icon mode, disabled dimming) are covered by
+// the stories; the class order by utils.test.ts
 describe("Button", () => {
-    it("renders its children as a button", async () => {
-        const screen = await render(<Button>Save</Button>);
-        await expect
-            .element(screen.getByRole("button", { name: "Save" }))
-            .toBeVisible();
-    });
-
-    it("calls onPress once per click", async () => {
+    it("calls onPress once per click and once per Enter", async () => {
         const onPress = vi.fn();
         const screen = await render(<Button onPress={onPress}>Save</Button>);
-        await screen.getByRole("button").click();
+        const button = screen.getByRole("button", { name: "Save" });
+
+        await button.click();
         expect(onPress).toHaveBeenCalledTimes(1);
+
+        (button.element() as HTMLElement).focus();
+        await userEvent.keyboard("{Enter}");
+        expect(onPress).toHaveBeenCalledTimes(2);
     });
 
     it("does not call onPress when disabled", async () => {
@@ -25,7 +27,9 @@ describe("Button", () => {
                 Save
             </Button>
         );
-        await expect.element(screen.getByRole("button")).toBeDisabled();
+        const button = screen.getByRole("button");
+        await expect.element(button).toBeDisabled();
+        await button.click({ force: true });
         expect(onPress).not.toHaveBeenCalled();
     });
 
@@ -34,23 +38,6 @@ describe("Button", () => {
         await expect
             .element(screen.getByRole("button"))
             .toHaveAttribute("type", "button");
-    });
-
-    it("applies the variant, the size and the icon mode", async () => {
-        const screen = await render(
-            <>
-                <Button variant="primary" size="lg">
-                    Go
-                </Button>
-                <Button icon size="sm" aria-label="Close" />
-            </>
-        );
-        await expect
-            .element(screen.getByRole("button", { name: "Go" }))
-            .toHaveClass("bg-ink", "h-11");
-        await expect
-            .element(screen.getByRole("button", { name: "Close" }))
-            .toHaveClass("size-8");
     });
 
     it("lets className override the variant", async () => {
@@ -62,14 +49,5 @@ describe("Button", () => {
         const button = screen.getByRole("button");
         await expect.element(button).toHaveClass("bg-accent");
         await expect.element(button).not.toHaveClass("bg-ink");
-    });
-
-    it("passes aria attributes through", async () => {
-        const screen = await render(
-            <Button aria-label="Remove Bulbasaur" icon />
-        );
-        await expect
-            .element(screen.getByRole("button", { name: "Remove Bulbasaur" }))
-            .toBeVisible();
     });
 });
