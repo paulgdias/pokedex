@@ -1,12 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, within } from "storybook/test";
 
 import {
     DITTO,
     EEVEE_LINE,
     ivysaur,
     MEOWTH_LINE,
-    venusaur,
     venusaurMega,
 } from "../__fixtures__/pokemon";
 import TestRouter from "../__fixtures__/router";
@@ -29,8 +28,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const location = (canvasElement: HTMLElement) =>
-    within(canvasElement).getByTestId("location");
+/** The computed value of a color token in the current theme. */
+const accent = (canvasElement: HTMLElement) => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--color-accent)";
+    canvasElement.append(probe);
+    const { color } = getComputedStyle(probe);
+    probe.remove();
+    return color;
+};
+
+const card = (canvasElement: HTMLElement, name: string) =>
+    within(canvasElement).getByText(name, { selector: ".capitalize" })
+        .parentElement?.parentElement?.parentElement as HTMLElement;
 
 export const ThreeStageLine: Story = {
     play: async ({ canvasElement }) => {
@@ -38,37 +48,40 @@ export const ThreeStageLine: Story = {
         await expect(
             canvas.getByRole("heading", { name: "Evolution chain" })
         ).toBeVisible();
+        // a single lane has no lane label
+        await expect(canvas.queryAllByRole("heading", { level: 3 })).toEqual(
+            []
+        );
 
-        // the current pokémon is marked and not a link
-        const current = canvasElement.querySelector('[aria-current="page"]');
-        await expect(current).toHaveTextContent("ivysaur");
+        // each card shows the dex number and the types
+        await expect(canvas.getByText("#0002")).toBeVisible();
+        await expect(canvas.getAllByText("poison")).toHaveLength(3);
+
+        // the current pokémon has the 2px accent border
+        const current = getComputedStyle(card(canvasElement, "ivysaur"));
+        await expect(current.borderTopColor).toBe(accent(canvasElement));
+        await expect(current.borderTopWidth).toBe("2px");
         await expect(
-            canvas.queryByRole("link", { name: /ivysaur/ })
-        ).toBeNull();
+            getComputedStyle(card(canvasElement, "bulbasaur")).borderTopColor
+        ).not.toBe(accent(canvasElement));
 
-        await expect(canvas.getByText("Lv. 16")).toBeVisible();
-        await expect(canvas.getByText("Lv. 32")).toBeVisible();
-        await expect(canvas.getByText("Mega Venusaur")).toBeVisible();
-        await expect(canvas.getByText("Gigantamax Venusaur")).toBeVisible();
+        // one arrow between each pair of stages, none before the first
+        const arrows = [
+            ...canvasElement.querySelectorAll("section svg"),
+        ].filter((arrow) => arrow.getBoundingClientRect().width > 0);
+        await expect(arrows).toHaveLength(2);
 
-        // picking another stage goes to its page and remembers where we were
-        await userEvent.click(
-            canvas.getByRole("link", { name: /venusaur #0003/ })
-        );
-        await waitFor(() =>
-            expect(location(canvasElement)).toHaveAttribute(
-                "data-pathname",
-                "/pokedex/venusaur"
-            )
-        );
-        await expect(location(canvasElement)).toHaveAttribute(
-            "data-previous",
-            "/pokedex/ivysaur?view=list"
-        );
-        await expect(location(canvasElement)).toHaveAttribute(
-            "data-pokemon",
-            "venusaur"
-        );
+        // the stages run across from md up and stack vertically below it (the
+        // test project renders stories at desktop width; the unit test checks
+        // the stacking)
+        const first = card(canvasElement, "bulbasaur").getBoundingClientRect();
+        const second = card(canvasElement, "ivysaur").getBoundingClientRect();
+        if (window.matchMedia("(min-width: 48rem)").matches) {
+            await expect(second.left).toBeGreaterThanOrEqual(first.right);
+        } else {
+            await expect(second.top).toBeGreaterThanOrEqual(first.bottom);
+            await expect(second.left).toBe(first.left);
+        }
     },
 };
 
@@ -76,18 +89,20 @@ export const OtherForms: Story = {
     args: { pokemon: venusaurMega },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const current = canvasElement.querySelector('[aria-current="page"]');
-        await expect(current).toHaveTextContent("Mega Venusaur");
+        const box = canvas.getByText("Other forms")
+            .parentElement as HTMLElement;
+        await expect(box).toBeVisible();
+        await expect(getComputedStyle(box).borderTopStyle).toBe("dashed");
 
-        await userEvent.click(
-            canvas.getByRole("link", { name: /Gigantamax Venusaur/ })
-        );
-        await waitFor(() =>
-            expect(location(canvasElement)).toHaveAttribute(
-                "data-pathname",
-                "/pokedex/venusaur-gmax"
-            )
-        );
+        // the current form has the accent border, the other one does not
+        const row = (name: string) =>
+            canvas.getByText(name).parentElement?.parentElement as HTMLElement;
+        await expect(
+            getComputedStyle(row("Mega Venusaur")).borderTopColor
+        ).toBe(accent(canvasElement));
+        await expect(
+            getComputedStyle(row("Gigantamax Venusaur")).borderTopColor
+        ).not.toBe(accent(canvasElement));
     },
 };
 
@@ -114,7 +129,6 @@ export const RegionalLanes: Story = {
             .getAllByRole("heading", { level: 3 })
             .map((heading) => heading.textContent);
         await expect(headings).toEqual(["Standard", "Alola", "Galar"]);
-        await expect(canvas.getByText("High friendship")).toBeVisible();
     },
 };
 
@@ -126,19 +140,5 @@ export const NoEvolutions: Story = {
                 name: "Evolution chain",
             })
         ).toBeNull();
-    },
-};
-
-export const ExplicitPrevious: Story = {
-    args: { pokemon: { ...venusaur }, previous: "/pokedex?q=saur" },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole("link", { name: /ivysaur/ }));
-        await waitFor(() =>
-            expect(location(canvasElement)).toHaveAttribute(
-                "data-previous",
-                "/pokedex?q=saur"
-            )
-        );
     },
 };

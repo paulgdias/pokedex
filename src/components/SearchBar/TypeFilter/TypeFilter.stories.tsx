@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, fn, screen, userEvent, waitFor, within } from "storybook/test";
+import { expect, fn, screen, userEvent, within } from "storybook/test";
 
 import { PokemonType } from "@utils/search";
 
@@ -37,7 +37,7 @@ export const PicksTypes: Story = {
             />
         );
     },
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const trigger = within(canvasElement).getByRole("button", {
             name: "Type",
         });
@@ -51,35 +51,26 @@ export const PicksTypes: Story = {
             within(dialog).getAllByRole("button", { pressed: false })
         ).toHaveLength(18);
 
+        // pressed types stay marked and are counted on the trigger
         await userEvent.click(
             within(dialog).getByRole("button", { name: "Fire" })
         );
-        await expect(args.onChange).toHaveBeenLastCalledWith(["fire"]);
         await userEvent.click(
             within(dialog).getByRole("button", { name: "Water" })
         );
-        await expect(args.onChange).toHaveBeenLastCalledWith(["fire", "water"]);
         await expect(
-            within(dialog).getByRole("button", { name: "Fire", pressed: true })
+            within(dialog).getAllByRole("button", { pressed: true })
+        ).toHaveLength(2);
+        await expect(
+            within(canvasElement).getByRole("button", { name: /Type\s*2/ })
         ).toBeVisible();
-
-        // deselecting removes only that type
-        await userEvent.click(
-            within(dialog).getByRole("button", { name: "Fire" })
-        );
-        await expect(args.onChange).toHaveBeenLastCalledWith(["water"]);
 
         await userEvent.click(
             within(dialog).getByRole("button", { name: "Reset" })
         );
-        await expect(args.onChange).toHaveBeenLastCalledWith([]);
-
-        await userEvent.click(
-            within(dialog).getByRole("button", { name: "Show 42 results" })
-        );
-        await waitFor(() =>
-            expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
-        );
+        await expect(
+            within(dialog).queryAllByRole("button", { pressed: true })
+        ).toHaveLength(0);
     },
 };
 

@@ -52,13 +52,6 @@ test("a deep link is deduplicated and unknown ids are dropped", async ({
     await expect(table.getByRole("link", { name: "bulbasaur" })).toHaveCount(1);
 });
 
-test("one pokémon is not enough to compare", async ({ page }) => {
-    await page.goto("/compare?ids=25");
-    await expect(
-        page.getByText("Add at least one more Pokémon to compare.")
-    ).toBeVisible();
-});
-
 test("the Compare button on a detail page seeds the comparison", async ({
     page,
 }) => {

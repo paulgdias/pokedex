@@ -5,8 +5,10 @@ import { STAT_LABELS } from "@utils/stats";
 
 import StatBars from ".";
 
+// the total and the bar lengths, capped at the maximum, are covered by the
+// stories
 describe("StatBars", () => {
-    it("shows one labelled meter per stat, in order, plus the total", async () => {
+    it("gives each stat its own labelled meter, in order", async () => {
         const screen = await render(
             <StatBars stats={[1, 2, 3, 4, 5, 6]} total={21} />
         );
@@ -22,23 +24,6 @@ describe("StatBars", () => {
             "5",
             "6",
         ]);
-        await expect.element(screen.getByText("Total")).toBeVisible();
-        await expect.element(screen.getByText("21")).toBeVisible();
-    });
-
-    it("scales bars against 255 and clamps anything higher", async () => {
-        const screen = await render(
-            <StatBars stats={[255, 510, 51, 0, 0, 0]} total={816} />
-        );
-        const width = (name: string) =>
-            (
-                screen.getByRole("meter", { name }).element()
-                    .firstElementChild as HTMLElement
-            ).style.width;
-        expect(width("HP")).toBe("100%");
-        expect(width("Attack")).toBe("100%");
-        expect(width("Defense")).toBe("20%");
-        expect(width("Speed")).toBe("0%");
     });
 
     it("treats missing stats as zero", async () => {

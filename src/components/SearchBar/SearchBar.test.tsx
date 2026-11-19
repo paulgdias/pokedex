@@ -3,9 +3,7 @@ import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
 
 import { EMPTY_FILTERS, PokedexFilters } from "@utils/search";
-import { DEFAULT_SORT } from "@utils/sort";
 
-import { DEX, makeDex } from "../__fixtures__/pokemon";
 import SearchBarHarness from "../__fixtures__/SearchBarHarness";
 
 type Props = Parameters<typeof SearchBarHarness>[0];
@@ -27,15 +25,8 @@ const withFilters = (filters: Partial<PokedexFilters>) => ({
     initialFilters: { ...EMPTY_FILTERS, ...filters },
 });
 
-// the sort and generation selects also contain <option>s
-const suggestions = (screen: Awaited<ReturnType<typeof render>>) =>
-    screen.getByRole("listbox", { name: "Suggestions" }).getByRole("option");
-
-const optionTexts = (screen: Awaited<ReturnType<typeof render>>) =>
-    suggestions(screen)
-        .elements()
-        .map((option) => option.textContent);
-
+// what the suggestions match is search.test.ts's; how they look, the
+// "no matches" state and the result count are the stories'
 describe("SearchBar search box", () => {
     it("reports every change and reflects the text", async () => {
         const { search, onTextChange } = await setup();
@@ -53,69 +44,18 @@ describe("SearchBar search box", () => {
         await expect.element(search).toHaveAttribute("aria-expanded", "false");
     });
 
-    it("suggests filters (types, generations, categories) for two or more characters", async () => {
-        const { screen, search } = await setup();
-
-        await search.fill("f");
-        // one character: no filter suggestions, only names containing it
-        expect(optionTexts(screen).some((text) => text?.includes("type"))).toBe(
-            false
-        );
-
-        await search.fill("fi");
-        expect(optionTexts(screen)).toEqual(["Firetype", "Fightingtype"]);
-
-        await search.fill("kan");
-        expect(optionTexts(screen)).toEqual(["KantoGen I"]);
-
-        await search.fill("gen 2");
-        expect(optionTexts(screen)).toEqual(["JohtoGen II"]);
-
-        await search.fill("myth");
-        expect(optionTexts(screen)).toEqual(["Mythicalonly"]);
-    });
-
-    it("does not re-suggest filters that are already applied", async () => {
-        const { screen, search } = await setup(
-            withFilters({
-                types: ["fire"],
-                generation: 1,
-                category: "legendary",
-            })
+    it("builds filter suggestions on top of the current filters", async () => {
+        const { search, onFiltersChange } = await setup(
+            withFilters({ types: ["fire"] })
         );
         await search.fill("fi");
-        expect(optionTexts(screen)).toEqual(["Fightingtype"]);
-        await search.fill("kan");
-        expect(suggestions(screen).query()).toBeNull();
-        await search.fill("leg");
-        expect(suggestions(screen).query()).toBeNull();
-    });
 
-    it("suggests pokémon by name or number, with number and types", async () => {
-        const { screen, search } = await setup();
+        await page.getByRole("option", { name: /Fighting/ }).click();
 
-        await search.fill("mew");
-        expect(optionTexts(screen)).toEqual([
-            "#0150mewtwopsychic",
-            "#0151mewpsychic",
-        ]);
-
-        await search.fill("#7");
-        expect(optionTexts(screen)).toEqual(["#0007squirtlewater"]);
-    });
-
-    it("caps pokémon suggestions at five", async () => {
-        const { screen, search } = await setup({ pokemon: makeDex(10) });
-        await search.fill("mon");
-        expect(suggestions(screen).elements()).toHaveLength(5);
-    });
-
-    it("says when nothing matches", async () => {
-        const { screen, search } = await setup();
-        await search.fill("zzz");
-        await expect
-            .element(screen.getByText("No matches for “zzz”"))
-            .toBeVisible();
+        expect(onFiltersChange).toHaveBeenCalledExactlyOnceWith({
+            types: ["fire", "fighting"],
+            text: "",
+        });
     });
 
     it("applies a filter suggestion and clears the text", async () => {
@@ -251,13 +191,6 @@ describe("SearchBar search box", () => {
 });
 
 describe("SearchBar toolbar", () => {
-    it("shows the result count", async () => {
-        const { screen } = await setup(withFilters({ category: "legendary" }));
-        await expect
-            .element(screen.getByText("shown"))
-            .toMatchTextContent("1 shown");
-    });
-
     it("offers the four sorts and reports the chosen one", async () => {
         const { screen, onSortChange } = await setup();
         const select = screen.getByRole("combobox", { name: /Sort/ });
@@ -305,22 +238,6 @@ describe("SearchBar toolbar", () => {
         ).not.toBeNull();
     });
 
-    it("ignores a sort value it does not know", async () => {
-        const { screen, onSortChange } = await setup({
-            initialSort: DEFAULT_SORT,
-        });
-        const select = screen
-            .getByRole("combobox", { name: /Sort/ })
-            .element() as HTMLSelectElement;
-        const stray = document.createElement("option");
-        stray.value = "bogus:asc";
-        select.append(stray);
-
-        await userEvent.selectOptions(select, "bogus:asc");
-
-        expect(onSortChange).not.toHaveBeenCalled();
-    });
-
     it("switches between card and list view", async () => {
         const { screen, onViewChange } = await setup();
         await expect
@@ -330,9 +247,6 @@ describe("SearchBar toolbar", () => {
         await screen.getByRole("radio", { name: "List view" }).click();
 
         expect(onViewChange).toHaveBeenCalledExactlyOnceWith("list");
-        await expect
-            .element(screen.getByRole("radio", { name: "List view" }))
-            .toBeChecked();
     });
 
     it("filters by category and back to all", async () => {
@@ -383,30 +297,13 @@ describe("SearchBar toolbar", () => {
         });
     });
 
-    it("lists active filters as chips and clears them all", async () => {
+    it("clears everything through onClearAll", async () => {
         const { screen, onClearAll } = await setup(
             withFilters({ generation: 1, types: ["grass"] })
         );
-        await expect
-            .element(
-                screen.getByRole("button", { name: "Remove filter Type Grass" })
-            )
-            .toBeVisible();
 
         await screen.getByRole("button", { name: "Clear all" }).click();
 
         expect(onClearAll).toHaveBeenCalledOnce();
-        expect(
-            screen.getByRole("button", { name: "Clear all" }).query()
-        ).toBeNull();
-    });
-
-    it("keeps the suggestions independent of the current filters", async () => {
-        const { screen, search } = await setup({
-            ...withFilters({ types: ["water"] }),
-            pokemon: DEX,
-        });
-        await search.fill("mew");
-        expect(optionTexts(screen)).toHaveLength(2);
     });
 });

@@ -42,6 +42,23 @@ export const Grid: Story = {
         await expect(
             within(table).getByText("Ground → Pidgey: 0× (no effect)")
         ).toBeInTheDocument();
+        // cells are shaded by outcome: weak, immune, resistant and neutral all differ
+        const fill = (multiplier: string) => {
+            const cell = table.querySelector(
+                `td[data-multiplier="${multiplier}"]`
+            );
+            return cell ? getComputedStyle(cell).backgroundColor : "";
+        };
+        // an immunity is inverted (light text on a solid fill)
+        const textColor = (multiplier: string) => {
+            const cell = table.querySelector(
+                `td[data-multiplier="${multiplier}"]`
+            );
+            return cell ? getComputedStyle(cell).color : "";
+        };
+        await expect(textColor("0")).not.toBe(textColor("0.5"));
+        const fills = [fill("2"), fill("0"), fill("1"), fill("0.5")];
+        await expect(new Set(fills).size).toBe(4);
     },
 };
 

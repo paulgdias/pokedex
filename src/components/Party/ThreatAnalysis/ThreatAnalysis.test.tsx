@@ -66,6 +66,7 @@ describe("ThreatAnalysis prompts", () => {
     });
 });
 
+// the cell colors are covered by the Grid story
 describe("ThreatAnalysis grid", () => {
     it("has a row per member and a column per threat", async () => {
         const { screen } = await setup(
@@ -94,17 +95,6 @@ describe("ThreatAnalysis grid", () => {
             pidgey: ["½×", "0×", "2×"],
             hoppip: ["¼×", "0×", "4×"],
         });
-    });
-
-    it("color-codes cells by band", async () => {
-        const { screen } = await setup([PIDGEY], ["ground", "ice", "normal"]);
-        const cell = (multiplier: string) =>
-            screen.container.querySelector(
-                `td[data-multiplier="${multiplier}"]`
-            )?.className ?? "";
-        expect(cell("0")).toContain("bg-ink");
-        expect(cell("2")).toContain("--color-fighting");
-        expect(cell("1")).toContain("text-muted");
     });
 
     it("describes every cell for screen readers", async () => {

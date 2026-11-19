@@ -18,38 +18,8 @@ const setup = async (filters: Partial<PokedexFilters>) => {
     return { screen, onChange, onClearAll };
 };
 
+// the chip labels and the empty state are covered by the stories
 describe("FilterChips", () => {
-    it("renders nothing without active filters", async () => {
-        const { screen } = await setup({});
-        expect(screen.container.innerHTML).toBe("");
-    });
-
-    it("ignores whitespace-only search text", async () => {
-        const { screen } = await setup({ text: "   " });
-        expect(screen.container.innerHTML).toBe("");
-    });
-
-    it("shows one chip per filter with a readable label", async () => {
-        const { screen } = await setup({
-            text: " pika ",
-            generation: 2,
-            types: ["fire", "water"],
-            category: "mythical",
-        });
-        const names = screen
-            .getByRole("button")
-            .elements()
-            .map((button) => button.getAttribute("aria-label") ?? "Clear all");
-        expect(names).toEqual([
-            "Remove filter Gen II · Johto",
-            "Remove filter Type Fire",
-            "Remove filter Type Water",
-            "Remove filter Only Mythical",
-            "Remove filter Search “pika”",
-            "Clear all",
-        ]);
-    });
-
     it("removes only the clicked type", async () => {
         const { screen, onChange } = await setup({
             types: ["fire", "water", "grass"],

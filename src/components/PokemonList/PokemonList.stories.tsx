@@ -53,24 +53,6 @@ export const VirtualizedGrid: Story = {
     },
 };
 
-export const NavigatesToAPokemon: Story = {
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await userEvent.click(
-            await canvas.findByLabelText("Pokemon Card for mon-2")
-        );
-        const location = canvas.getByTestId("location");
-        await waitFor(() =>
-            expect(location).toHaveAttribute("data-pathname", "/pokedex/mon-2")
-        );
-        // back navigation returns to the same filters
-        await expect(location).toHaveAttribute(
-            "data-previous",
-            "/pokedex?q=mon"
-        );
-    },
-};
-
 export const Loading: Story = {
     args: { pokemon: makeDex(6), isLoading: true },
     play: async ({ canvasElement }) => {

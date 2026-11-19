@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { DEX, mockPokeApi } from "./mocks";
+import { mockPokeApi } from "./mocks";
 
 // The detail page debounces its info request (`INFO_DEBOUNCE_MS` in
 // `src/pages/Pokemon.tsx`). These tests freeze the page clock and advance it
@@ -25,7 +25,9 @@ test("the detail page shows the stats, and lazy info arrives after", async ({
     );
 });
 
-test("the arrow keys step through the dex", async ({ page }) => {
+test("the arrow keys step through the dex, one history entry per press", async ({
+    page,
+}) => {
     await mockPokeApi(page);
     await page.goto("/pokedex/bulbasaur");
     await page.getByRole("heading", { level: 1, name: "Bulbasaur" }).waitFor();
@@ -39,9 +41,13 @@ test("the arrow keys step through the dex", async ({ page }) => {
     ).toBeVisible();
     await page.keyboard.press("ArrowLeft");
     await expect(page).toHaveURL("/pokedex/bulbasaur");
+
+    // a single press is a step of its own, so browser Back retraces it
+    await page.goBack();
+    await expect(page).toHaveURL("/pokedex/ivysaur");
 });
 
-test("skimming with the arrow keys requests only the pokémon you stop on", async ({
+test("holding an arrow key adds one history entry and requests only the pokémon it stops on", async ({
     page,
 }) => {
     await page.clock.install({ time: CLOCK_START });
@@ -51,49 +57,29 @@ test("skimming with the arrow keys requests only the pokémon you stop on", asyn
     // frozen, so the debounce cannot fire until the test lets it, however
     // slow the machine is
     await page.clock.pauseAt(CLOCK_PAUSE);
+    const before = await page.evaluate(() => history.length);
 
-    // ivysaur, venusaur, then charmander, faster than the 300 ms debounce
+    // Playwright marks repeated `down` calls as auto-repeat, like a held key.
+    // Each stop is awaited, so every repeat steps from a known pokémon.
     for (const [stop, next] of [
         ["ivysaur", "venusaur"],
         ["venusaur", "charmander"],
         ["charmander", "charmeleon"],
+        ["charmeleon", "charizard"],
     ]) {
-        await page.keyboard.press("ArrowRight");
+        await page.keyboard.down("ArrowRight");
         await expect(page).toHaveURL(`/pokedex/${stop}`);
         await expect(
             page.getByRole("button", { name: `Next: ${next}` })
         ).toBeVisible();
     }
-    await page.clock.runFor(DEBOUNCE_MS);
-    await expect.poll(() => requests.infoIds).toEqual([1, 4]);
-});
-
-test("holding an arrow key adds one history entry and fetches only where it stops", async ({
-    page,
-}) => {
-    await page.clock.install({ time: CLOCK_START });
-    const requests = await mockPokeApi(page);
-    await page.goto("/pokedex/bulbasaur");
-    await expect.poll(() => requests.infoIds).toEqual([1]);
-    await page.clock.pauseAt(CLOCK_PAUSE);
-    const before = await page.evaluate(() => history.length);
-
-    // Playwright marks repeated `down` calls as auto-repeat, like a held key
-    for (let repeat = 0; repeat < 12; repeat++) {
-        await page.keyboard.down("ArrowRight");
-        await page.waitForTimeout(33);
-    }
     await page.keyboard.up("ArrowRight");
 
-    // it moved on, and browser Back would not have to walk every stop
-    await expect(page).not.toHaveURL("/pokedex/bulbasaur");
-    const stop = new URL(page.url()).pathname.split("/").pop();
-    const stoppedId = DEX.find((mon) => mon.name === stop)?.id;
-    expect(await page.evaluate(() => history.length)).toBeLessThanOrEqual(
-        before + 1
-    );
+    // the first press adds an entry and the repeats replace it, so browser
+    // Back does not have to walk every stop
+    expect(await page.evaluate(() => history.length)).toBe(before + 1);
 
-    // only the pokémon it rests on is requested, not every one passed
+    // only charmeleon, where it rests, is requested, not every one passed
     await page.clock.runFor(DEBOUNCE_MS);
-    await expect.poll(() => requests.infoIds).toEqual([1, stoppedId]);
+    await expect.poll(() => requests.infoIds).toEqual([1, 5]);
 });

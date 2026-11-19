@@ -38,24 +38,9 @@ const columns = (screen: Screen) => {
     return rows.filter((r) => r.getBoundingClientRect().top === top).length;
 };
 
+// virtualizing, scrolling to the top, the empty and loading states and the
+// scroll button switch are covered by the stories; Enter is PokemonCard's
 describe("PokemonList", () => {
-    it("shows the first cards and virtualizes the rest", async () => {
-        const screen = await setup({ pokemon: makeDex(60) });
-        await expect.element(card(screen, "mon-1")).toBeVisible();
-        expect(card(screen, "mon-60").query()).toBeNull();
-        expect(
-            screen.container.querySelectorAll(".pokemonCard").length
-        ).toBeLessThan(30);
-    });
-
-    it("renders each pokémon as a link card with its data", async () => {
-        const screen = await setup({ pokemon: makeDex(4) });
-        await expect
-            .element(screen.getByRole("link", { name: "Navigate to mon-1" }))
-            .toHaveAttribute("href", "/pokedex/mon-1");
-        expect(screen.getByRole("link").elements().length).toBe(4);
-    });
-
     it("flags legendary and mythical pokémon on their cards", async () => {
         const dex: PokemonDetails[] = [
             { ...makeDex(1)[0], name: "myth", isMythical: true },
@@ -81,38 +66,6 @@ describe("PokemonList", () => {
         expect(columns(narrow)).toBe(2);
     });
 
-    it("uses fewer columns than the layout allows when there are few pokémon", async () => {
-        const screen = await setup({ pokemon: makeDex(2), width: 1000 });
-        await expect.element(card(screen, "mon-1")).toBeVisible();
-        expect(columns(screen)).toBe(2);
-    });
-
-    it("renders nothing for an empty list", async () => {
-        const screen = await setup({ pokemon: [] });
-        expect(screen.getByRole("grid").query()).toBeNull();
-        expect(screen.getByRole("button").query()).toBeNull();
-    });
-
-    it("shows aria-hidden placeholders instead of cards while loading", async () => {
-        const screen = await setup({ pokemon: makeDex(6), isLoading: true });
-        await expect
-            .poll(
-                () =>
-                    screen.container.querySelectorAll(
-                        '[role="gridcell"] > [aria-hidden="true"]'
-                    ).length
-            )
-            .toBeGreaterThan(0);
-        expect(screen.getByLabelText(/Pokemon Card for/).query()).toBeNull();
-    });
-
-    it("keeps an empty list while loading blank", async () => {
-        const screen = await setup({ pokemon: [], isLoading: true });
-        expect(screen.container.querySelectorAll(".pokemonCard")).toHaveLength(
-            0
-        );
-    });
-
     it("navigates to a pokémon, remembering the list's filters", async () => {
         const screen = await setup({ pokemon: makeDex(6) });
 
@@ -126,17 +79,6 @@ describe("PokemonList", () => {
             .toHaveAttribute("data-previous", "/pokedex?q=mon");
     });
 
-    it("navigates on Enter from the keyboard", async () => {
-        const screen = await setup({ pokemon: makeDex(6) });
-        (card(screen, "mon-2").element() as HTMLElement).focus();
-
-        await (await import("vitest/browser")).userEvent.keyboard("{Enter}");
-
-        await expect
-            .element(screen.getByTestId("location"))
-            .toHaveAttribute("data-pathname", "/pokedex/mon-2");
-    });
-
     it("prefers an explicit `previous`", async () => {
         const screen = await setup({
             pokemon: makeDex(6),
@@ -148,35 +90,6 @@ describe("PokemonList", () => {
         await expect
             .element(screen.getByTestId("location"))
             .toHaveAttribute("data-previous", "/pokedex?type=fire");
-    });
-
-    it("scrolls down to later pokémon", async () => {
-        const screen = await setup({ pokemon: makeDex(60) });
-        const grid = screen.getByRole("grid").element();
-
-        grid.scrollTop = grid.scrollHeight;
-
-        await expect.element(card(screen, "mon-60")).toBeVisible();
-    });
-
-    it("has a button that scrolls back to the top", async () => {
-        const screen = await setup({ pokemon: makeDex(60) });
-        const grid = screen.getByRole("grid").element();
-        grid.scrollTop = grid.scrollHeight;
-        await expect.element(card(screen, "mon-60")).toBeVisible();
-
-        await screen.getByRole("button", { name: "Go to Top of Page" }).click();
-
-        await expect.poll(() => grid.scrollTop).toBe(0);
-    });
-
-    it("hides the scroll button when scrollToPosition is off", async () => {
-        const screen = await setup({
-            pokemon: makeDex(60),
-            scrollToPosition: false,
-        });
-        await expect.element(card(screen, "mon-1")).toBeVisible();
-        expect(screen.getByRole("button").query()).toBeNull();
     });
 
     it("returns to the top when the list changes", async () => {
@@ -194,6 +107,6 @@ describe("PokemonList", () => {
         const screen = await setup({ pokemon: makeDex(4), className: "-mr-0" });
         const root = screen.container.querySelector(".flex-1") as HTMLElement;
         expect(root.classList.contains("-mr-0")).toBe(true);
-        expect(root.classList.contains("-mr-4")).toBe(false);
+        expect(root.classList.contains("-mr-5")).toBe(false);
     });
 });

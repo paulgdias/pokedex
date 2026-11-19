@@ -24,13 +24,13 @@ The evolution chain on a pokémon's detail page: compact cards in stages joined 
 
 ### Three Stage Line
 
-A linear three-stage line. Picking another stage goes to its page and remembers where you were.
+A linear three-stage line in one unlabelled lane. The current pokémon has the accent border; the stages run across from `md` up and stack vertically below it.
 
 <Canvas of={Stories.ThreeStageLine} />
 
 ### Other Forms
 
-A pokémon with Mega forms, shown in the dashed box.
+A pokémon with Mega forms, shown in the dashed box; the current form has the accent border.
 
 <Canvas of={Stories.OtherForms} />
 
@@ -51,9 +51,3 @@ The standard lane followed by one lane per regional variant.
 A pokémon with a single form: the section is not rendered.
 
 <Canvas of={Stories.NoEvolutions} />
-
-### Explicit Previous
-
-`previous` overrides the location that back navigation returns to.
-
-<Canvas of={Stories.ExplicitPrevious} />

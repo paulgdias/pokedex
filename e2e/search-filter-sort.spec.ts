@@ -1,14 +1,16 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 import { mockPokeApi } from "./mocks";
 
+// the filter, sort and suggestion rules are covered by the utils/search and
+// utils/sort tests, and the controls' callbacks by the SearchBar tests; these
+// check the page wires them to the URL and the list
 test.beforeEach(async ({ page }) => {
     await mockPokeApi(page);
 });
 
-const shown = (page: import("@playwright/test").Page) =>
-    page.getByText(/\d+ shown/);
-const firstCard = (page: import("@playwright/test").Page) =>
+const shown = (page: Page) => page.getByText(/\d+ shown/);
+const firstCard = (page: Page) =>
     page.getByRole("link", { name: /^Navigate to / }).first();
 
 test("search filters immediately and writes q to the URL after the debounce", async ({
@@ -26,44 +28,18 @@ test("search filters immediately and writes q to the URL after the debounce", as
     await expect(page).not.toHaveURL(/q=/);
 });
 
-test("the type filter narrows the list and writes type to the URL", async ({
+test("search suggestions come from the whole dex, not the filtered list", async ({
     page,
 }) => {
-    await page.goto("/pokedex");
-    await page.getByRole("button", { name: /^Type/ }).click();
-    const dialog = page.getByRole("dialog", { name: "Filter by type" });
-    await dialog.getByRole("button", { name: "Fire" }).click();
-    await page.keyboard.press("Escape");
-
-    // charmander, charmeleon, charizard, cyndaquil
+    await page.goto("/pokedex?type=fire");
     await expect(shown(page)).toContainText("4 shown");
-    await expect(page).toHaveURL(/type=fire/);
+
+    // pikachu is not a fire type, but a name search still finds it
+    await page.getByRole("combobox", { name: "Search Pokémon" }).fill("pika");
+    await expect(page.getByRole("option", { name: /pikachu/ })).toBeVisible();
 });
 
-test("the category toggle shows legendary and mythical pokémon", async ({
-    page,
-}) => {
-    await page.goto("/pokedex");
-    const category = page.getByLabel("Category");
-
-    await category.getByText("Legendary").click();
-    await expect(shown(page)).toContainText("2 shown");
-    await expect(page).toHaveURL(/only=legendary/);
-
-    await category.getByText("Mythical").click();
-    await expect(shown(page)).toContainText("1 shown");
-    await expect(page).toHaveURL(/only=mythical/);
-});
-
-test("the generation sidebar filters by generation", async ({ page }) => {
-    await page.goto("/pokedex");
-    await page.getByRole("link", { name: /Johto/ }).click();
-    // chikorita, cyndaquil, totodile, tyranitar
-    await expect(shown(page)).toContainText("4 shown");
-    await expect(page).toHaveURL(/gen=2/);
-});
-
-test("the heading names the region and counts the pokémon shown", async ({
+test("the sidebar and the type filter narrow the list, the heading and the URL", async ({
     page,
 }) => {
     await page.goto("/pokedex");
@@ -72,18 +48,23 @@ test("the heading names the region and counts the pokémon shown", async ({
     await expect(page.getByText("National Dex · 22 Pokémon")).toBeVisible();
 
     await page.getByRole("link", { name: /Johto/ }).click();
+    await expect(page).toHaveURL(/gen=2/);
     await expect(heading).toHaveText("Johto");
+    // chikorita, cyndaquil, totodile, tyranitar
     await expect(page.getByText("Generation II · 4 Pokémon")).toBeVisible();
 
-    // the count follows the filters, not just the generation
     await page.getByRole("button", { name: /^Type/ }).click();
     await page
         .getByRole("dialog", { name: "Filter by type" })
         .getByRole("button", { name: "Fire" })
         .click();
     await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/type=fire/);
+    await expect(page).toHaveURL(/gen=2/);
+    // the count follows every filter, not just the generation: cyndaquil
     await expect(heading).toHaveText("Johto");
     await expect(page.getByText("Generation II · 1 Pokémon")).toBeVisible();
+    await expect(shown(page)).toContainText("1 shown");
 });
 
 test("sorting reorders the list and writes sort to the URL", async ({
@@ -114,11 +95,4 @@ test("filter chips can be removed one by one or all at once", async ({
     await expect(page).not.toHaveURL(/type=/);
     await expect(page).not.toHaveURL(/only=/);
     await expect(shown(page)).toContainText("22 shown");
-});
-
-test("a shared URL restores the search, filter and sort", async ({ page }) => {
-    await page.goto("/pokedex?type=grass&sort=name:desc");
-    // treecko, chikorita, venusaur, ivysaur, bulbasaur
-    await expect(shown(page)).toContainText("5 shown");
-    await expect(firstCard(page)).toHaveAccessibleName("Navigate to venusaur");
 });

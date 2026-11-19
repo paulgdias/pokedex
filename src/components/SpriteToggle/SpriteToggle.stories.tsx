@@ -35,31 +35,30 @@ export const SwitchesView: Story = {
             />
         );
     },
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const artwork = canvas.getByRole("radio", { name: "Artwork" });
         const inGame = canvas.getByRole("radio", { name: "In-Game" });
         await expect(artwork).toBeChecked();
 
+        // the highlight follows the choice; onChange is unit-tested
         await userEvent.click(inGame);
-        await expect(args.onChange).toHaveBeenLastCalledWith("in-game");
         await expect(inGame).toBeChecked();
         await expect(artwork).not.toBeChecked();
-
-        await userEvent.click(artwork);
-        await expect(args.onChange).toHaveBeenLastCalledWith("artwork");
+        await expect(getComputedStyle(inGame).backgroundColor).not.toBe(
+            getComputedStyle(artwork).backgroundColor
+        );
     },
 };
 
 export const InGameUnavailable: Story = {
     args: { isInGameAvailable: false },
-    play: async ({ args, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         const inGame = within(canvasElement).getByRole("radio", {
             name: "In-Game",
         });
+        // dimmed and unavailable; that it ignores presses is unit-tested
         await expect(inGame).toBeDisabled();
-
-        await userEvent.click(inGame);
-        await expect(args.onChange).not.toHaveBeenCalled();
+        await expect(getComputedStyle(inGame).opacity).toBe("0.5");
     },
 };

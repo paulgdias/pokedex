@@ -33,6 +33,11 @@ export const Default: Story = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const pidgey = canvas.getByRole("region", { name: "pidgey matchups" });
+        // each member shows its sprite and its own type pills
+        const sprite = pidgey.querySelector("img");
+        await expect(sprite).toBeVisible();
+        await expect(sprite).toHaveAttribute("alt", "");
+        await expect(within(pidgey).getByText("flying")).toBeVisible();
         // flying makes pidgey immune to ground
         await expect(within(pidgey).getByText("0×")).toBeVisible();
         // the fixture chart never mentions dragon
