@@ -61,6 +61,10 @@ Project-wide context is in the root `CLAUDE.md`. Import via `@utils/...` (each u
 **Two data shapes**
 - GraphQL `Pokemon` uses `id` and `specs.*`; app `PokemonDetails` uses a flat `id`, `generationId`, etc. Convert at the loader boundary with `pokemon.ts`; don't leak the GraphQL shape into components.
 
+## Testing utils
+
+- A util's test is the single owner of its rules. Use fixtures where each branch matters (for example a primary-type-only fixture so a sort tie-break can fail), and do not assert constants or `Record`-typed key coverage that the type checker already guarantees. Do not test states the loader cannot produce.
+
 ## Adding a filter or sort key
 
 - **Sort key**: add it to `SORT_KEYS` (`src/types/SortingTypes.ts`), add a comparator in `sort.ts` (it must return the natural `asc` order), and add an entry to `SORT_OPTIONS` in `src/components/SearchBar/index.tsx`.

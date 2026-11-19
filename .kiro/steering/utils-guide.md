@@ -74,3 +74,7 @@ Each util is a folder: `name/index.ts(x)` with `name/name.test.ts(x)` beside it.
 **Sort key**: add to `SORT_KEYS` in `src/types/SortingTypes.ts`, add a comparator in `sort/` (must return natural `asc` order), add an entry to `SORT_OPTIONS` in `src/components/SearchBar/index.tsx`.
 
 **Filter**: extend `PokedexFilters` and `EMPTY_FILTERS`, then update `getFiltersFromURLParams`, `withFilters`, and `applyFilters` in `search/`, and surface it in `SearchBar` / `FilterChips`. Keep URL param parsing tolerant (invalid → default).
+
+## Testing utils
+
+A util's test is the single owner of its rules. Use fixtures where each branch matters, do not assert constants the type checker already guarantees, and do not test states the loader cannot produce. See "Writing tests" in `testing-standards.md`.
