@@ -14,11 +14,9 @@ export const CARD_HEIGHT = 268;
 export const getPokemonGridProps = ({
     width,
     pokemon = [],
-    isPlaceholder = false,
 }: {
     width: number;
     pokemon?: PokemonDetails[];
-    isPlaceholder?: boolean;
 }) => {
     const gridGap = GRID_GAP;
     const columnCount =
@@ -26,7 +24,7 @@ export const getPokemonGridProps = ({
         1;
     const columnWidth = width / columnCount;
     const rowHeight = CARD_HEIGHT + gridGap;
-    const itemCount = isPlaceholder ? 36 : pokemon.length;
+    const itemCount = pokemon.length;
     const rowCount = Math.ceil(itemCount / columnCount);
     const overscanRowCount = 2;
 

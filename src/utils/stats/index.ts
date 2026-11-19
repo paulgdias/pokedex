@@ -21,10 +21,7 @@ export const formatName = (name: string) =>
 
 /** PokeAPI flavor text is hard-wrapped with newlines and form feeds. */
 export const formatFlavorText = (text: string) =>
-    text
-        .replace(/[\n\f]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+    text.replace(/\s+/g, " ").trim();
 
 /** Height comes in decimetres, weight in hectograms. */
 export const formatHeight = (decimetres: number) => {

@@ -13,7 +13,6 @@ The card grid: a virtualized `react-virtualized` `Grid` inside an `AutoSizer`. C
 - Only cards near the viewport are mounted.
 - Scrolls back to the top whenever `pokemon` changes.
 - `scrollToPosition` (default on) shows a `ScrollTopButton` that scrolls the grid to the top; pass `false` to leave it out.
-- `isLoading` renders `PlaceholderCard`s instead of `pokemon`.
 - Clicking a card navigates to its page and passes `previous` in router state, so back navigation returns to the same filters.
 
 ## Props
@@ -27,12 +26,6 @@ The card grid: a virtualized `react-virtualized` `Grid` inside an `AutoSizer`. C
 A 60-pokémon dex: only what is near the viewport is mounted.
 
 <Canvas of={Stories.VirtualizedGrid} />
-
-### Loading
-
-Placeholder cards while loading.
-
-<Canvas of={Stories.Loading} />
 
 ### Empty
 

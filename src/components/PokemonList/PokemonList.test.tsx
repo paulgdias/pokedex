@@ -38,7 +38,7 @@ const columns = (screen: Screen) => {
     return rows.filter((r) => r.getBoundingClientRect().top === top).length;
 };
 
-// virtualizing, scrolling to the top, the empty and loading states and the
+// virtualizing, scrolling to the top, the empty state and the
 // scroll button switch are covered by the stories; Enter is PokemonCard's
 describe("PokemonList", () => {
     it("flags legendary and mythical pokémon on their cards", async () => {

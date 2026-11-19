@@ -5,7 +5,6 @@ import { twMerge } from "tailwind-merge";
 
 import ScrollTopButton from "@components/Buttons/ScrollTopButton";
 import PokemonCard from "@components/PokemonCard";
-import PlaceholderCard from "@components/PokemonCard/PlaceholderCard";
 import { PokemonDetails } from "@customTypes/PokemonTypes";
 import { useNavigateToPokemon } from "@utils/useNavigateToPokemon";
 
@@ -17,13 +16,11 @@ const PokemonList = ({
     className,
     scrollToPosition = true,
     pokemon,
-    isLoading = false,
     previous,
 }: {
     className?: string;
     scrollToPosition?: boolean;
     pokemon: PokemonDetails[];
-    isLoading?: boolean;
     previous?: string;
 }) => {
     const grid = useRef<Grid | null>(null);
@@ -38,7 +35,7 @@ const PokemonList = ({
         }
     }, [grid, pokemon]);
 
-    if (!isLoading && pokemon.length === 0) {
+    if (pokemon.length === 0) {
         return null;
     }
 
@@ -51,7 +48,6 @@ const PokemonList = ({
                         columnCount,
                         columnWidth,
                         rowHeight,
-                        itemCount,
                         rowCount,
                         gridGap,
                         overscanRowCount,
@@ -84,12 +80,6 @@ const PokemonList = ({
                                     </div>
                                 );
 
-                                if (isLoading) {
-                                    return renderCell(
-                                        <PlaceholderCard style={cellStyle} />
-                                    );
-                                }
-
                                 const index =
                                     columnIndex + rowIndex * columnCount;
 
@@ -114,11 +104,7 @@ const PokemonList = ({
                             height={height}
                             rowHeight={rowHeight}
                             rowCount={rowCount}
-                            columnCount={
-                                itemCount < columnCount
-                                    ? itemCount
-                                    : columnCount
-                            }
+                            columnCount={columnCount}
                             width={width}
                             columnWidth={columnWidth}
                             aria-label="Pokémon"
