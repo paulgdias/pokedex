@@ -73,8 +73,7 @@ const Party: React.FC = () => {
     const removeThreat = (type: string) => {
         writeParam(
             THREATS_PARAM,
-            serializeThreats(threats.filter((threat) => threat !== type)) ||
-                null
+            serializeThreats(threats.filter((threat) => threat !== type))
         );
     };
 
