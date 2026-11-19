@@ -163,20 +163,32 @@ describe("EvolutionChain other forms", () => {
         );
     });
 
-    it("falls back to the whole form name when it does not extend the base name", async () => {
-        const odd = chain([
-            makePokemon({ id: 25, name: "pikachu" }),
+    // the Rapid Strike form's Gigantamax does not extend the default
+    // (Single Strike) name: only the shared words name the pokémon
+    it("names a form of another variant by the words it does not share", async () => {
+        const urshifu = chain([
+            makePokemon({ id: 892, name: "urshifu-single-strike" }),
             makePokemon({
-                id: 10080,
-                name: "gmax-pika",
-                speciesId: 25,
+                id: 10226,
+                name: "urshifu-single-strike-gmax",
+                speciesId: 892,
+                isDefault: false,
+                form: "gmax",
+            }),
+            makePokemon({
+                id: 10227,
+                name: "urshifu-rapid-strike-gmax",
+                speciesId: 892,
                 isDefault: false,
                 form: "gmax",
             }),
         ]);
-        const screen = await setup(odd[0]);
+        const screen = await setup(urshifu[0]);
         await expect
-            .element(screen.getByText("Gmax-pika Pikachu"))
+            .element(screen.getByText("Gigantamax Urshifu Single Strike"))
+            .toBeVisible();
+        await expect
+            .element(screen.getByText("Gigantamax Urshifu Rapid Strike"))
             .toBeVisible();
     });
 });

@@ -23,14 +23,25 @@ const FORM_LABELS: Record<string, string> = {
 const capitalize = (word: string) =>
     word.charAt(0).toUpperCase() + word.slice(1);
 
-/** "charizard-mega-x" -> "Mega Charizard X" */
-const formatFormName = (form: PokemonDetails, base: PokemonDetails) => {
-    const suffix = form.name.startsWith(`${base.name}-`)
-        ? form.name.slice(base.name.length + 1).split("-")
-        : [form.name];
-    const [first, ...rest] = suffix;
-    const prefix = first === "gmax" ? "Gigantamax" : capitalize(first);
-    return [prefix, capitalize(base.name), ...rest.map(capitalize)].join(" ");
+const FORM_KINDS: Record<string, string> = {
+    mega: "Mega",
+    gmax: "Gigantamax",
+};
+
+/**
+ * "charizard-mega-x" -> "Mega Charizard X": the kind of form first, then the
+ * rest of the name. Works for a form of another variant too:
+ * "urshifu-rapid-strike-gmax" -> "Gigantamax Urshifu Rapid Strike".
+ */
+const formatFormName = (form: PokemonDetails) => {
+    const parts = form.name.split("-");
+    const kind = parts.find((part) => part in FORM_KINDS);
+    return [
+        ...(kind ? [FORM_KINDS[kind]] : []),
+        ...parts.filter((part) => part !== kind),
+    ]
+        .map(capitalize)
+        .join(" ");
 };
 
 const Thumbnail = ({
@@ -160,7 +171,7 @@ const OtherForms = ({
                     <Thumbnail pokemon={form} className="size-12 rounded-lg" />
                     <span className="flex min-w-0 flex-col">
                         <span className="truncate text-sm font-bold">
-                            {formatFormName(form, step.pokemon)}
+                            {formatFormName(form)}
                         </span>
                         <span className="text-xs text-muted">
                             {FORM_LABELS[form.form ?? ""]}
