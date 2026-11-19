@@ -88,9 +88,9 @@ describe("SpriteToggle", () => {
         await expect
             .element(screen.getByRole("radio", { name: "In-Game" }))
             .toBeDisabled();
-        await expect
-            .element(screen.getByRole("radio", { name: "Artwork" }))
-            .toBeEnabled();
+        await screen
+            .getByRole("radio", { name: "In-Game" })
+            .click({ force: true });
         expect(onChange).not.toHaveBeenCalled();
     });
 });

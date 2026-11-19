@@ -35,14 +35,13 @@ export const ChoosesTheme: Story = {
         const light = canvas.getByRole("radio", { name: "Light theme" });
         await expect(system).toBeChecked();
 
+        // the page switches with the selection
         await userEvent.click(dark);
         await expect(dark).toBeChecked();
-        await expect(localStorage.getItem("theme")).toBe("dark");
         await expect(document.documentElement.dataset.theme).toBe("dark");
 
         await userEvent.click(light);
         await expect(light).toBeChecked();
-        await expect(localStorage.getItem("theme")).toBe("light");
         await expect(document.documentElement.dataset.theme).toBe("light");
     },
 };

@@ -1,70 +1,38 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
 
 import ThemeToggle from ".";
 
-const radio = (screen: Awaited<ReturnType<typeof render>>, name: string) =>
-    screen.getByRole("radio", { name });
-
+// resolving, storing and blocked storage are useTheme's (useTheme.test.tsx);
+// the selection a viewer sees is covered by the stories
 describe("ThemeToggle", () => {
     beforeEach(() => {
         localStorage.clear();
         document.documentElement.dataset.theme = "light";
     });
-    afterEach(() => {
-        vi.restoreAllMocks();
-        localStorage.clear();
-    });
+    afterEach(() => localStorage.clear());
 
-    it("starts on the system preference when nothing is saved", async () => {
-        const screen = await render(<ThemeToggle />);
-        await expect.element(radio(screen, "System theme")).toBeChecked();
-    });
-
-    it("saves the choice and applies it to the document", async () => {
+    it.each([
+        ["Light theme", "light", "dark"],
+        ["System theme", "system", "light"],
+        ["Dark theme", "dark", "light"],
+    ])("%s sets the %s preference", async (name, preference, before) => {
+        localStorage.setItem("theme", before);
         const screen = await render(<ThemeToggle />);
 
-        await radio(screen, "Dark theme").click();
+        await screen.getByRole("radio", { name }).click();
 
+        expect(localStorage.getItem("theme")).toBe(preference);
+    });
+
+    it("keeps the choice when the selected option is pressed again", async () => {
+        const screen = await render(<ThemeToggle />);
+        const dark = screen.getByRole("radio", { name: "Dark theme" });
+
+        await dark.click();
+        await dark.click();
+
+        await expect.element(dark).toBeChecked();
         expect(localStorage.getItem("theme")).toBe("dark");
-        expect(document.documentElement.dataset.theme).toBe("dark");
-        await expect.element(radio(screen, "Dark theme")).toBeChecked();
-    });
-
-    it("resolves the system option from prefers-color-scheme", async () => {
-        vi.spyOn(window, "matchMedia").mockImplementation(
-            (query) =>
-                ({
-                    matches: query.includes("dark"),
-                    addEventListener: vi.fn(),
-                    removeEventListener: vi.fn(),
-                }) as unknown as MediaQueryList
-        );
-        const screen = await render(<ThemeToggle />);
-
-        await radio(screen, "Light theme").click();
-        expect(document.documentElement.dataset.theme).toBe("light");
-
-        await radio(screen, "System theme").click();
-        expect(localStorage.getItem("theme")).toBe("system");
-        expect(document.documentElement.dataset.theme).toBe("dark");
-    });
-
-    it("ignores an invalid saved value", async () => {
-        localStorage.setItem("theme", "sepia");
-        const screen = await render(<ThemeToggle />);
-        await expect.element(radio(screen, "System theme")).toBeChecked();
-    });
-
-    it("still applies the choice when storage is blocked", async () => {
-        vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
-            throw new Error("blocked");
-        });
-        const screen = await render(<ThemeToggle />);
-
-        await radio(screen, "Dark theme").click();
-
-        expect(localStorage.getItem("theme")).toBeNull();
-        expect(document.documentElement.dataset.theme).toBe("light");
     });
 });
