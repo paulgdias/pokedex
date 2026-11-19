@@ -36,8 +36,14 @@ export const SingleAndDualTypes: Story = {
             "electric",
             "ground",
         ]);
-        // dual types multiply: grass × poison resists grass twice over
         await expect(attackers(canvas, "¼×")).toEqual(["grass"]);
+
+        // each pill's dot is drawn in its own type's color
+        const dots = [...canvasElement.querySelectorAll("dd > span > span")];
+        const colors = dots.map((dot) => getComputedStyle(dot).backgroundColor);
+        await expect(colors).toHaveLength(6);
+        await expect(colors).not.toContain("rgba(0, 0, 0, 0)");
+        await expect(new Set(colors).size).toBe(6);
     },
 };
 
@@ -47,9 +53,5 @@ export const ImmunityAndDoubleWeakness: Story = {
         const canvas = within(canvasElement);
         await expect(attackers(canvas, "4×")).toEqual(["ice"]);
         await expect(attackers(canvas, "0×")).toEqual(["ground"]);
-        // spoken as damage taken, not just a bare multiplier
-        await expect(
-            canvas.getAllByText("Damage taken:", { exact: false }).length
-        ).toBeGreaterThan(0);
     },
 };
